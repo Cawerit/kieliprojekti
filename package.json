@@ -1,0 +1,14 @@
+{
+  "name": "kieliprojekti",
+  "version": "0.0.1",
+  "description": "Yolo",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Oskari Noppa, Aleksi Kyllönen, Villeveikko Sula",
+  "license": "ISC",
+  "dependencies": {
+    "yargs": "^7.0.2"
+  }
+}
