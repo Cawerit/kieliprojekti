@@ -4,11 +4,14 @@
   "description": "Yolo",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest ; exit 0;"
   },
   "author": "Oskari Noppa, Aleksi Kyllönen, Villeveikko Sula",
   "license": "ISC",
   "dependencies": {
     "yargs": "^7.0.2"
+  },
+  "devDependencies": {
+    "jest": "^19.0.2"
   }
 }
