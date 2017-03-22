@@ -7,5 +7,5 @@ module.exports = {
   VALI: 'Vali',
   SYMBOLI: 'Symboli',
   TEKSTI: 'Teksti',
-  YHTASUURUUS: 'Yhtasuuruus'
+  ASETUS: 'Asetus'
 };

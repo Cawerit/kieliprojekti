@@ -3,44 +3,68 @@ var parseriTyypit = require('./parserityypit.js'),
 
 const eiOoVali = token => token.tyyppi !== tokenTyypit.VALI;
     
-function parse(tokenit, indeksi, ast) { // ast = abstract syntax tree
-    let solu = tokenit[indeksi];
+function parse(tokenit) {
+    let indeksi = 0;
     
-    if (solu.arvo === ')') {
-        return ast;
-    }
+    return parseRekursiivinen();
     
-    if (solu.tyyppi === tokenTyypit.SYMBOLI) {
-        const seuraavaIndeksi = seuraavaMerkitseva(tokenit, indeksi, eiOoVali);
+    function parseRekursiivinen() {
+        let ast = [];
+        let solu = tokenit[indeksi];
         
-        if (seuraavaIndeksi === -1) {
+        if (solu.arvo === ')') {
+            indeksi++;
             return ast;
         }
         
-        const seuraava = tokenit[seuraavaIndeksi];
-        const seuraavaSeuraava = seuraavaMerkitseva(tokenit, seuraavaIndeksi, eiOoVali);
-        
-        if (seuraava.arvo === '(') {
-            ast.push({
-              tyyppi: parseriTyypit.FUNKTIOKUTSU,
-              arvo: solu.arvo,
-              argumentit: parse(tokenit, seuraavaSeuraava, [])
-            });
-        } else {
-            ast.push({
-               tyyppi: parseriTyypit.MUUTTUJA,
-               arvo: solu.arvo,
-            });
+        if (solu.tyyppi === tokenTyypit.SYMBOLI) {
+            const seuraavaIndeksi = seuraavaMerkitseva(tokenit, indeksi, eiOoVali);
             
-            if (seuraava.tyyppi === tokenTyypit.PILKKU) {
-                ast = ast.concat(parse(tokenit, seuraavaSeuraava, []));
-            } else if (seuraava.arvo === ')') {
+            if (seuraavaIndeksi === -1) {
                 return ast;
             }
+            
+            let seuraava = tokenit[seuraavaIndeksi];
+            
+            if (seuraava.arvo === '(') {
+                
+                indeksi = seuraavaMerkitseva(tokenit, seuraavaIndeksi, eiOoVali);
+                
+                const tulos = {
+                  arvo: solu.arvo,
+                  argumentit: parseRekursiivinen()
+                };
+                
+                const seuraavaSeuraava = seuraavaMerkitseva(tokenit, indeksi, eiOoVali);
+                
+                if (tokenit[seuraavaSeuraava] && tokenit[seuraavaSeuraava].tyyppi === tokenTyypit.ASETUS) {
+                    tulos.tyyppi = parseriTyypit.FUNKTIOLUONTI;
+                } else {
+                    tulos.tyyppi = parseriTyypit.FUNKTIOKUTSU;
+                }
+                
+                ast.push(tulos);
+                
+            } else {
+                ast.push({
+                   tyyppi: parseriTyypit.MUUTTUJA,
+                   arvo: solu.arvo,
+                   
+                });
+                
+                if (seuraava.tyyppi === tokenTyypit.PILKKU) {
+                    
+                    indeksi = seuraavaMerkitseva(tokenit, seuraavaIndeksi, eiOoVali);
+                    ast = ast.concat(parseRekursiivinen());
+                    
+                } else {
+                    indeksi++;
+                }
+            }
         }
+        
+        return ast;
     }
-    
-    return ast;
 }
 
 
@@ -58,7 +82,7 @@ module.exports.parse = function(tokenit) {
     return [
       {
           tyyppi: parseriTyypit.OHJELMA,
-          arvo: parse(tokenit, 0, [])
+          arvo: parse(tokenit)
       }  
     ];
 };

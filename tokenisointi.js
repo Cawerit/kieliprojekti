@@ -79,7 +79,7 @@ module.exports.tokenisoi = function(tiedosto) {
       
       if (merkki === '=') {
           tokenit.push({
-             tyyppi: tokenTyypit.YHTASUURUUS,
+             tyyppi: tokenTyypit.ASETUS,
              arvo: merkki
           });
           indeksi++;

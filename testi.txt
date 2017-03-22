@@ -1,10 +1,13 @@
+woopwoop { arvo: 'summaa',
+  argumentit: 
+   [ { tyyppi: 'Muuttuja', arvo: 'a' },
+     { tyyppi: 'Muuttuja', arvo: 'b' } ] } 9 { tyyppi: 'Asetus', arvo: '=' }
 [
   {
     "tyyppi": "Ohjelma",
     "arvo": [
       {
-        "tyyppi": "Funktiokutsu",
-        "arvo": "foobar",
+        "arvo": "summaa",
         "argumentit": [
           {
             "tyyppi": "Muuttuja",
@@ -14,7 +17,8 @@
             "tyyppi": "Muuttuja",
             "arvo": "b"
           }
-        ]
+        ],
+        "tyyppi": "Funktioluonti"
       }
     ]
   }
