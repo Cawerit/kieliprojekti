@@ -6,7 +6,7 @@ module.exports.tokenisoi = function(tiedosto) {
   let indeksi = 0;
   const tokenit = [];
 
-  const numero = /[0-9]/;
+  const numero = /[0-9]|\./;
   const tyhja = /\s/;
   
   while (indeksi < tiedosto.length) {
@@ -26,6 +26,10 @@ module.exports.tokenisoi = function(tiedosto) {
           let edellinen = tokenit[tokenit.length - 1];
           
           if (edellinen && edellinen.tyyppi === tokenTyypit.NUMERO) {
+              if (merkki === '.' && edellinen.arvo.includes('.')) {
+                throw new Error(virheet.PISTEVIRHE);
+              }
+              
               edellinen.arvo += merkki;
           } else {
               tokenit.push({

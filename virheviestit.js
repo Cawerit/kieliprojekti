@@ -1,4 +1,5 @@
 
 module.exports = {
-  LAINAUS_PUUTTUU: 'Lainaus puuttuu!!'    
+  LAINAUS_PUUTTUU: 'Lainaus puuttuu!!',
+  PISTEVIRHE: 'Pistevirhe!!'
 }

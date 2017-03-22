@@ -1,0 +1,21 @@
+[
+  {
+    "tyyppi": "Ohjelma",
+    "arvo": [
+      {
+        "tyyppi": "Funktiokutsu",
+        "arvo": "foobar",
+        "argumentit": [
+          {
+            "tyyppi": "Muuttuja",
+            "arvo": "a"
+          },
+          {
+            "tyyppi": "Muuttuja",
+            "arvo": "b"
+          }
+        ]
+      }
+    ]
+  }
+]

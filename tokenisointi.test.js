@@ -19,3 +19,8 @@ test('heittää virheen jos tekstinpätkää ei ole lopetettu', () => {
    const suoritus = () => tokenisoi(' "fail ');
    expect(suoritus).toThrow();
 });
+
+test('heittää virheen jos luvussa on kaksi pistettä', () => {
+    const suoritus = () => tokenisoi('42.3.5');
+    expect(suoritus).toThrow();
+});
