@@ -4,5 +4,6 @@ module.exports = {
   FUNKTIOKUTSU: 'Funktiokutsu',
   FUNKTIOLUONTI: 'Funktioluonti',
   MUUTTUJA: 'Muuttuja',
-  BLOKKI: 'Blokki'
+  BLOKKI: 'Blokki',
+  ILMAISULISTA: 'Ilmaisulista'
 };

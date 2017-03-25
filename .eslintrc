@@ -1,9 +1,14 @@
 {
+    "extends": "eslint:recommended",
     "env": {
+        "es6": true,
         "node": true
     },
     "globals": {
         "expect": false,
         "test": false
+    },
+    "rules": {
+        "no-console": 0
     }
 }
