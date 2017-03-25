@@ -1,2 +1,1 @@
-summaa (a, b) =
-    a + b
+summaa (a, b) = a + b

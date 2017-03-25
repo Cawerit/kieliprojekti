@@ -24,3 +24,17 @@ test('heittää virheen jos luvussa on kaksi pistettä', () => {
     const suoritus = () => tokenisoi('42.3.5');
     expect(suoritus).toThrow();
 });
+
+test('käsittelee peräkkäiset rivinvaihdot oikein', () => {
+   const koodi =
+`testi
+
+
+testi`;
+
+   expect(tokenisoi(koodi)).toEqual([
+      { tyyppi: 'Symboli', arvo: 'testi' },
+      { tyyppi: 'Rivinvaihto', arvo: '\n'.repeat(3) },
+      { tyyppi: 'Symboli', arvo: 'testi' }
+   ]);
+});

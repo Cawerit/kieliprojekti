@@ -8,6 +8,7 @@ module.exports.tokenisoi = function(tiedosto) {
 
   const numero = /[0-9]|\./;
   const tyhja = /\s/;
+  const rivinvaihto = /\n/;
   
   while (indeksi < tiedosto.length) {
       let merkki = tiedosto[indeksi];
@@ -43,12 +44,43 @@ module.exports.tokenisoi = function(tiedosto) {
       }
       
       if (tyhja.test(merkki)) {
+        if (rivinvaihto.test(merkki)) {
+          let tyhjaTila = '';
+          
+          while(indeksi < tiedosto.length && rivinvaihto.test(merkki)) {
+            let seuraavaRivinVaihto = tiedosto.indexOf('\n', indeksi + 1);
+            if (seuraavaRivinVaihto === -1) {
+              seuraavaRivinVaihto = tiedosto.length - 1;
+            }
+            
+            const rivi = tiedosto.substring(indeksi, seuraavaRivinVaihto);
+            
+            if (rivi.trim().length === 0) {
+              tyhjaTila += rivi;
+              indeksi = seuraavaRivinVaihto;
+            } else {
+              tyhjaTila += merkki;
+              indeksi++;
+            }
+            
+            merkki = tiedosto[indeksi];
+          }
+          
+          tokenit.push({
+            arvo: tyhjaTila,
+            tyyppi: tokenTyypit.RIVINVAIHTO
+          });
+          
+        } else {
+          
           tokenit.push({
               tyyppi: tokenTyypit.VALI,
               arvo: merkki
           });
-          
-        indeksi++;
+          indeksi++;
+        
+        }
+        
         continue;
       }
       

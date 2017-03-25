@@ -1,11 +1,380 @@
-woopwoop { arvo: 'summaa',
-  argumentit: 
-   [ { tyyppi: 'Muuttuja', arvo: 'a' },
-     { tyyppi: 'Muuttuja', arvo: 'b' } ] } 9 { tyyppi: 'Asetus', arvo: '=' }
+parse rekursiivinen alkaa 0 { tyyppi: 'Symboli', arvo: 'summaa' }
+funktio argumentit alkaa 3
+parse rekursiivinen alkaa 3 { tyyppi: 'Symboli', arvo: 'a' }
+muuttuja { tyyppi: 'Symboli', arvo: 'a' }
+parse rekursiivinen alkaa 6 { tyyppi: 'Symboli', arvo: 'b' }
+muuttuja { tyyppi: 'Symboli', arvo: 'b' }
+b jalkeennn 7 [ { tyyppi: 'Muuttuja', arvo: 'b' } ]
+parse rekursiivinen alkaa 7 { tyyppi: 'Sulku', arvo: ')' }
+sulkukiiniiiiii
+{ tyyppi: 'Vali', arvo: ' ' }
+seuraava []
+parse rekursiivinen alkaa 8 { tyyppi: 'Vali', arvo: ' ' }
+väli 8 16
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+seuraava Error: failfail
+    at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:22:20)
+    at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+    at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+    at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+    at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+    at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+    at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+    at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+    at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+    at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+seuraava [ Error: failfail
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:22:20)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:106:65)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33) ]
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+seuraava [ Error: failfail
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:22:20)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:106:65)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33) ]
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+seuraava [ Error: failfail
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:22:20)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:106:65)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33) ]
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+seuraava [ Error: failfail
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:22:20)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:106:65)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33) ]
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+seuraava [ Error: failfail
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:22:20)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:106:65)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33) ]
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+seuraava [ Error: failfail
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:22:20)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:106:65)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33) ]
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+seuraava [ Error: failfail
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:22:20)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:106:65)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33) ]
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+seuraava [ Error: failfail
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:22:20)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:106:65)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33) ]
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+seuraava [ Error: failfail
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:22:20)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:106:65)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33) ]
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+seuraava [ Error: failfail
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:22:20)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:106:65)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33) ]
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+seuraava [ Error: failfail
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:22:20)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:106:65)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33) ]
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+seuraava [ Error: failfail
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:22:20)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:106:65)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33) ]
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+seuraava [ Error: failfail
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:22:20)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:106:65)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33) ]
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+seuraava [ Error: failfail
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:22:20)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:106:65)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33) ]
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+seuraava [ Error: failfail
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:22:20)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:106:65)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33) ]
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+seuraava [ Error: failfail
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:22:20)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:106:65)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33) ]
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+seuraava [ Error: failfail
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:22:20)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:106:65)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33) ]
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+seuraava [ Error: failfail
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:22:20)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:106:65)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33) ]
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+seuraava [ Error: failfail
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:22:20)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:106:65)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:106:65) ]
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+seuraava [ Error: failfail
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:22:20)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:106:65)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:106:65)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:82:38) ]
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+seuraava [ Error: failfail
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:22:20)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:106:65)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:106:65)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:82:38)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:49:31) ]
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+seuraava [ Error: failfail
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:22:20)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:106:65)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:106:65)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:82:38)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:49:31)
+      at parse (/home/ubuntu/workspace/parseri.js:13:12) ]
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+seuraava [ Error: failfail
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:22:20)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:106:65)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:106:65)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:82:38)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:49:31)
+      at parse (/home/ubuntu/workspace/parseri.js:13:12)
+      at Object.module.exports.parse (/home/ubuntu/workspace/parseri.js:126:18) ]
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+seuraava [ Error: failfail
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:22:20)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:106:65)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:106:65)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:82:38)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:49:31)
+      at parse (/home/ubuntu/workspace/parseri.js:13:12)
+      at Object.module.exports.parse (/home/ubuntu/workspace/parseri.js:126:18)
+      at /home/ubuntu/workspace/index.js:16:29 ]
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+seuraava [ Error: failfail
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:22:20)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:106:65)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:106:65)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:82:38)
+      at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:49:31)
+      at parse (/home/ubuntu/workspace/parseri.js:13:12)
+      at Object.module.exports.parse (/home/ubuntu/workspace/parseri.js:126:18)
+      at /home/ubuntu/workspace/index.js:16:29
+      at tryToString (fs.js:448:3) ]
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+seuraava Error: failfail
+    at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:22:20)
+    at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+    at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:49:31)
+    at parse (/home/ubuntu/workspace/parseri.js:13:12)
+    at Object.module.exports.parse (/home/ubuntu/workspace/parseri.js:126:18)
+    at /home/ubuntu/workspace/index.js:16:29
+    at tryToString (fs.js:448:3)
+    at FSReqWrap.readFileAfterClose [as oncomplete] (fs.js:435:12)
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+funktio argumentit loppuu 9
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
+seuraava Error: failfail
+    at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:22:20)
+    at parseRekursiivinen (/home/ubuntu/workspace/parseri.js:103:33)
+    at parse (/home/ubuntu/workspace/parseri.js:13:12)
+    at Object.module.exports.parse (/home/ubuntu/workspace/parseri.js:126:18)
+    at /home/ubuntu/workspace/index.js:16:29
+    at tryToString (fs.js:448:3)
+    at FSReqWrap.readFileAfterClose [as oncomplete] (fs.js:435:12)
+parse rekursiivinen alkaa 9 { tyyppi: 'Asetus', arvo: '=' }
 [
   {
     "tyyppi": "Ohjelma",
-    "arvo": [
+    "runko": [
       {
         "arvo": "summaa",
         "argumentit": [
@@ -16,10 +385,13 @@ woopwoop { arvo: 'summaa',
           {
             "tyyppi": "Muuttuja",
             "arvo": "b"
-          }
+          },
+          {},
+          {}
         ],
-        "tyyppi": "Funktioluonti"
-      }
+        "tyyppi": "Funktiokutsu"
+      },
+      {}
     ]
   }
 ]
