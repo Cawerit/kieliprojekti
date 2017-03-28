@@ -3,6 +3,7 @@ var parseriTyypit = require('./parserityypit.js'),
     virheet = require('./virheviestit.js');
 
 function parse(tokenit) {
+    
     let indeksi = 0, token = tokenit[indeksi];
 
     const seuraava = () => token = tokenit[++indeksi];

@@ -2,7 +2,8 @@ var args = require('yargs').argv,
     path = require('path'),
     fs = require('fs'),
     tokenisointi = require('./tokenisointi.js'),
-    parseri = require('./parseri.js');
+    parseri = require('./parseri.js'),
+    muuntaja = require('./muunnos.js');
 
 
 if (args.f) {
@@ -14,7 +15,8 @@ if (args.f) {
         
         const tokenit = tokenisointi.tokenisoi(tiedosto);
         const ast = parseri.parse(tokenit);
+        const muunnettu = muuntaja.muunna(ast);
         
-        console.log(JSON.stringify(ast, null, 2));
+        console.log(JSON.stringify(muunnettu, null, 2));
     });
 }
