@@ -1,12 +1,12 @@
 
 
 module.exports = {
-  SULKU: 'Sulku',
-  NUMERO: 'Numero',
-  PILKKU: 'Pilkku',
-  VALI: 'Vali',
-  RIVINVAIHTO: 'Rivinvaihto',
-  SYMBOLI: 'Symboli',
-  TEKSTI: 'Teksti',
-  ASETUS: 'Asetus'
+  SULKU: Symbol('Sulku'),
+  NUMERO: Symbol('Numero'),
+  PILKKU: Symbol('Pilkku'),
+  VALI: Symbol('Vali'),
+  RIVINVAIHTO: Symbol('Rivinvaihto'),
+  SYMBOLI: Symbol('Symboli'),
+  TEKSTI: Symbol('Teksti'),
+  ASETUS: Symbol('Asetus')
 };

@@ -141,7 +141,7 @@ function parse(tokenit) {
           }
           
           seuraava();
-        } while (indeksi < tokenit.length && token && token.tyyppi !== parseriTyypit.PILKKU);
+        } while (indeksi < tokenit.length && token && token.tyyppi !== tokenTyypit.PILKKU);
         
         tulos.ilmaisut.push(ilmaisunOsat);
         seuraava();

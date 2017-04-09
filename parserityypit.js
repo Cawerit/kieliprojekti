@@ -1,12 +1,12 @@
 
 module.exports = {
-  OHJELMA: 'Ohjelma',
-  FUNKTIOKUTSU: 'Funktiokutsu',
-  FUNKTIOLUONTI: 'Funktioluonti',
-  MUUTTUJA: 'Muuttuja',
-  BLOKKI: 'Blokki',
-  ILMAISULISTA: 'Ilmaisulista',
-  PILKKU: 'Pilkku',
-  NUMERO: 'Numero',
-  TEKSTI: 'Teksi'
+  OHJELMA: Symbol('Ohjelma'),
+  FUNKTIOKUTSU: Symbol('Funktiokutsu'),
+  FUNKTIOLUONTI: Symbol('Funktioluonti'),
+  MUUTTUJA: Symbol('Muuttuja'),
+  BLOKKI: Symbol('Blokki'),
+  ILMAISULISTA: Symbol('Ilmaisulista'),
+  PILKKU: Symbol('Pilkku'),
+  NUMERO: Symbol('Numero'),
+  TEKSTI: Symbol('Teksi')
 };

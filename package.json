@@ -9,6 +9,7 @@
   "author": "Oskari Noppa, Aleksi Kyllönen, Villeveikko Sula",
   "license": "ISC",
   "dependencies": {
+    "lodash": "^4.17.4",
     "yargs": "^7.0.2"
   },
   "devDependencies": {
