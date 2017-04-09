@@ -6,5 +6,7 @@ module.exports = {
   MUUTTUJA: 'Muuttuja',
   BLOKKI: 'Blokki',
   ILMAISULISTA: 'Ilmaisulista',
-  PILKKU: 'Pilkku'
+  PILKKU: 'Pilkku',
+  NUMERO: 'Numero',
+  TEKSTI: 'Teksi'
 };

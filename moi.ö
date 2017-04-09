@@ -1,1 +1,1 @@
-testi (a, b) = teeJotain(blaa(1, 2))
+testi (a, b) = teeJotain(teeJotainMuuta(2) + 3)
