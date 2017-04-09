@@ -41,7 +41,11 @@ function muunna(ast) {
     return ast;
 }
 
-const onIlmaisu = solu => solu.tyyppi === tyypit.MUUTTUJA || solu.tyyppi === tyypit.FUNKTIOKUTSU;
+const onIlmaisu = solu => 
+    solu.tyyppi === tyypit.MUUTTUJA 
+    || solu.tyyppi === tyypit.FUNKTIOKUTSU 
+    || solu.tyyppi === tyypit.NUMERO
+    || solu.tyyppi === tyypit.TEKSTI;
 
 function onInfiksi(a, b, c) {
     return Boolean(a && b && c) && onIlmaisu(a) && b.tyyppi === tyypit.MUUTTUJA && onIlmaisu(c);

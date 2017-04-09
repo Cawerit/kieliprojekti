@@ -48,11 +48,22 @@ function parse(tokenit) {
       }
       
       if (token.tyyppi === tokenTyypit.PILKKU) {
-        return parseriTyypit.PILKKU;
+        tulos.tyyppi = parseriTyypit.PILKKU;
+        return tulos;
       }
 
       if (token.tyyppi === tokenTyypit.SYMBOLI) {
         tulos.tyyppi = parseriTyypit.MUUTTUJA;
+        return tulos;
+      }
+      
+      if (token.tyyppi === tokenTyypit.NUMERO) {
+        tulos.tyyppi = parseriTyypit.NUMERO;
+        return tulos;
+      }
+      
+      if (token.tyyppi === tokenTyypit.TEKSTI) {
+        tulos.tyyppi === parseriTyypit.TEKSTI;
         return tulos;
       }
 
@@ -100,6 +111,9 @@ function parse(tokenit) {
       }
     }
 
+    /**
+     * Käsittelee koodin sulkujen sisältä
+     */
     function parseArgumenttiTaiParametriLista() {
       if (token.arvo !== '(') {
         throw new Virhe(virheet.HUONO_LAUSEKELISTAN_ALOITUS);
@@ -111,20 +125,37 @@ function parse(tokenit) {
       };
 
       seuraava();
-      while(indeksi < tokenit.length && token && token.arvo !== ')') {
+      
+      ulompi:
+      while(indeksi < tokenit.length && token) {
         let ilmaisunOsat = [];
         do {
-          console.log('inception', ilmaisunOsat[ilmaisunOsat.length - 1], token);
+          if (token.arvo === ')') {
+            tulos.ilmaisut.push(ilmaisunOsat);
+            seuraava();
+            break ulompi;  
+          }
           let ilmaisunOsa = parseIlmaisu(ilmaisunOsat[ilmaisunOsat.length - 1]);
           if (ilmaisunOsa) {
             ilmaisunOsat.push(ilmaisunOsa);
           }
+          
           seuraava();
         } while (indeksi < tokenit.length && token && token.tyyppi !== parseriTyypit.PILKKU);
-        tulos.ilmaisut.push(ilmaisunOsat);
         
-        console.log('wooo', ilmaisunOsat);
+        tulos.ilmaisut.push(ilmaisunOsat);
         seuraava();
+      }
+      
+      // Tarkista sisältääkö tulos laskettuja arvoja (mitä tahansa muuta kuin muuttujanimiä)
+      // Tätä tietoa käytetään myöhemmässä parsinnan vaiheessa jos kyseessä on funktioluonti:
+      // funktion parametreissa lasketut arvot eivät ole järkeviä, esim: `funktionimi(1, 2) = 1 + 2` ei ole järkevä.
+      if(!tulos.sisaltaaLaskettujaArvoja) {
+        for (const ilmaisunOsat of tulos.ilmaisut) {
+          if (ilmaisunOsat.length !== 1 || ilmaisunOsat[0].tyyppi !== parseriTyypit.MUUTTUJA) {
+            tulos.sisaltaaLaskettujaArvoja = true;  
+          }
+        }
       }
 
       return tulos;
