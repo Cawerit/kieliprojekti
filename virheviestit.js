@@ -4,7 +4,8 @@ const virheet = {
   PISTEVIRHE: 'Pistevirhe!!',
   HUONO_LAUSEKELISTAN_ALOITUS: 'Lausekelistan tulee alkaa "(" merkillä',
   ODOTTAMATON_ILMAISUN_LOPETUS: 'Odottamaton ilmaisun lopetus',
-  LASKETTUJA_ARVOJA_PARAMETREISSA: 'Laskettuja arvoja parametreissa'
+  LASKETTUJA_ARVOJA_PARAMETREISSA: 'Laskettuja arvoja parametreissa',
+  GENEROINTI_TARVITSEE_OHJELMAN: 'Generointi tarvitsee ohjelman'
 };
 
 

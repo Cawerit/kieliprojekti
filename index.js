@@ -5,7 +5,9 @@ var args = require('yargs').argv,
     parseri = require('./parseri.js'),
     muuntaja = require('./muunnos.js'),
     virheet = require('./virheviestit.js'),
-    forEach = require('lodash/forEach')
+    forEach = require('lodash/forEach'),
+    generointi = require('./generointi.js'),
+    cloneDeep = require('lodash/cloneDeep')
     ;
 
 
@@ -25,11 +27,13 @@ if (args.f) {
             return;
         }
         const muunnettu = muuntaja.muunna(ast);
-        try {
-            console.log(JSON.stringify(nayta(muunnettu), null, 2));
-        } catch (err) {
-            console.log('fail');
-        }
+    
+        console.log(JSON.stringify(nayta(cloneDeep(muunnettu)), null, 2));
+        console.log('=======================================');
+    
+        const generoitu = generointi.generoi(muunnettu, args.kieli || 'java');
+    
+        console.log(generoitu);
     });
 }
 
