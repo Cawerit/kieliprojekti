@@ -10,14 +10,19 @@ module.exports.tokenisoi = function(tiedosto) {
   const tyhja = /\s/;
   const rivinvaihto = /\n/;
   
+  const uusiToken = arvot => {
+    arvot.indeksi = indeksi;
+    return arvot;
+  };
+  
   while (indeksi < tiedosto.length) {
       let merkki = tiedosto[indeksi];
       
       if (merkki === '(' || merkki === ')') {
-          tokenit.push({
+          tokenit.push(uusiToken({
              tyyppi: tokenTyypit.SULKU,
              arvo: merkki
-          });
+          }));
           
           indeksi++;
           continue;
@@ -33,10 +38,10 @@ module.exports.tokenisoi = function(tiedosto) {
               
               edellinen.arvo += merkki;
           } else {
-              tokenit.push({
+              tokenit.push(uusiToken({
                  tyyppi: tokenTyypit.NUMERO,
                  arvo: merkki
-              });
+              }));
           }
           
           indeksi++;
@@ -66,17 +71,17 @@ module.exports.tokenisoi = function(tiedosto) {
             merkki = tiedosto[indeksi];
           }
           
-          tokenit.push({
+          tokenit.push(uusiToken({
             arvo: tyhjaTila,
             tyyppi: tokenTyypit.RIVINVAIHTO
-          });
+          }));
           
         } else {
           
-          tokenit.push({
+          tokenit.push(uusiToken({
               tyyppi: tokenTyypit.VALI,
               arvo: merkki
-          });
+          }));
           indeksi++;
         
         }
@@ -110,19 +115,19 @@ module.exports.tokenisoi = function(tiedosto) {
       }
       
       if (merkki === '=') {
-          tokenit.push({
+          tokenit.push(uusiToken({
              tyyppi: tokenTyypit.ASETUS,
              arvo: merkki
-          });
+          }));
           indeksi++;
           continue;
       }
       
       if (merkki === ',') {
-          tokenit.push({
+          tokenit.push(uusiToken({
              tyyppi: tokenTyypit.PILKKU,
              arvo: ','
-          });
+          }));
           indeksi++;
           continue;
       }
@@ -131,10 +136,10 @@ module.exports.tokenisoi = function(tiedosto) {
       if (edellinen && edellinen.tyyppi === tokenTyypit.SYMBOLI) {
           edellinen.arvo += merkki;
       } else {
-          tokenit.push({
+          tokenit.push(uusiToken({
               tyyppi: tokenTyypit.SYMBOLI,
               arvo: merkki
-          });
+          }));
       }
       
       indeksi++;

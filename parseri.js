@@ -13,10 +13,18 @@ function parse(tokenit) {
       let raja = 100;
       return () => {
         if (--raja <= 0) {
-          throw new Error('Liian monta kierrosta');
+          throw new Virhe('Liian monta kierrosta');
         }
       };
     })();
+    
+    // Virhe joka heitetään jos parsinta failaa
+    class Virhe {
+      constructor(viesti) {
+        this.message = viesti;
+        this.sijainti = { indeksi: token.indeksi };
+      }
+    }
 
     const ast = [];
     while(indeksi < tokenit.length) {
@@ -35,8 +43,12 @@ function parse(tokenit) {
         arvo: token.arvo
       };
 
-      if (token.tyyppi === tokenTyypit.VALI || token.tyyppi === tokenTyypit.PILKKU) {
+      if (token.tyyppi === tokenTyypit.VALI) {
         return;
+      }
+      
+      if (token.tyyppi === tokenTyypit.PILKKU) {
+        return parseriTyypit.PILKKU;
       }
 
       if (token.tyyppi === tokenTyypit.SYMBOLI) {
@@ -47,7 +59,7 @@ function parse(tokenit) {
       if (token.tyyppi === tokenTyypit.ASETUS) {
         if (edellinen && edellinen.tyyppi === parseriTyypit.FUNKTIOKUTSU) {
           if (edellinen.argumentit.sisaltaaLaskettujaArvoja) {
-            throw new Error(virheet.LASKETTUJA_ARVOJA_PARAMETREISSA);
+            throw new Virhe(virheet.LASKETTUJA_ARVOJA_PARAMETREISSA);
           }
 
           // Muutetaan edellinen funktiokutsusta funktion luonniksi
@@ -83,14 +95,14 @@ function parse(tokenit) {
           }
 
         } else {
-          throw new Error(virheet.OSOTTAMATON_ILMAISUN_LOPETUS);
+          throw new Virhe(virheet.ODOTTAMATON_ILMAISUN_LOPETUS);
         }
       }
     }
 
     function parseArgumenttiTaiParametriLista() {
       if (token.arvo !== '(') {
-        throw new Error(virheet.HUONO_LAUSEKELISTAN_ALOITUS);
+        throw new Virhe(virheet.HUONO_LAUSEKELISTAN_ALOITUS);
       }
 
       const tulos = {
@@ -100,16 +112,20 @@ function parse(tokenit) {
 
       seuraava();
       while(indeksi < tokenit.length && token && token.arvo !== ')') {
-        const arvo = parseIlmaisu();
-        if (arvo) {
-          if (arvo.tyyppi !== parseriTyypit.MUUTTUJA) {
-            tulos.sisaltaaLaskettujaArvoja = true;
+        let ilmaisunOsat = [];
+        do {
+          console.log('inception', ilmaisunOsat[ilmaisunOsat.length - 1], token);
+          let ilmaisunOsa = parseIlmaisu(ilmaisunOsat[ilmaisunOsat.length - 1]);
+          if (ilmaisunOsa) {
+            ilmaisunOsat.push(ilmaisunOsa);
           }
-          tulos.ilmaisut.push(arvo);
-        }
+          seuraava();
+        } while (indeksi < tokenit.length && token && token.tyyppi !== parseriTyypit.PILKKU);
+        tulos.ilmaisut.push(ilmaisunOsat);
+        
+        console.log('wooo', ilmaisunOsat);
         seuraava();
       }
-      seuraava();
 
       return tulos;
     }

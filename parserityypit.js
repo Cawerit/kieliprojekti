@@ -5,5 +5,6 @@ module.exports = {
   FUNKTIOLUONTI: 'Funktioluonti',
   MUUTTUJA: 'Muuttuja',
   BLOKKI: 'Blokki',
-  ILMAISULISTA: 'Ilmaisulista'
+  ILMAISULISTA: 'Ilmaisulista',
+  PILKKU: 'Pilkku'
 };
