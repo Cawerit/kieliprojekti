@@ -7,7 +7,8 @@ var args = require('yargs').argv,
     virheet = require('./virheviestit.js'),
     forEach = require('lodash/forEach'),
     generointi = require('./generointi.js'),
-    cloneDeep = require('lodash/cloneDeep')
+    cloneDeep = require('lodash/cloneDeep'),
+    apufunktiot = require('./apufunktiot.js')
     ;
 
 
@@ -19,8 +20,6 @@ if (args.f) {
         }
         
         const tokenit = tokenisointi.tokenisoi(tiedosto);
-        console.log(tokenit);
-        return;
         
         let ast;
         try {
@@ -29,24 +28,19 @@ if (args.f) {
             console.log(virheet.kasitteleVirhe(virhe, tiedosto));
             return;
         }
+        
         const muunnettu = muuntaja.muunna(ast);
     
-        console.log(JSON.stringify(nayta(cloneDeep(muunnettu)), null, 2));
+        apufunktiot.nayta(muunnettu);
+        return;
+        
+        
         console.log('=======================================');
+        
+        return;
     
         const generoitu = generointi.generoi(muunnettu, args.kieli || 'java');
     
         console.log(generoitu);
-    });
-}
-
-function nayta(obj) {
-    return forEach(obj, (val, key) => {
-      const t = typeof val;
-      if (t === 'object') {
-          nayta(val);
-      } else if (t === 'symbol') {
-          obj[key] = val.toString().match(/Symbol\((.*)\)/)[1];
-      }
     });
 }

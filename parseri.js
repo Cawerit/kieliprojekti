@@ -1,6 +1,8 @@
 var parseriTyypit = require('./parserityypit.js'),
     tokenTyypit = require('./tokenit.js'),
-    virheet = require('./virheviestit.js');
+    virheet = require('./virheviestit.js'),
+    _ = require('lodash')
+  ;
 
 function parse(tokenit) {
     
@@ -63,7 +65,12 @@ function parse(tokenit) {
       }
       
       if (token.tyyppi === tokenTyypit.TEKSTI) {
-        tulos.tyyppi === parseriTyypit.TEKSTI;
+        tulos.tyyppi = parseriTyypit.TEKSTI;
+        return tulos;
+      }
+      
+      if (token.tyyppi === tokenTyypit.INFIKSISYMBOLI) {
+        tulos.tyyppi = parseriTyypit.INFIKSIFUNKTIOKUTSU;
         return tulos;
       }
 
@@ -80,7 +87,7 @@ function parse(tokenit) {
 
           const runko = [];
           while(indeksi < tokenit.length) {
-            const tulos = parseIlmaisu(runko[runko.length - 1]);
+            const tulos = parseIlmaisu(_.last(tokenit));
             if (tulos) {
               runko.push(tulos);
             }
