@@ -9,5 +9,6 @@ module.exports = {
   PILKKU: Symbol('Pilkku'),
   NUMERO: Symbol('Numero'),
   TEKSTI: Symbol('Teksi'),
-  INFIKSIFUNKTIOKUTSU: Symbol('Infiksifunktiokutsu')
+  INFIKSIFUNKTIOKUTSU: Symbol('Infiksifunktiokutsu'),
+  INFIKSIFUNKTIOLUONTI: Symbol('Infiksifunktioluonti')
 };

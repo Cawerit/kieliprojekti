@@ -5,7 +5,8 @@ const virheet = {
   HUONO_LAUSEKELISTAN_ALOITUS: 'Lausekelistan tulee alkaa "(" merkillä',
   ODOTTAMATON_ILMAISUN_LOPETUS: 'Odottamaton ilmaisun lopetus',
   LASKETTUJA_ARVOJA_PARAMETREISSA: 'Laskettuja arvoja parametreissa',
-  GENEROINTI_TARVITSEE_OHJELMAN: 'Generointi tarvitsee ohjelman'
+  GENEROINTI_TARVITSEE_OHJELMAN: 'Generointi tarvitsee ohjelman',
+  SYNTAKSIVIRHE_INFIKSIN_LUONNISSA: 'Syntaksivirhe infiksin luonnissa'
 };
 
 
@@ -13,6 +14,10 @@ module.exports = virheet;
 
 
 module.exports.kasitteleVirhe = (virhe, koodi) => {
+  if(!virhe || !virhe.sijainti) {  
+    return virhe;
+  }
+  
   const indeksi = virhe.sijainti.indeksi;
   const kohta = koodi.slice(0, indeksi);
   const rivinvaihdot = kohta.split('\n');

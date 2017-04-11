@@ -9,6 +9,11 @@ function parse(tokenit) {
     let indeksi = 0, token = tokenit[indeksi];
 
     const seuraava = () => token = tokenit[++indeksi];
+    const infiksiAvainsana = 'infiksi';
+    
+    const ohita = tyypit => {
+      do { seuraava(); } while(token && tyypit.indexOf(token.tyyppi) !== -1);
+    };
 
     // Debuggauksessa käytetty raja joka estää ikuisten looppien tulon vahingossa
     const turvaraja = (() => {
@@ -24,7 +29,7 @@ function parse(tokenit) {
     class Virhe {
       constructor(viesti) {
         this.message = viesti;
-        this.sijainti = { indeksi: token.indeksi };
+        this.sijainti = { indeksi: token ? token.indeksi : 0 };
       }
     }
 
@@ -36,6 +41,45 @@ function parse(tokenit) {
       }
       seuraava();
     }
+    
+    function parseInfiksifunktioluonti() {
+      ohita([tokenTyypit.VALI]);
+      if (!token || token.tyyppi !== tokenTyypit.NUMERO) {
+        throw new Virhe(virheet.SYNTAKSIVIRHE_INFIKSIN_LUONNISSA);
+      }
+      
+      const tulos = {
+        tyyppi: parseriTyypit.INFIKSIFUNKTIOLUONTI,
+        presedenssi: parseFloat(token.arvo)
+      };
+      
+      ohita([tokenTyypit.VALI]);
+      
+      if (token.tyyppi !== tokenTyypit.SYMBOLI) {
+        throw new Virhe(virheet.SYNTAKSIVIRHE_INFIKSIN_LUONNISSA);
+      }
+      
+      tulos.arvo = token.arvo;
+      
+      seuraava();
+      
+      const runko = [{
+        arvo: tulos.arvo,
+        tyyppi: parseriTyypit.MUUTTUJA
+      }];
+      
+      while(indeksi < tokenit.length) {
+        const tulos = parseIlmaisu(_.last(runko));
+        if (tulos) {
+          runko.push(tulos);
+        }
+        seuraava();
+      }
+      
+      tulos.runko = runko;
+      return tulos;
+    }
+    
     return ast;
 
     function parseIlmaisu(edellinen) {
@@ -54,7 +98,13 @@ function parse(tokenit) {
         return tulos;
       }
 
+      // Muuttuja tai "infiksi" avainsana
       if (token.tyyppi === tokenTyypit.SYMBOLI) {
+        
+        if (token.arvo === infiksiAvainsana) {
+          return parseInfiksifunktioluonti();
+        }
+        
         tulos.tyyppi = parseriTyypit.MUUTTUJA;
         return tulos;
       }
@@ -101,7 +151,6 @@ function parse(tokenit) {
 
       if (token.tyyppi === tokenTyypit.SULKU) {
         if (token.arvo === '(') {
-
           if (edellinen.tyyppi === parseriTyypit.MUUTTUJA) {
             edellinen.tyyppi = parseriTyypit.FUNKTIOKUTSU;
             edellinen.argumentit = parseArgumenttiTaiParametriLista();
