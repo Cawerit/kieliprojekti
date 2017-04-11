@@ -9,5 +9,5 @@ module.exports = {
   SYMBOLI: Symbol('Symboli'),
   TEKSTI: Symbol('Teksti'),
   ASETUS: Symbol('Asetus'),
-  ERIKOISMERKKI: Symbol('Erikoismerkki')
+  INFIKSISYMBOLI: Symbol('Infiksisymboli')
 };

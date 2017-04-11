@@ -151,11 +151,17 @@ module.exports.tokenisoi = function(tiedosto) {
       }
       
       let edellinen = tokenit[tokenit.length - 1];
-      if (edellinen && edellinen.tyyppi === tokenTyypit.SYMBOLI) {
+      const onErikoismerkki = apufunktiot.sisaltaaErikoismerkkeja(merkki);
+      
+      if (edellinen && (edellinen.tyyppi === tokenTyypit.SYMBOLI || edellinen.tyyppi === tokenTyypit.INFIKSISYMBOLI)) {
           edellinen.arvo += merkki;
+          
+          if (onErikoismerkki) {
+            edellinen.tyyppi = tokenTyypit.INFIKSISYMBOLI;
+          }
       } else {
           tokenit.push(uusiToken({
-              tyyppi: tokenTyypit.SYMBOLI,
+              tyyppi: onErikoismerkki ? tokenTyypit.INFIKSISYMBOLI : tokenTyypit.SYMBOLI,
               arvo: merkki
           }));
       }
