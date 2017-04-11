@@ -8,5 +8,6 @@ module.exports = {
   RIVINVAIHTO: Symbol('Rivinvaihto'),
   SYMBOLI: Symbol('Symboli'),
   TEKSTI: Symbol('Teksti'),
-  ASETUS: Symbol('Asetus')
+  ASETUS: Symbol('Asetus'),
+  ERIKOISMERKKI: Symbol('Erikoismerkki')
 };

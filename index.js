@@ -19,6 +19,9 @@ if (args.f) {
         }
         
         const tokenit = tokenisointi.tokenisoi(tiedosto);
+        console.log(tokenit);
+        return;
+        
         let ast;
         try {
             ast = parseri.parse(tokenit);

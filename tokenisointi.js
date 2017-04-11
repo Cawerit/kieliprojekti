@@ -1,13 +1,17 @@
 var tokenTyypit = require('./tokenit.js'),
-    virheet = require('./virheviestit.js');
+    virheet = require('./virheviestit.js'),
+    apufunktiot = require('./apufunktiot.js'),
+    _ = require('lodash');
+ 
 
 module.exports.tokenisoi = function(tiedosto) {
     
   let indeksi = 0;
   const tokenit = [];
 
-  const numero = /[0-9]|\./;
-  const tyhja = /\s/;
+  const
+    numero = apufunktiot.numeroReg,
+    tyhja = /\s/;
   const rivinvaihto = /\n/;
   
   const uusiToken = arvot => {
@@ -15,8 +19,11 @@ module.exports.tokenisoi = function(tiedosto) {
     return arvot;
   };
   
+  const onNumeroPrefix = merkki => merkki === '-' || merkki === '+'; 
+  
   while (indeksi < tiedosto.length) {
       let merkki = tiedosto[indeksi];
+  
       
       if (merkki === '(' || merkki === ')') {
           tokenit.push(uusiToken({
@@ -26,6 +33,17 @@ module.exports.tokenisoi = function(tiedosto) {
           
           indeksi++;
           continue;
+      }
+      
+      // Tarkistetaan mahdollinen negatiivisen numeron syntaksi
+      if (onNumeroPrefix(merkki) && (!_.last(tokenit) || _.last(tokenit).tyyppi === tokenTyypit.VALI) && numero.test(tiedosto[indeksi + 1])) {
+        tokenit.push(uusiToken({
+          tyyppi: tokenTyypit.NUMERO,
+          arvo: merkki
+        }));
+        
+        indeksi++;
+        continue;
       }
       
       if (numero.test(merkki)) {
