@@ -3,12 +3,18 @@ var tokenTyypit = require('./tokenit.js'),
     apufunktiot = require('./apufunktiot.js'),
     _ = require('lodash');
  
+/**
+ * Tokenisointi huolehtii Ö-tiedostojen purkamisesta tokeneiksi. Tokenit toimivat välivaiheena
+ * koodin muuntamisessa toiselle ohjelmointikielelle. Kaikki Ö:n kääntämiseen tarvittavat tokentyypit
+ * Löytyvät tiedostosta tokenit.js.
+ **/ 
 
 module.exports.tokenisoi = function(tiedosto) {
     
   let indeksi = 0;
   const tokenit = [];
 
+// Erilaisia apuvälineitä tokenisointiin:
   const
     numero = apufunktiot.numeroReg,
     tyhja = /\s/;
@@ -21,10 +27,11 @@ module.exports.tokenisoi = function(tiedosto) {
   
   const onNumeroPrefix = merkki => merkki === '-' || merkki === '+'; 
   
+  // Itse tokenisointi tapahtuu tässä silmukassa, ja se jatkuu kunnes koko tiedosto on käyty läpi.
   while (indeksi < tiedosto.length) {
-      let merkki = tiedosto[indeksi];
+      let merkki = tiedosto[indeksi]; // Kutsutaan tällä hetkellä tarkasteltavaa indeksiä merkiksi. 
   
-      
+      // Jos merkki on sulku (avaava tai sulkeva), tokenisoidaan se suluksi.
       if (merkki === '(' || merkki === ')') {
           tokenit.push(uusiToken({
              tyyppi: tokenTyypit.SULKU,
@@ -35,7 +42,7 @@ module.exports.tokenisoi = function(tiedosto) {
           continue;
       }
       
-      // Tarkistetaan mahdollinen negatiivisen numeron syntaksi
+      // Tarkistetaan mahdollinen negatiivisen numeron syntaksi merkin kohdalta
       if (onNumeroPrefix(merkki) && (!_.last(tokenit) || _.last(tokenit).tyyppi === tokenTyypit.VALI) && numero.test(tiedosto[indeksi + 1])) {
         tokenit.push(uusiToken({
           tyyppi: tokenTyypit.NUMERO,
@@ -46,14 +53,14 @@ module.exports.tokenisoi = function(tiedosto) {
         continue;
       }
       
+      //Tarkistetaan onko merkki numero
       if (numero.test(merkki)) {
           let edellinen = tokenit[tokenit.length - 1];
           
           if (edellinen && edellinen.tyyppi === tokenTyypit.NUMERO) {
-              if (merkki === '.' && edellinen.arvo.includes('.')) {
+              if (merkki === '.' && edellinen.arvo.includes('.')) { //Tarkistetaan onko numerossa useampi kuin yksi desimaalipiste
                 throw new Error(virheet.PISTEVIRHE);
               }
-              
               edellinen.arvo += merkki;
           } else {
               tokenit.push(uusiToken({
@@ -66,6 +73,7 @@ module.exports.tokenisoi = function(tiedosto) {
           continue;
       }
       
+      //Tunnistetaan tyhjän merkin tilanteessa, onko kyseessä väli vai rivinvaihto.
       if (tyhja.test(merkki)) {
         if (rivinvaihto.test(merkki)) {
           let tyhjaTila = '';
@@ -107,6 +115,7 @@ module.exports.tokenisoi = function(tiedosto) {
         continue;
       }
       
+      //Jos merkki on " tai ', tunnistetaan se tekstiksi.
       if (merkki === '"') {
           let arvo = '';
           
@@ -132,6 +141,7 @@ module.exports.tokenisoi = function(tiedosto) {
           continue;
       }
       
+      //Merkki = tunnistetaan asetukseksi.
       if (merkki === '=') {
           tokenit.push(uusiToken({
              tyyppi: tokenTyypit.ASETUS,
@@ -141,6 +151,7 @@ module.exports.tokenisoi = function(tiedosto) {
           continue;
       }
       
+      //Merkki , tunnistetaan pilkuksi.
       if (merkki === ',') {
           tokenit.push(uusiToken({
              tyyppi: tokenTyypit.PILKKU,
@@ -150,9 +161,11 @@ module.exports.tokenisoi = function(tiedosto) {
           continue;
       }
       
+      //Apufunktioita infiksisymbolien tunnistamiseen.
       let edellinen = tokenit[tokenit.length - 1];
       const onErikoismerkki = apufunktiot.sisaltaaErikoismerkkeja(merkki);
       
+      //Tunnistetaan ja merkitään infiksisymbolit symboleista erikoismerkin avulla.
       if (edellinen && (edellinen.tyyppi === tokenTyypit.SYMBOLI || edellinen.tyyppi === tokenTyypit.INFIKSISYMBOLI)) {
           edellinen.arvo += merkki;
           

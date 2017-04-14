@@ -29,10 +29,13 @@ if (args.f) {
             return;
         }
         
+        apufunktiot.nayta(ast);
+        return;
+        
         const muunnettu = muuntaja.muunna(ast);
     
-        apufunktiot.nayta(muunnettu);
-        return;
+        //apufunktiot.nayta(muunnettu);
+        //return;
         
         
         console.log('=======================================');
