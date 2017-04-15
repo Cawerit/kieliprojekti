@@ -1,1 +1,1 @@
-foobar(a, b) = teeJotain(a, b)
+foo(a, b) = jos(a) niin: a(b) muuten: b(1 + 5)

@@ -137,7 +137,7 @@ function parse(tokenit) {
 
           const runko = [];
           while(indeksi < tokenit.length) {
-            const tulos = parseIlmaisu(_.last(tokenit));
+            const tulos = parseIlmaisu(_.last(runko));
             if (tulos) {
               runko.push(tulos);
             }

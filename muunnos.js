@@ -15,7 +15,7 @@ function muunna(ast) {
             }
             
             if (solu.argumentit) {
-                solu.argumentit.ilmaisut = muunna(solu.argumentit.ilmaisut);
+                solu.argumentit.ilmaisut = solu.argumentit.ilmaisut.map(muunna);
             }
             
             if (solu.ilmaisut) {
@@ -34,7 +34,7 @@ function muunna(ast) {
                     tyyppi: tyypit.FUNKTIOKUTSU,
                     arvo: solu.arvo,
                     argumentit: {
-                        ilmaisut: [edellinen, seuraava]
+                        ilmaisut: [[edellinen], [seuraava]]
                     }
                 };
                 
