@@ -1,1 +1,1 @@
-foo(a, b) = jos(a) niin: a(b) muuten: b(1 + 5)
+a(b) = b + 1

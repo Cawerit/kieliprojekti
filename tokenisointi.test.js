@@ -8,16 +8,16 @@ const poistaSijainti = omit('sijainti');
 
 test('tulkitsee yksinkertaisen numeron oikein', () => {
     const tulos = map(poistaSijainti, tokenisoi('3'));
-    console.log(tulos);
-    /*expect(tulos).toEqual([
-      { tyyppi: tokentyypit.NUMERO, arvo: '3' } 
-    ]);*/
+
+    expect(tulos).toEqual([
+      { tyyppi: tokentyypit.NUMERO, arvo: '3', indeksi: 0 } 
+    ]);
 });
-/*
+
 test('tulkitsee desimaaliluvun oikein', () => {
    const tulos = tokenisoi('3.5');
    expect(tulos).toEqual([
-        { tyyppi: tokentyypit.NUMERO, arvo: '3.5' }    
+        { tyyppi: tokentyypit.NUMERO, arvo: '3.5', indeksi: 0 }    
    ]);
 });
 
@@ -39,8 +39,8 @@ test('käsittelee peräkkäiset rivinvaihdot oikein', () => {
 testi`;
 
    expect(tokenisoi(koodi)).toEqual([
-      { tyyppi: tokentyypit.SYMBOLI, arvo: 'testi' },
-      { tyyppi: tokentyypit.RIVINVAIHTO, arvo: '\n'.repeat(3) },
-      { tyyppi: tokentyypit.SYMBOLI, arvo: 'testi' }
+      { tyyppi: tokentyypit.SYMBOLI, arvo: 'testi', indeksi: 0 },
+      { tyyppi: tokentyypit.RIVINVAIHTO, arvo: '\n'.repeat(3), indeksi: 5 },
+      { tyyppi: tokentyypit.SYMBOLI, arvo: 'testi', indeksi: 8 }
    ]);
-});*/
+});

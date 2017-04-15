@@ -77,6 +77,10 @@ module.exports.tokenisoi = function(tiedosto) {
       if (tyhja.test(merkki)) {
         if (rivinvaihto.test(merkki)) {
           let tyhjaTila = '';
+          const indeksiAlussa = indeksi;
+          
+          // Kasataan kaikki rivinvaihdot yhteen, sillä kielessä rivinvaihtojen merättäinen määrä ei ole merkitsevä
+          // ja "turhista" rivinvaihdoista voidaan näin päästä jo tokenisointivaiheessa eroon
           
           while(indeksi < tiedosto.length && rivinvaihto.test(merkki)) {
             let seuraavaRivinVaihto = tiedosto.indexOf('\n', indeksi + 1);
@@ -97,10 +101,16 @@ module.exports.tokenisoi = function(tiedosto) {
             merkki = tiedosto[indeksi];
           }
           
-          tokenit.push(uusiToken({
+          const uusiToken_ = uusiToken({
             arvo: tyhjaTila,
             tyyppi: tokenTyypit.RIVINVAIHTO
-          }));
+          });
+          // Ilman tätä muutosta tokenin indeksiksi olisi tullut se indeksi jossa
+          // oli viimeinen rivinvaihto, mutta meille hyödyllisempi on se indeksi
+          // jossa rivinvaihdot alkoivat
+          uusiToken_.indeksi = indeksiAlussa;
+          
+          tokenit.push(uusiToken_);
           
         } else {
           
