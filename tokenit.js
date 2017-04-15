@@ -1,13 +1,13 @@
 
 
 module.exports = {
-  SULKU: Symbol('Sulku'),
-  NUMERO: Symbol('Numero'),
-  PILKKU: Symbol('Pilkku'),
-  VALI: Symbol('Vali'),
-  RIVINVAIHTO: Symbol('Rivinvaihto'),
-  SYMBOLI: Symbol('Symboli'),
-  TEKSTI: Symbol('Teksti'),
-  ASETUS: Symbol('Asetus'),
-  INFIKSISYMBOLI: Symbol('Infiksisymboli')
+  SULKU: 'tokenit/Sulku',
+  NUMERO: 'tokenit/Numero',
+  PILKKU: 'tokenit/Pilkku',
+  VALI: 'tokenit/Vali',
+  RIVINVAIHTO: 'tokenit/Rivinvaihto',
+  SYMBOLI: 'tokenit/Symboli',
+  TEKSTI: 'tokenit/Teksti',
+  ASETUS: 'tokenit/Asetus',
+  INFIKSISYMBOLI: 'tokenit/Infiksisymboli'
 };

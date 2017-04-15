@@ -31,6 +31,9 @@ function parse(tokenit) {
         this.message = viesti;
         this.sijainti = { indeksi: token ? token.indeksi : 0 };
       }
+      toString() {
+        return "Virhe: " + this.message;
+      }
     }
 
     const ast = [];
@@ -55,7 +58,7 @@ function parse(tokenit) {
       
       ohita([tokenTyypit.VALI]);
       
-      if (token.tyyppi !== tokenTyypit.SYMBOLI) {
+      if (token.tyyppi !== tokenTyypit.INFIKSISYMBOLI) {
         throw new Virhe(virheet.SYNTAKSIVIRHE_INFIKSIN_LUONNISSA);
       }
       
