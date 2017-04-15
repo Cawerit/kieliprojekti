@@ -45,6 +45,49 @@ function parse(tokenit) {
       seuraava();
     }
     
+    return ast;
+    
+    function parseRunko() {
+      const runko = [];
+      
+      let sisennys = 0;
+      // Tarkistetaan mikä on tämänhetkinen sisennyksen taso
+      for(let i = indeksi; i--; i >= 0) {
+        const m = tokenit[indeksi];
+        if (m.tyyppi === tokenTyypit.VALI) {
+          sisennys++;
+        } else if(m.tyyppi === tokenTyypit.RIVINVAIHTO) {
+          break;
+        } else {
+          sisennys = 0;
+        }
+      }
+      
+      while(indeksi < tokenit.length) {
+        if (tokenit[indeksi].tyyppi === tokenTyypit.RIVINVAIHTO) {
+          seuraava();
+          // Tarkistetaan että rivinvaihdon jälkeen on säilytetty sisennys
+          let i = 0;
+          while((indeksi + i) < tokenit.length && tokenit[indeksi + i].tyyppi === tokenTyypit.VALI) i++;
+          i = Math.max(0, i - 1);
+          
+          // Jos sisennys on pienempi kuin funktioluonnin rungossa kuuluisi olla, lopetetaan funktion rungon parsinta
+          indeksi += i;
+          token = tokenit[indeksi];
+          if (i <= sisennys || i >= tokenit.length) {
+            break;
+          }
+        }
+        
+        const tulos = parseIlmaisu(_.last(runko));
+        if (tulos) {
+          runko.push(tulos);
+        }
+        seuraava();
+      }
+      return runko;
+    }
+    
     function parseInfiksifunktioluonti() {
       ohita([tokenTyypit.VALI]);
       if (!token || token.tyyppi !== tokenTyypit.NUMERO) {
@@ -82,8 +125,6 @@ function parse(tokenit) {
       tulos.runko = runko;
       return tulos;
     }
-    
-    return ast;
 
     function parseIlmaisu(edellinen) {
       turvaraja();
@@ -138,16 +179,7 @@ function parse(tokenit) {
           edellinen.parametrit = edellinen.argumentit;
           edellinen.argumentit = undefined;
 
-          const runko = [];
-          while(indeksi < tokenit.length) {
-            const tulos = parseIlmaisu(_.last(runko));
-            if (tulos) {
-              runko.push(tulos);
-            }
-            seuraava();
-          }
-
-          edellinen.runko = runko;
+          edellinen.runko = parseRunko();
           return;
         }
       }

@@ -1,5 +1,2 @@
-foo(a, b)
-
--- kommentti
-
-bar()
+foo(a) = a
+bar(b) = 3
