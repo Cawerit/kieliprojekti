@@ -17,8 +17,10 @@ module.exports.tokenisoi = function(tiedosto) {
 // Erilaisia apuvälineitä tokenisointiin:
   const
     numero = apufunktiot.numeroReg,
-    tyhja = /\s/;
-  const rivinvaihto = /\n/;
+    tyhja = /\s/,
+    rivinvaihto = /\n/,
+    pakomerkki = '\\'
+    ;
   
   const uusiToken = arvot => {
     arvot.indeksi = indeksi;
@@ -81,7 +83,6 @@ module.exports.tokenisoi = function(tiedosto) {
           
           // Kasataan kaikki rivinvaihdot yhteen, sillä kielessä rivinvaihtojen merättäinen määrä ei ole merkitsevä
           // ja "turhista" rivinvaihdoista voidaan näin päästä jo tokenisointivaiheessa eroon
-          
           while(indeksi < tiedosto.length && rivinvaihto.test(merkki)) {
             let seuraavaRivinVaihto = tiedosto.indexOf('\n', indeksi + 1);
             if (seuraavaRivinVaihto === -1) {
@@ -128,25 +129,41 @@ module.exports.tokenisoi = function(tiedosto) {
       //Jos merkki on " tai ', tunnistetaan se tekstiksi.
       if (merkki === '"') {
           let arvo = '';
+          const indeksiAlussa = indeksi;
           
           indeksi++;
           merkki = tiedosto[indeksi];
           
-          while(merkki !== '"') {
-              // Jos käyttäjä on unohtanut lopettaa tekstinpätkän, heitä virhe
-              if (indeksi >= tiedosto.length) {
-                  throw new Error(virheet.LAINAUS_PUUTTUU);
-              }
-              
-              arvo += merkki;
-              indeksi++;
+          // Kerätään koko tekstinpätkä yhteen
+          while (merkki !== '"') {
+            // Jos käyttäjä on unohtanut lopettaa tekstinpätkän, heitä virhe
+            if (indeksi >= tiedosto.length) {
+                throw new Error(virheet.LAINAUS_PUUTTUU);
+            }
+            // "\" merkin avulla voi hypätä " yli niin ettei se lopeta tekstiä
+            if (merkki === pakomerkki) {
+              indeksi++
               merkki = tiedosto[indeksi];
+              
+              if (indeksi >= tiedosto.length) {
+                // Tämä on virhetilanne. Annetaan ohjelman hypätä takaisin while-loopin
+                // alkuun jokssa heitetään virhe tiedoston ennenaikaisen lopettamisen takia
+                continue;
+              }
+            }
+            
+            arvo += merkki;
+            indeksi++;
+            merkki = tiedosto[indeksi];
           }
           
-          tokenit.push({
+          const uusiToken_ = uusiToken({
               tyyppi: tokenTyypit.TEKSTI,
               arvo: arvo
           });
+          uusiToken_.indeksi = indeksiAlussa;
+          
+          tokenit.push(uusiToken_);
           indeksi++;
           continue;
       }

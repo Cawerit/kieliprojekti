@@ -8,7 +8,7 @@ module.exports = {
   ILMAISULISTA: 'parseri/Ilmaisulista',
   PILKKU: 'parseri/Pilkku',
   NUMERO: 'parseri/Numero',
-  TEKSTI: 'parseri/Teksi',
+  TEKSTI: 'parseri/Teksti',
   INFIKSIFUNKTIOKUTSU: 'parseri/Infiksifunktiokutsu',
   INFIKSIFUNKTIOLUONTI: 'parseri/Infiksifunktioluonti'
 };
