@@ -9,5 +9,6 @@ module.exports = {
   SYMBOLI: 'tokenit/Symboli',
   TEKSTI: 'tokenit/Teksti',
   ASETUS: 'tokenit/Asetus',
-  INFIKSISYMBOLI: 'tokenit/Infiksisymboli'
+  INFIKSISYMBOLI: 'tokenit/Infiksisymboli',
+  KOMMENTTI: 'tokenit/Kommentti'
 };

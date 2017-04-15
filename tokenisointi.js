@@ -44,6 +44,21 @@ module.exports.tokenisoi = function(tiedosto) {
           continue;
       }
       
+      // "--" Aloittaa kommentin 
+      if (merkki === '-' && tiedosto[indeksi+1] === '-') {
+        let rivinLoppu = tiedosto.indexOf('\n', indeksi + 2);
+        if (rivinLoppu === -1) {
+          rivinLoppu = tiedosto.length;
+        }
+        tokenit.push(uusiToken({
+          tyyppi: tokenTyypit.KOMMENTTI,
+          arvo: tiedosto.substring(indeksi + 2, rivinLoppu)
+        }));
+        
+        indeksi = rivinLoppu;
+        continue;
+      }
+      
       // Tarkistetaan mahdollinen negatiivisen numeron syntaksi merkin kohdalta
       if (onNumeroPrefix(merkki) && (!_.last(tokenit) || _.last(tokenit).tyyppi === tokenTyypit.VALI) && numero.test(tiedosto[indeksi + 1])) {
         tokenit.push(uusiToken({

@@ -92,7 +92,7 @@ function parse(tokenit) {
         arvo: token.arvo
       };
 
-      if (token.tyyppi === tokenTyypit.VALI) {
+      if (token.tyyppi === tokenTyypit.VALI || token.tyyppi === tokenTyypit.KOMMENTTI) {
         return;
       }
       
