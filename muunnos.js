@@ -22,12 +22,6 @@ function muunna(ast) {
                 solu.ilmaisut = solu.ilmaisut.map(muunna);
             }
             
-            /*console.log(
-                edellinen && (`${edellinen.arvo}: ${edellinen.tyyppi.toString()}`), 
-                solu && (`${solu.arvo}: ${solu.tyyppi.toString()}`),
-                seuraava && (`${seuraava.arvo}: ${seuraava.tyyppi.toString()}`), 
-                onInfiksi(edellinen, solu, seuraava));*/
-            
             if (onInfiksi(edellinen, solu, seuraava)) {
                 
                 ast[indeksi] = {
@@ -51,12 +45,6 @@ function muunna(ast) {
     
     return ast;
 }
-
-const onIlmaisu = solu => 
-    solu.tyyppi === tyypit.MUUTTUJA 
-    || solu.tyyppi === tyypit.FUNKTIOKUTSU 
-    || solu.tyyppi === tyypit.NUMERO
-    || solu.tyyppi === tyypit.TEKSTI;
 
 function onInfiksi(a, b, c) {
     return Boolean(a && b && c) && b.tyyppi === tyypit.INFIKSIFUNKTIOKUTSU;
