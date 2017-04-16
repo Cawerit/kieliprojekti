@@ -35,20 +35,28 @@ function parse(tokenit) {
         return "Virhe: " + this.message;
       }
     }
-
-    const ast = [];
-    while(indeksi < tokenit.length) {
-      const tulos = parseIlmaisu(ast[ast.length - 1]);
-      if (tulos) {
-        ast.push(tulos);
-      }
-      seuraava();
-    }
     
-    return ast;
-    
-    function parseRunko() {
-      const runko = [];
+    /**
+     * Parsii "rungoksi" kutsuttavan rakenteen, joka on kaikki tokenit
+     * nykyisestä indeksistä alkaen siihen asti että sisennyksen taso
+     * palaa taaksepäin.
+     * 
+     * ```
+     * --------------------------------------|
+     * foo(x) =   --------------|            |
+     *   1 + 2                  | foo runko  | Ohjelman runko
+     *   bar(y) = -|            |            |
+     *     x + y   | bar runko  |            |
+     * baz(x)                                |
+     * 1 + 2                                 |
+     * 
+     *```
+     * 
+     * @param {Array=} [runkoAluksi] Valinnainen lähtökohta rungolle
+     * @return {Array} AST
+     */
+    function parseRunko(runkoAluksi) {
+      const runko = runkoAluksi || [];
       
       let sisennys = 0;
       // Tarkistetaan mikä on tämänhetkinen sisennyksen taso
@@ -126,6 +134,16 @@ function parse(tokenit) {
       return tulos;
     }
 
+    /**
+     * Funktio joka sisältää suurimman osan parsinnan logiikasta.
+     * Käsittelee eri tokentyypit ja muodostaa nistä AST:n.
+     * Käytännössä muut funktiot tässä tiedostossa kutsuvat
+     * tätä funktiota eri tavoin.
+     * 
+     * @param {Object=} [edellinen] Valinnainen edellinen parseIlmaisu-funktiokutsun tulos.
+     *        HUOM! Joissain tapauksissa, kuten funktioluonneissa, tämä funktio muokkaa
+     *        edellisen ast noden sisältöä.
+     */
     function parseIlmaisu(edellinen) {
       turvaraja();
 
@@ -251,6 +269,10 @@ function parse(tokenit) {
 
       return tulos;
     }
+    
+    
+    return parseRunko();
+    
 }
 
 module.exports.parse = function(tokenit) {
