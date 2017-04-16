@@ -52,8 +52,8 @@ function parse(tokenit) {
       
       let sisennys = 0;
       // Tarkistetaan mikä on tämänhetkinen sisennyksen taso
-      for(let i = indeksi; i--; i >= 0) {
-        const m = tokenit[indeksi];
+      for(let i = indeksi; i >= 0; i--) {
+        const m = tokenit[i];
         if (m.tyyppi === tokenTyypit.VALI) {
           sisennys++;
         } else if(m.tyyppi === tokenTyypit.RIVINVAIHTO) {
@@ -65,11 +65,10 @@ function parse(tokenit) {
       
       while(indeksi < tokenit.length) {
         if (tokenit[indeksi].tyyppi === tokenTyypit.RIVINVAIHTO) {
-          seuraava();
           // Tarkistetaan että rivinvaihdon jälkeen on säilytetty sisennys
-          let i = 0;
+          let i = 1;
           while((indeksi + i) < tokenit.length && tokenit[indeksi + i].tyyppi === tokenTyypit.VALI) i++;
-          i = Math.max(0, i - 1);
+          i--;
           
           // Jos sisennys on pienempi kuin funktioluonnin rungossa kuuluisi olla, lopetetaan funktion rungon parsinta
           indeksi += i;
@@ -85,6 +84,7 @@ function parse(tokenit) {
         }
         seuraava();
       }
+      
       return runko;
     }
     
