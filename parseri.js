@@ -57,7 +57,7 @@ function parse(tokenit) {
      */
     function parseRunko(runkoAluksi) {
       const runko = runkoAluksi || [];
-      
+      const iid = _.uniqueId();
       let sisennys = 0;
       // Tarkistetaan mikä on tämänhetkinen sisennyksen taso
       for(let i = indeksi; i >= 0; i--) {
@@ -81,6 +81,7 @@ function parse(tokenit) {
           // Jos sisennys on pienempi kuin funktioluonnin rungossa kuuluisi olla, lopetetaan funktion rungon parsinta
           indeksi += i;
           token = tokenit[indeksi];
+          
           if (i <= sisennys || i >= tokenit.length) {
             break;
           }
@@ -90,7 +91,9 @@ function parse(tokenit) {
         if (tulos) {
           runko.push(tulos);
         }
-        seuraava();
+        if (!token || token.tyyppi !== tokenTyypit.RIVINVAIHTO) {
+          seuraava();
+        }
       }
       
       return runko;
@@ -117,20 +120,11 @@ function parse(tokenit) {
       
       seuraava();
       
-      const runko = [{
+      tulos.runko = parseRunko([{
         arvo: tulos.arvo,
         tyyppi: parseriTyypit.MUUTTUJA
-      }];
+      }]);
       
-      while(indeksi < tokenit.length) {
-        const tulos = parseIlmaisu(_.last(runko));
-        if (tulos) {
-          runko.push(tulos);
-        }
-        seuraava();
-      }
-      
-      tulos.runko = runko;
       return tulos;
     }
 
@@ -187,7 +181,12 @@ function parse(tokenit) {
       }
 
       if (token.tyyppi === tokenTyypit.ASETUS) {
-        if (edellinen && edellinen.tyyppi === parseriTyypit.FUNKTIOKUTSU) {
+        if(!edellinen) {
+          // Asetuslause vaatii edellisen arvon
+          throw new Virhe(virheet.ODOTTAMATON_ASETUSLAUSE);
+        }
+        
+        if (edellinen.tyyppi === parseriTyypit.FUNKTIOKUTSU) {
           if (edellinen.argumentit.sisaltaaLaskettujaArvoja) {
             throw new Virhe(virheet.LASKETTUJA_ARVOJA_PARAMETREISSA);
           }
@@ -197,7 +196,20 @@ function parse(tokenit) {
           edellinen.parametrit = edellinen.argumentit;
           edellinen.argumentit = undefined;
 
+          seuraava();
           edellinen.runko = parseRunko();
+          return;
+        } else if(edellinen.tyyppi === parseriTyypit.MUUTTUJA) {
+          // Muuttujan luonti
+          edellinen.tyyppi = parseriTyypit.ASETUSLAUSE;
+          seuraava();
+          // parseRunko ei oikeastaan ole kovin sopiva tähän tehtävään,
+          // sillä odotamme ennemminkin yksinkertaista ilmaisua kuin
+          // kokonaista ohjelmarunkoa. parseRunko kuitenkin osaa käsitellä
+          // hyvin esimerkiksi rivinvaihdot, joten käytetään yksinkertaisuuden
+          // nimissä sitä ja tarkistetaan myöhemmin että tulos on yksinkertainen ilmaisu
+          edellinen.runko = parseRunko();
+          
           return;
         }
       }
@@ -271,7 +283,15 @@ function parse(tokenit) {
     }
     
     
-    return parseRunko();
+    const ast = [];
+    while(indeksi < tokenit.length) {
+      const tulos = parseIlmaisu(_.last(ast));
+      if (tulos) {
+        ast.push(tulos);
+      }
+      seuraava();
+    }
+    return ast;
     
 }
 

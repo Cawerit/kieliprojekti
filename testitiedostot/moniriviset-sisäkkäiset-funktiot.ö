@@ -1,6 +1,6 @@
-foo(a) =
+foo(x) =
   1 + 2
-  bar(d) =
-    3 + 2
-baz(x) =
-  foo(x)
+  bar(y) =
+    baz(z) =
+      1 + 2
+foo(3)

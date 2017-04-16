@@ -6,7 +6,9 @@ const virheet = {
   ODOTTAMATON_ILMAISUN_LOPETUS: 'Odottamaton ilmaisun lopetus',
   LASKETTUJA_ARVOJA_PARAMETREISSA: 'Laskettuja arvoja parametreissa',
   GENEROINTI_TARVITSEE_OHJELMAN: 'Generointi tarvitsee ohjelman',
-  SYNTAKSIVIRHE_INFIKSIN_LUONNISSA: 'Syntaksivirhe infiksin luonnissa'
+  SYNTAKSIVIRHE_INFIKSIN_LUONNISSA: 'Syntaksivirhe infiksin luonnissa',
+  ODOTTAMATON_ASETUSLAUSE: 'Asetuslause vaatii muuttujan tai funktion johon arvo asetetaan',
+  ASETUS_EI_OLE_ILMAISU: 'Asetuksen oikeanpuolisen arvon tulee olla yksinkertainen ilmaisu'
 };
 
 

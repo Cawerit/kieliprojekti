@@ -9,7 +9,7 @@
           "ilmaisut": [
             [
               {
-                "arvo": "a",
+                "arvo": "x",
                 "tyyppi": "parseri/Muuttuja"
               }
             ]
@@ -44,7 +44,7 @@
               "ilmaisut": [
                 [
                   {
-                    "arvo": "d",
+                    "arvo": "y",
                     "tyyppi": "parseri/Muuttuja"
                   }
                 ]
@@ -53,60 +53,60 @@
             },
             "runko": [
               {
-                "tyyppi": "parseri/Funktiokutsu",
-                "arvo": "+",
-                "argumentit": {
+                "arvo": "baz",
+                "tyyppi": "parseri/Funktioluonti",
+                "parametrit": {
                   "ilmaisut": [
                     [
                       {
-                        "arvo": "3",
-                        "tyyppi": "parseri/Numero"
-                      }
-                    ],
-                    [
-                      {
-                        "arvo": "2",
-                        "tyyppi": "parseri/Numero"
-                      }
-                    ]
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "arvo": "baz",
-            "tyyppi": "parseri/Funktioluonti",
-            "parametrit": {
-              "ilmaisut": [
-                [
-                  {
-                    "arvo": "x",
-                    "tyyppi": "parseri/Muuttuja"
-                  }
-                ]
-              ],
-              "sisaltaaLaskettujaArvoja": false
-            },
-            "runko": [
-              {
-                "arvo": "foo",
-                "tyyppi": "parseri/Funktiokutsu",
-                "argumentit": {
-                  "ilmaisut": [
-                    [
-                      {
-                        "arvo": "x",
+                        "arvo": "z",
                         "tyyppi": "parseri/Muuttuja"
                       }
                     ]
                   ],
                   "sisaltaaLaskettujaArvoja": false
-                }
+                },
+                "runko": [
+                  {
+                    "tyyppi": "parseri/Funktiokutsu",
+                    "arvo": "+",
+                    "argumentit": {
+                      "ilmaisut": [
+                        [
+                          {
+                            "arvo": "1",
+                            "tyyppi": "parseri/Numero"
+                          }
+                        ],
+                        [
+                          {
+                            "arvo": "2",
+                            "tyyppi": "parseri/Numero"
+                          }
+                        ]
+                      ]
+                    }
+                  }
+                ]
               }
             ]
           }
         ]
+      },
+      {
+        "arvo": "foo",
+        "tyyppi": "parseri/Funktiokutsu",
+        "argumentit": {
+          "ilmaisut": [
+            [
+              {
+                "arvo": "3",
+                "tyyppi": "parseri/Numero"
+              }
+            ]
+          ],
+          "sisaltaaLaskettujaArvoja": true
+        }
       }
     ]
   }
