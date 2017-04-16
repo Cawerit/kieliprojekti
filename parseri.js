@@ -35,14 +35,68 @@ function parse(tokenit) {
         return "Virhe: " + this.message;
       }
     }
-
-    const ast = [];
-    while(indeksi < tokenit.length) {
-      const tulos = parseIlmaisu(ast[ast.length - 1]);
-      if (tulos) {
-        ast.push(tulos);
+    
+    /**
+     * Parsii "rungoksi" kutsuttavan rakenteen, joka on kaikki tokenit
+     * nykyisestä indeksistä alkaen siihen asti että sisennyksen taso
+     * palaa taaksepäin.
+     * 
+     * ```
+     * --------------------------------------|
+     * foo(x) =   --------------|            |
+     *   1 + 2                  | foo runko  | Ohjelman runko
+     *   bar(y) = -|            |            |
+     *     x + y   | bar runko  |            |
+     * baz(x)                                |
+     * 1 + 2                                 |
+     * 
+     *```
+     * 
+     * @param {Array=} [runkoAluksi] Valinnainen lähtökohta rungolle
+     * @return {Array} AST
+     */
+    function parseRunko(runkoAluksi) {
+      const runko = runkoAluksi || [];
+      const iid = _.uniqueId();
+      let sisennys = 0;
+      // Tarkistetaan mikä on tämänhetkinen sisennyksen taso
+      for(let i = indeksi; i >= 0; i--) {
+        const m = tokenit[i];
+        if (m.tyyppi === tokenTyypit.VALI) {
+          sisennys++;
+        } else if(m.tyyppi === tokenTyypit.RIVINVAIHTO) {
+          break;
+        } else {
+          sisennys = 0;
+        }
       }
-      seuraava();
+      
+      while(indeksi < tokenit.length) {
+        if (tokenit[indeksi].tyyppi === tokenTyypit.RIVINVAIHTO) {
+          // Tarkistetaan että rivinvaihdon jälkeen on säilytetty sisennys
+          let i = 1;
+          while((indeksi + i) < tokenit.length && tokenit[indeksi + i].tyyppi === tokenTyypit.VALI) i++;
+          i--;
+          
+          // Jos sisennys on pienempi kuin funktioluonnin rungossa kuuluisi olla, lopetetaan funktion rungon parsinta
+          indeksi += i;
+          token = tokenit[indeksi];
+          
+          if (i <= sisennys || i >= tokenit.length) {
+            break;
+          }
+        }
+        
+        const tulos = parseIlmaisu(_.last(runko));
+        if (tulos) {
+          runko.push(tulos);
+        }
+        if (!token || token.tyyppi !== tokenTyypit.RIVINVAIHTO) {
+          seuraava();
+        }
+      }
+      
+      return runko;
     }
     
     function parseInfiksifunktioluonti() {
@@ -66,25 +120,24 @@ function parse(tokenit) {
       
       seuraava();
       
-      const runko = [{
+      tulos.runko = parseRunko([{
         arvo: tulos.arvo,
         tyyppi: parseriTyypit.MUUTTUJA
-      }];
+      }]);
       
-      while(indeksi < tokenit.length) {
-        const tulos = parseIlmaisu(_.last(runko));
-        if (tulos) {
-          runko.push(tulos);
-        }
-        seuraava();
-      }
-      
-      tulos.runko = runko;
       return tulos;
     }
-    
-    return ast;
 
+    /**
+     * Funktio joka sisältää suurimman osan parsinnan logiikasta.
+     * Käsittelee eri tokentyypit ja muodostaa nistä AST:n.
+     * Käytännössä muut funktiot tässä tiedostossa kutsuvat
+     * tätä funktiota eri tavoin.
+     * 
+     * @param {Object=} [edellinen] Valinnainen edellinen parseIlmaisu-funktiokutsun tulos.
+     *        HUOM! Joissain tapauksissa, kuten funktioluonneissa, tämä funktio muokkaa
+     *        edellisen ast noden sisältöä.
+     */
     function parseIlmaisu(edellinen) {
       turvaraja();
 
@@ -128,7 +181,12 @@ function parse(tokenit) {
       }
 
       if (token.tyyppi === tokenTyypit.ASETUS) {
-        if (edellinen && edellinen.tyyppi === parseriTyypit.FUNKTIOKUTSU) {
+        if(!edellinen) {
+          // Asetuslause vaatii edellisen arvon
+          throw new Virhe(virheet.ODOTTAMATON_ASETUSLAUSE);
+        }
+        
+        if (edellinen.tyyppi === parseriTyypit.FUNKTIOKUTSU) {
           if (edellinen.argumentit.sisaltaaLaskettujaArvoja) {
             throw new Virhe(virheet.LASKETTUJA_ARVOJA_PARAMETREISSA);
           }
@@ -138,16 +196,20 @@ function parse(tokenit) {
           edellinen.parametrit = edellinen.argumentit;
           edellinen.argumentit = undefined;
 
-          const runko = [];
-          while(indeksi < tokenit.length) {
-            const tulos = parseIlmaisu(_.last(runko));
-            if (tulos) {
-              runko.push(tulos);
-            }
-            seuraava();
-          }
-
-          edellinen.runko = runko;
+          seuraava();
+          edellinen.runko = parseRunko();
+          return;
+        } else if(edellinen.tyyppi === parseriTyypit.MUUTTUJA) {
+          // Muuttujan luonti
+          edellinen.tyyppi = parseriTyypit.ASETUSLAUSE;
+          seuraava();
+          // parseRunko ei oikeastaan ole kovin sopiva tähän tehtävään,
+          // sillä odotamme ennemminkin yksinkertaista ilmaisua kuin
+          // kokonaista ohjelmarunkoa. parseRunko kuitenkin osaa käsitellä
+          // hyvin esimerkiksi rivinvaihdot, joten käytetään yksinkertaisuuden
+          // nimissä sitä ja tarkistetaan myöhemmin että tulos on yksinkertainen ilmaisu
+          edellinen.runko = parseRunko();
+          
           return;
         }
       }
@@ -219,6 +281,18 @@ function parse(tokenit) {
 
       return tulos;
     }
+    
+    
+    const ast = [];
+    while(indeksi < tokenit.length) {
+      const tulos = parseIlmaisu(_.last(ast));
+      if (tulos) {
+        ast.push(tulos);
+      }
+      seuraava();
+    }
+    return ast;
+    
 }
 
 module.exports.parse = function(tokenit) {

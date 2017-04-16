@@ -5,7 +5,7 @@ const numeroReg = /[0-9]|\./;
 const onErikoismerkki = kirjain => !numeroReg.test(kirjain) && kirjain.toUpperCase() === kirjain.toLowerCase(); 
 
 function nayta (obj) {
-    console.log(JSON.stringify(obj, null, 2));
+    console.log(JSON.stringify(obj, null, 4));
 }
 
 

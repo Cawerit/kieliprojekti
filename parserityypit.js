@@ -10,5 +10,6 @@ module.exports = {
   NUMERO: 'parseri/Numero',
   TEKSTI: 'parseri/Teksti',
   INFIKSIFUNKTIOKUTSU: 'parseri/Infiksifunktiokutsu',
-  INFIKSIFUNKTIOLUONTI: 'parseri/Infiksifunktioluonti'
+  INFIKSIFUNKTIOLUONTI: 'parseri/Infiksifunktioluonti',
+  ASETUSLAUSE: 'parseri/Asetuslause'
 };
