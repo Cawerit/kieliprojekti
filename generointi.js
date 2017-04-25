@@ -8,19 +8,19 @@ module.exports.generoi = function(ast, kohdekieli) {
         throw new Error(virheet.GENEROINTI_TARVITSEE_OHJELMAN);
     }
     
-    let tulos = '';
-    
-    ast[0].runko.forEach(solmu => {
-       const koodari = generoija[solmu.tyyppi];
-       if (koodari) {
-           tulos += koodari({
-               solmu
-           });
-       } else {
-           console.log('looloolool');
-           throw new Error(`Ei muokkaajaa tyypille ${solmu.tyyppi}`);
+    const kavele = solmu => {
+      const koodari = generoija[solmu.tyyppi];  
+      if (koodari) {
+          return koodari({
+              solmu,
+              kavele
+          });
+      } else {
+          const err = new Error(`Ei muokkaajaa tyypille ${solmu.tyyppi}`);
+          console.log(err);
+          throw err;
        }
-    });
+    };
     
-    return tulos;
+    return kavele(ast[0]);
 };

@@ -1,0 +1,27 @@
+[
+  {
+    "tyyppi": "parseri/Ohjelma",
+    "runko": [
+      {
+        "tyyppi": "parseri/Funktiokutsu",
+        "arvo": "*",
+        "argumentit": {
+          "ilmaisut": [
+            [
+              {
+                "arvo": "a",
+                "tyyppi": "parseri/Muuttuja"
+              }
+            ],
+            [
+              {
+                "arvo": "b",
+                "tyyppi": "parseri/Muuttuja"
+              }
+            ]
+          ]
+        }
+      }
+    ]
+  }
+]

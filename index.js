@@ -34,16 +34,14 @@ if (args.f) {
         
         const muunnettu = muuntaja.muunna(ast);
     
-        apufunktiot.nayta(muunnettu);
-        return;
+        // apufunktiot.nayta(muunnettu);
         
-        
-        console.log('=======================================');
-        
-        return;
-    
-        const generoitu = generointi.generoi(muunnettu, args.kieli || 'java');
-    
-        console.log(generoitu);
+        // console.log('=======================================');
+        try {
+            const generoitu = generointi.generoi(muunnettu, args.kieli || 'javascript');
+            console.log(generoitu);
+        } catch (err) {
+            console.log(err);
+        }
     });
 }

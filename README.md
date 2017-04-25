@@ -15,5 +15,7 @@
 
 ## Ohjelmointikieli Ö
 
-Abstrakti.
+Ö on funktionaalinen, suomenkielinen ohjelmointikieli. Kielen tarkoituksena on olla 
+helppokäyttöinen vaihtoehto funktionaalisiin ohjelmointikieliin tutustuvalle.
+
 

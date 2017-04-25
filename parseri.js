@@ -57,7 +57,6 @@ function parse(tokenit) {
      */
     function parseRunko(runkoAluksi) {
       const runko = runkoAluksi || [];
-      const iid = _.uniqueId();
       let sisennys = 0;
       // Tarkistetaan mikä on tämänhetkinen sisennyksen taso
       for(let i = indeksi; i >= 0; i--) {
