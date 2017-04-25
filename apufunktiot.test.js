@@ -14,3 +14,11 @@ describe('onErikoismerkki funktio', () => {
     
 });
 
+
+describe('onNatiivikutsu funktio', () => {
+    
+    test('tunnistaa apufunktion', () => {
+       expect(apufunktiot.onNatiivikutsu('%%%foo%%%')).toBe(true); 
+    });
+    
+})

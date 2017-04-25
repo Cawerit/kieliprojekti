@@ -1,11 +1,11 @@
 var parseriTyypit = require('./parserityypit.js'),
     tokenTyypit = require('./tokenit.js'),
     virheet = require('./virheviestit.js'),
+    apufunktiot = require('./apufunktiot.js'),
     _ = require('lodash')
   ;
 
-function parse(tokenit) {
-    
+function parse(tokenit, natiiviKutsut) {
     let indeksi = 0, token = tokenit[indeksi];
 
     const seuraava = () => token = tokenit[++indeksi];
@@ -175,7 +175,7 @@ function parse(tokenit) {
       }
       
       if (token.tyyppi === tokenTyypit.INFIKSISYMBOLI) {
-        tulos.tyyppi = parseriTyypit.INFIKSIFUNKTIOKUTSU;
+        tulos.tyyppi = (natiiviKutsut && apufunktiot.onNatiivikutsu(token.arvo)) ? parseriTyypit.NATIIVIKUTSU : parseriTyypit.INFIKSIFUNKTIOKUTSU;
         return tulos;
       }
 
@@ -294,11 +294,11 @@ function parse(tokenit) {
     
 }
 
-module.exports.parse = function(tokenit) {
+module.exports.parse = function(tokenit, natiiviKutsut) {
     return [
       {
           tyyppi: parseriTyypit.OHJELMA,
-          runko: parse(tokenit)
+          runko: parse(tokenit, natiiviKutsut)
       }
     ];
 };

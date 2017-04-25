@@ -11,5 +11,6 @@ module.exports = {
   TEKSTI: 'parseri/Teksti',
   INFIKSIFUNKTIOKUTSU: 'parseri/Infiksifunktiokutsu',
   INFIKSIFUNKTIOLUONTI: 'parseri/Infiksifunktioluonti',
-  ASETUSLAUSE: 'parseri/Asetuslause'
+  ASETUSLAUSE: 'parseri/Asetuslause',
+  NATIIVIKUTSU: 'parseri/Natiivikutsu'
 };

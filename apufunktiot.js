@@ -8,9 +8,13 @@ function nayta (obj) {
     console.log(JSON.stringify(obj, null, 4));
 }
 
+function onNatiivikutsu(nimi) {
+    return /%%%[A-Za-z]+%%%/.test(nimi);
+}
+
 
 function sisaltaaErikoismerkkeja(teksti) {
     return Array.from(teksti).some(onErikoismerkki);
 }
 
-module.exports = { sisaltaaErikoismerkkeja, onErikoismerkki, numeroReg, nayta };
+module.exports = { sisaltaaErikoismerkkeja, onErikoismerkki, numeroReg, nayta, onNatiivikutsu };
