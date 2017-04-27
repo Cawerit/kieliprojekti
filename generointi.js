@@ -26,7 +26,7 @@ function generoi(ast, kohdekieli) {
     }
     
     const kavele = solmu => {
-      const koodari = generoija[solmu.tyyppi];  
+      const koodari = generoija[solmu.tyyppi];
       if (koodari) {
           return koodari({
               solmu,

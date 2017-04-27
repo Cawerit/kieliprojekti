@@ -2,8 +2,16 @@ var standardikirjasto;
 
 (function() {
     
+    /**
+     * Yhteenlasku numeroilla
+     */
     var summaa = fn('+', ['Numero', 'Numero'], function(a, b){ return a + b; }); 
+    /**
+     * Jakolasku numeroilla
+     */
     var jaa = fn('/', ['Numero', 'Numero'], function(a, b){ return a / b; });
+    
+    var yhdistaTekstit = fn('++', ['Teksti', 'Teksti'], function(a, b) { return a + b; });
     
     function tyyppi(a) {
         switch(typeof a) {
@@ -23,7 +31,7 @@ var standardikirjasto;
         return function() {
             var args = Array.prototype.slice.call(arguments);
             for(var i = 0, n = args.length; i < n; i++) {
-                if (argTyypit[i] !== typeof args[i]) {
+                if (argTyypit[i] !== tyyppi(args[i])) {
                     argumenttiVirhe(nimi, i, args[i], argTyypit[i]);
                 }
             }
@@ -34,7 +42,8 @@ var standardikirjasto;
     standardikirjasto = {
         summaa: summaa,
         jaa: jaa,
-        tyyppi: tyyppi
+        tyyppi: tyyppi,
+        yhdistaTekstit: yhdistaTekstit
     };
     
 })();

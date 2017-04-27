@@ -8,7 +8,8 @@ var args = require('yargs').argv,
     forEach = require('lodash/forEach'),
     generointi = require('./generointi.js'),
     cloneDeep = require('lodash/cloneDeep'),
-    apufunktiot = require('./apufunktiot.js')
+    apufunktiot = require('./apufunktiot.js'),
+    vm = require('vm')
     ;
 
 
@@ -33,13 +34,22 @@ if (args.f) {
         // return;
         
         const muunnettu = muuntaja.muunna(ast);
+        
+        // console.log(tokenit);
     
         //apufunktiot.nayta(muunnettu);
         
         // console.log('=======================================');
+        
         try {
-            const generoitu = generointi.generoi(muunnettu, args.kieli || 'javascript');
-            console.log(generoitu);
+            const suorita = !!args.e;
+            const generoitu = generointi.generoi(muunnettu, suorita ? 'javascript' : (args.kieli || 'javascript'));
+            
+            if (suorita) {
+                console.log(new vm.Script(generoitu).runInNewContext()); // Suorittaa annetun ö-tiedoston konsolissa
+            } else {
+                 console.log(generoitu);   
+            }
         } catch (err) {
             console.log(err);
         }

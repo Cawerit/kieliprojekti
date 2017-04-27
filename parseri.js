@@ -27,7 +27,7 @@ function parse(tokenit, natiiviKutsut) {
 
     // Debuggauksessa käytetty raja joka estää ikuisten looppien tulon vahingossa
     const turvaraja = (() => {
-      let raja = 100;
+      let raja = 1000;
       return () => {
         if (--raja <= 0) {
           throw new Virhe('Liian monta kierrosta');

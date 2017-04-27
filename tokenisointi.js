@@ -101,7 +101,7 @@ module.exports.tokenisoi = function(tiedosto) {
           while(indeksi < tiedosto.length && rivinvaihto.test(merkki)) {
             let seuraavaRivinVaihto = tiedosto.indexOf('\n', indeksi + 1);
             if (seuraavaRivinVaihto === -1) {
-              seuraavaRivinVaihto = tiedosto.length - 1;
+              seuraavaRivinVaihto = tiedosto.length;
             }
             
             const rivi = tiedosto.substring(indeksi, seuraavaRivinVaihto);
