@@ -34,7 +34,7 @@ if (args.f) {
         
         const muunnettu = muuntaja.muunna(ast);
     
-        // apufunktiot.nayta(muunnettu);
+        //apufunktiot.nayta(muunnettu);
         
         // console.log('=======================================');
         try {

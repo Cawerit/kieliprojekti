@@ -1,1 +1,9 @@
-infiksi 5 + (a, b) = %%%summaa%%%
+infiksi 5 + (a, b) = %%%summaa%%%(a, b)
+
+infiksi 5 - (a, b) = %%%vahenna%%%(a, b)
+
+infiksi 10 * (a, b) = %%%kerro%%%(a, b)
+
+infiksi 10 / (a, b) = %%%jaa%%%(a, b)
+
+tyyppi(a) = %%%tyyppi%%%(a)

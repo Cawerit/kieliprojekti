@@ -2,11 +2,21 @@ var parseriTyypit = require('./parserityypit.js'),
     tokenTyypit = require('./tokenit.js'),
     virheet = require('./virheviestit.js'),
     apufunktiot = require('./apufunktiot.js'),
-    _ = require('lodash')
+    _ = require('lodash'),
+    args = require('yargs').argv
   ;
+
+/**
+ * Parseri huolehtii tokenisoinnista saatujen tokeni-listojen järjestämisestä
+ * asymmetriseksi syntaksipuuksi. Asymmetrinen syntaksipuu 
+ **/ 
 
 function parse(tokenit, natiiviKutsut) {
     let indeksi = 0, token = tokenit[indeksi];
+    
+    if (natiiviKutsut == undefined) {
+      natiiviKutsut = !!args.natiivi;
+    }
 
     const seuraava = () => token = tokenit[++indeksi];
     const infiksiAvainsana = 'infiksi';
@@ -215,16 +225,21 @@ function parse(tokenit, natiiviKutsut) {
 
       if (token.tyyppi === tokenTyypit.SULKU) {
         if (token.arvo === '(') {
-          if (edellinen.tyyppi === parseriTyypit.MUUTTUJA) {
-            edellinen.tyyppi = parseriTyypit.FUNKTIOKUTSU;
-            edellinen.argumentit = parseArgumenttiTaiParametriLista();
-            return;
-          } else {
-            return Object.assign(parseArgumenttiTaiParametriLista(), {
-              tyyppi: parseriTyypit.ILMAISULISTA
-            });
+          switch (edellinen.tyyppi) {
+            
+            case parseriTyypit.MUUTTUJA:
+              edellinen.tyyppi = parseriTyypit.FUNKTIOKUTSU;
+              // break; jätetty pois tarkoituksella
+              
+            case parseriTyypit.NATIIVIKUTSU:
+              edellinen.argumentit = parseArgumenttiTaiParametriLista();
+              return;
+              
+            default:
+              return Object.assign(parseArgumenttiTaiParametriLista(), {
+                tyyppi: parseriTyypit.ILMAISULISTA
+              });
           }
-
         } else {
           throw new Virhe(virheet.ODOTTAMATON_ILMAISUN_LOPETUS);
         }

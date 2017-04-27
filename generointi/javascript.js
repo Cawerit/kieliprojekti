@@ -43,9 +43,12 @@ module.exports = {
   [P.MUUTTUJA]: ({solmu}) => enk(solmu.arvo),
   
   [P.NATIIVIKUTSU]: ({solmu, kavele}) => {
-    return `standardikirjasto.${solmu.arvo.replace(/%%%/g, '')}.apply(this, Array.prototype.slice.call(arguments))`;  
+    const argumentit = solmu.argumentit.ilmaisut.map(i => kavele(i[0])).join(',');
+    return `standardikirjasto.${solmu.arvo.replace(/%%%/g, '')}(${argumentit})`;  
   },
   
-  [P.NUMERO]: ({solmu}) => parseFloat(solmu.arvo)
+  [P.NUMERO]: ({solmu}) => parseFloat(solmu.arvo),
+  
+  [P.TEKSTI]: ({solmu}) => '"' + (solmu.arvo) + '"'
     
 };
