@@ -5,13 +5,24 @@ var standardikirjasto;
     /**
      * Yhteenlasku numeroilla
      */
+     
     var summaa = fn('+', ['Numero', 'Numero'], function(a, b){ return a + b; }); 
     /**
      * Jakolasku numeroilla
      */
     var jaa = fn('/', ['Numero', 'Numero'], function(a, b){ return a / b; });
     
+    /**
+     * Yhdistää kaksi tekstiä toisiinsa
+     */
     var yhdistaTekstit = fn('++', ['Teksti', 'Teksti'], function(a, b) { return a + b; });
+    
+    function Komento(tehtava, tilanMuokkaus) {
+        this.tehtava = tehtava;
+        this.tilanMuokkaus = tilanMuokkaus;
+    }
+    
+    var nayta = fn('nayta', ['Teksti', 'Funktio'], (tehtava, tilanMuokkaus) => new Komento(tehtava, tilanMuokkaus));
     
     function tyyppi(a) {
         switch(typeof a) {
@@ -43,7 +54,8 @@ var standardikirjasto;
         summaa: summaa,
         jaa: jaa,
         tyyppi: tyyppi,
-        yhdistaTekstit: yhdistaTekstit
+        yhdistaTekstit: yhdistaTekstit,
+        nayta: nayta
     };
     
 })();

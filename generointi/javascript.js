@@ -49,6 +49,8 @@ module.exports = {
   
   [P.NUMERO]: ({solmu}) => parseFloat(solmu.arvo),
   
-  [P.TEKSTI]: ({solmu}) => '"' + (solmu.arvo) + '"'
+  [P.TEKSTI]: ({solmu}) => '"' + (solmu.arvo) + '"',
+  
+  [P.ASETUSLAUSE]: ({solmu, kavele}) => `var ${enk(solmu.arvo)} = (${solmu.runko.map(kavele)});`
     
 };

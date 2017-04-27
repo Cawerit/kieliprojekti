@@ -225,7 +225,7 @@ function parse(tokenit, natiiviKutsut) {
 
       if (token.tyyppi === tokenTyypit.SULKU) {
         if (token.arvo === '(') {
-          switch (edellinen.tyyppi) {
+          switch (edellinen && edellinen.tyyppi) {
             
             case parseriTyypit.MUUTTUJA:
               edellinen.tyyppi = parseriTyypit.FUNKTIOKUTSU;
