@@ -1,4 +1,4 @@
-tila = objekti( "peliväline1": eiMitään, "peliväline2": eiMitään, "nimi1": eiMitään, "nimi2": eiMitään )
+tila = "Hei maailma!"
 
 ohjelma (tila) =
-  nayta("Hei maailma!")
+  näytä(tila)

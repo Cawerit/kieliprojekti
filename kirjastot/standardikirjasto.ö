@@ -22,7 +22,6 @@ infiksi 10 % (a, b) = %%%jakojaannos%%%(a, b)
 
 infiksi 11 ^ (a, b) = %%%potenssiinKorotus%%%(a, b)
 
-
 on(a, b) = %%%on%%%(a, b)
 
 

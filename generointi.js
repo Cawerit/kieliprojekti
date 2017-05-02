@@ -14,11 +14,11 @@ module.exports.generoi = function(ast, kohdekieli) {
     const standardikirjasto = fs.readFileSync(path.join(__dirname, 'kirjastot', 'standardikirjasto.ö'), 'utf8');
     
     return standardikirjastoJs + '\n' +
-        generoi(kasittele(standardikirjasto), kohdekieli) + '\n' +
+        generoi(kasittele(standardikirjasto), kohdekieli, true) + '\n' +
         generoi(ast, kohdekieli);
 };
 
-function generoi(ast, kohdekieli) {
+function generoi(ast, kohdekieli, vaadiOhjelma = false) {
     const generoija = require('./generointi/' + kohdekieli + '.js');
     
     if (!ast.length === 1 || ast[0].tyyppi !== parseriTyypit.OHJELMA) {
@@ -30,7 +30,8 @@ function generoi(ast, kohdekieli) {
       if (koodari) {
           return koodari({
               solmu,
-              kavele
+              kavele,
+              vaadiOhjelma
           });
       } else {
           const err = new Error(`Ei muokkaajaa tyypille ${solmu.tyyppi}`);

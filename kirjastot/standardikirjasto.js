@@ -1,6 +1,7 @@
 var standardikirjasto;
 
 (function() {
+    function noop() {};
     
     /**
      * Yhteenlasku numeroilla
@@ -18,11 +19,33 @@ var standardikirjasto;
     var yhdistaTekstit = fn('++', ['Teksti', 'Teksti'], function(a, b) { return a + b; });
     
     function Komento(tehtava, tilanMuokkaus) {
-        this.tehtava = tehtava;
-        this.tilanMuokkaus = tilanMuokkaus;
+        this._tehtava = tehtava;
+        this._tilanMuokkaus = tilanMuokkaus;
     }
     
-    var nayta = fn('nayta', ['Teksti', 'Funktio'], (tehtava, tilanMuokkaus) => new Komento(tehtava, tilanMuokkaus));
+    Komento.prototype.tehtava = function() {
+      try {
+          var tulos = this._tehtava();
+          return Promise.resolve(tulos);
+      } catch (err) {
+          console.log(err);
+          return Promise.reject(err);
+      }
+    };
+    
+    Komento.prototype.tilanMuokkaus = function(vanhaTila, komennonTulos) {
+        if (typeof this._tilanMuokkaus === 'function') { 
+            try {
+                return this._tilanMuokkaus(vanhaTila);
+            } catch (err) {
+                console.log(err);
+            }
+        }
+    };
+    
+    var nayta = fn('nayta', ['Teksti'], function(viesti) {
+        return new Komento(function() { console.log(viesti); }, undefined);    
+    });
     
     function tyyppi(a) {
         switch(typeof a) {
@@ -35,7 +58,7 @@ var standardikirjasto;
     }
     
     function argumenttiVirhe(nimi, indeksi, argumentti, tyyppi) {
-        throw new Error(`Huono argumentti funktioon ${nimi}. Argumentin ${indeksi} pitäisi olla ${tyyppi}, mutta se oli ${argumentti}`);    
+        throw new Error(`Huono argumentti funktioon ${nimi}. Argumentin ${indeksi + 1} pitäisi olla ${tyyppi}, mutta se oli ${argumentti}`);    
     }
     
     function fn(nimi, argTyypit, f) {
@@ -50,12 +73,31 @@ var standardikirjasto;
         }
     }
     
+    function suorita(ohjelma, tila) {
+        try {
+            var tulos = ohjelma(tila);
+            
+            if (tulos && tulos instanceof Komento) {
+                var tehtavanTulos = tulos.tehtava();
+                tehtavanTulos.then(function(t) {
+                    var uusiTila = tulos.tilanMuokkaus(tila, t); 
+                    if (uusiTila) {
+                        suorita(ohjelma, uusiTila);
+                    }
+                });
+            }
+        } catch (virhe) {
+            console.log(virhe);
+        }
+    }
+    
     standardikirjasto = {
         summaa: summaa,
         jaa: jaa,
         tyyppi: tyyppi,
         yhdistaTekstit: yhdistaTekstit,
-        nayta: nayta
+        nayta: nayta,
+        suorita: suorita
     };
     
 })();

@@ -23,9 +23,25 @@ function ${enk(solmu.arvo)} (${parametrit}) { ${runko.join('')} }`);
 module.exports = {
   
   [P.OHJELMA]: kavely => {
-    const solmu = kavely.solmu;
-    const tulos = solmu.runko.map(kavely.kavele).join('; ');
-    return beautify(tulos);
+    const solmu = kavely.solmu,
+      tulos = solmu.runko.map(kavely.kavele).join('; '),
+      kaunistettu = beautify(tulos),
+      ohjelmaNimi = enk('ohjelma'),
+      tilaNimi = enk('tila')
+    ;
+    
+    return kavely.vaadiOhjelma ? kaunistettu : `
+    
+${kaunistettu}
+;
+
+if (typeof ${ohjelmaNimi} !== 'function' || typeof ${tilaNimi} === 'undefined') {
+  throw new Error('Ö-ohjelma vaatii funktion nimeltä "ohjelma" ja tilan');
+} else {
+  standardikirjasto.suorita(${ohjelmaNimi}, ${tilaNimi});
+}
+    
+    `;
   },
   
   [P.FUNKTIOLUONTI]: generoiFunktioluonti,
