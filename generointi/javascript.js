@@ -59,8 +59,14 @@ if (typeof ${ohjelmaNimi} !== 'function' || typeof ${tilaNimi} === 'undefined') 
   [P.MUUTTUJA]: ({solmu}) => enk(solmu.arvo),
   
   [P.NATIIVIKUTSU]: ({solmu, kavele}) => {
-    const argumentit = solmu.argumentit.ilmaisut.map(i => kavele(i[0])).join(',');
-    return `standardikirjasto.${solmu.arvo.replace(/%%%/g, '')}(${argumentit})`;  
+    const arvo = solmu.arvo.replace(/%%%/g, '');
+    
+    if (solmu.argumentit) {
+      const argumentit = solmu.argumentit.ilmaisut.map(i => kavele(i[0])).join(',');
+      return `standardikirjasto.${arvo}(${argumentit})`;  
+    } else {
+      return `standardikirjasto.${arvo}`;
+    }
   },
   
   [P.NUMERO]: ({solmu}) => parseFloat(solmu.arvo),

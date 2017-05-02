@@ -4,27 +4,37 @@ tyyppi(a) =
 infiksi 5 + (a, b) = 
   %%%summaa%%%(a, b)
 
-
 infiksi 5 - (a, b) = 
   %%%vahenna%%%(a, b)
   
 infiksi 10 * (a, b) = %%%kerro%%%(a, b)
 
-
 infiksi 10 / (a, b) = %%%jaa%%%(a, b)
-
 
 infiksi 5 ++ (a, b) = %%%yhdistaTekstit%%%(a, b)
 
-
 infiksi 10 % (a, b) = %%%jakojaannos%%%(a, b)
-
 
 infiksi 11 ^ (a, b) = %%%potenssiinKorotus%%%(a, b)
 
 on(a, b) = %%%on%%%(a, b)
 
-
 infiksi 2 on: (a, b) = %%%on%%%(a, b)
 
 näytä(teksti, tila) = %%%nayta%%%(teksti, tila)
+
+tämä(arvo) = %%%tama%%%(arvo)
+
+eiMitään = %%%eiMitaan%%%
+
+pituus(jono) = %%%pituus%%%(jono)
+
+jos(ehto, arvo) = %%%jos%%%(ehto, arvo)
+
+infiksi 1 muutoin: (ehkäArvo, taiSitten) = %%%muutoin%%%(ehkäArvo, taiSitten)
+
+muutoin(ehkäArvo, taiSitten) = %%%muutoin%%%(ehkäArvo, taiSitten)
+
+kysy(kysymys, tilanMuokkaus) = %%%kysy%%%(kysymys, tilanMuokkaus)
+
+identiteetti(a) = a

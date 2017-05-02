@@ -18,6 +18,107 @@ var standardikirjasto;
      */
     var yhdistaTekstit = fn('++', ['Teksti', 'Teksti'], function(a, b) { return a + b; });
     
+    function Ehka () {}
+    function Tama (arvo) { Ehka.call(this); this.arvo = arvo; }
+    function EiMitaan () { Ehka.call(this); }
+    
+    Tama.prototype = Object.create(Ehka.prototype);
+    EiMitaan.prototype = Object.create(Ehka.prototype);
+    
+    Tama.prototype.toString = function() {
+        return 'tämä(' + this.arvo + ')';
+    };
+    
+    EiMitaan.prototype.toString = function() {
+        return 'eiMitaan';
+    };
+    
+    Tama.prototype._on = function(b) {
+        return !!b && b instanceof Tama && on(b.arvo, this.arvo);
+    };
+    
+    EiMitaan.prototype._on = function(b) {
+        return b === this || (!!b && b instanceof EiMitaan);
+    };
+    
+    Tama.prototype.constructor = Tama;
+    EiMitaan.prototype.constructor = EiMitaan;
+    
+    function on(a, b) {
+        if (a === b) {
+            return true;
+        }
+        if (a == null || b == null) {
+            return false;    
+        }
+        if (typeof a === 'object' && typeof b === 'object') {
+            if (a.constructor !== b.constructor) return false;
+            var proto = Object.getPrototypeOf(a);
+            if (typeof proto._on === 'function') {
+                return proto._on.call(a, b);
+            }
+            var keysA = Object.keys(a);
+            var keysB = Object.keys(b);
+            if (keysA.length !== keysB.length) {
+                return false;
+            }
+            for(var i = 0, n = keysA.length; i < n; i++) {
+                var key = keysA[i];
+                if(!on(a[key], b[key])) {
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+        
+        return false;
+    } 
+    
+    function kysy(kysymys, tilanMuokkaus) {
+        return new Komento(function() {
+            return new Promise(function(resolve) {
+                var readline = require('readline');
+                var rl = readline.createInterface({
+                  input: process.stdin,
+                  output: process.stdout
+                });
+                rl.question(kysymys, function(vastaus) {
+                    resolve(vastaus);
+                    rl.close();
+                }); 
+            });
+        }, tilanMuokkaus);
+    }
+    
+    function pituus (jono) {
+        if (typeof jono === 'string' || Array.isArray(jono)) {
+            return Array.from(jono).length;
+        } else {
+            argumenttiVirhe('pituus', 0, jono, 'Teksti tai Lista');
+        }
+    }
+    
+    var jos = fn('jos', ['Totuusarvo', '*'], function(ehto, arvo) {
+        if(ehto) {
+            return new Tama(arvo);
+        } else {
+            return new EiMitaan();
+        }
+    });
+    
+    function muutoin(ehkaArvo, taiSitten) {
+        if (!ehkaArvo || !(ehkaArvo instanceof Ehka)) {
+            argumenttiVirhe('muutoin:', 0, ehkaArvo, 'tämä(arvo) tai eiMitään');
+        } else if (taiSitten === undefined) {
+            argumenttiVirhe('muutoin:', 1, taiSitten, 'jotakin');
+        } else {
+            
+            return ehkaArvo instanceof Tama ? ehkaArvo.arvo : taiSitten;
+            
+        }
+    }
+    
     function Komento(tehtava, tilanMuokkaus) {
         this._tehtava = tehtava;
         this._tilanMuokkaus = tilanMuokkaus;
@@ -28,7 +129,6 @@ var standardikirjasto;
           var tulos = this._tehtava();
           return Promise.resolve(tulos);
       } catch (err) {
-          console.log(err);
           return Promise.reject(err);
       }
     };
@@ -36,7 +136,7 @@ var standardikirjasto;
     Komento.prototype.tilanMuokkaus = function(vanhaTila, komennonTulos) {
         if (typeof this._tilanMuokkaus === 'function') { 
             try {
-                return this._tilanMuokkaus(vanhaTila);
+                return this._tilanMuokkaus(komennonTulos);
             } catch (err) {
                 console.log(err);
             }
@@ -65,7 +165,7 @@ var standardikirjasto;
         return function() {
             var args = Array.prototype.slice.call(arguments);
             for(var i = 0, n = args.length; i < n; i++) {
-                if (argTyypit[i] !== tyyppi(args[i])) {
+                if (argTyypit[i] !== '*' && argTyypit[i] !== tyyppi(args[i])) {
                     argumenttiVirhe(nimi, i, args[i], argTyypit[i]);
                 }
             }
@@ -76,12 +176,11 @@ var standardikirjasto;
     function suorita(ohjelma, tila) {
         try {
             var tulos = ohjelma(tila);
-            
             if (tulos && tulos instanceof Komento) {
                 var tehtavanTulos = tulos.tehtava();
                 tehtavanTulos.then(function(t) {
-                    var uusiTila = tulos.tilanMuokkaus(tila, t); 
-                    if (uusiTila) {
+                    var uusiTila = tulos.tilanMuokkaus(tila, t);
+                    if (uusiTila !== undefined) {
                         suorita(ohjelma, uusiTila);
                     }
                 });
@@ -97,7 +196,14 @@ var standardikirjasto;
         tyyppi: tyyppi,
         yhdistaTekstit: yhdistaTekstit,
         nayta: nayta,
-        suorita: suorita
+        suorita: suorita,
+        tama: function(a) { return new Tama(a); },
+        eiMitaan: new EiMitaan(),
+        pituus: pituus,
+        jos: jos,
+        muutoin: muutoin,
+        kysy: kysy,
+        on: on
     };
     
 })();
