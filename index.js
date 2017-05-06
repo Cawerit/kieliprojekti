@@ -19,9 +19,9 @@ if (args.f) {
             console.error(virhe);
             return;
         }
-        
+
         const tokenit = tokenisointi.tokenisoi(tiedosto);
-        
+
         let ast;
         try {
             ast = parseri.parse(tokenit);
@@ -29,26 +29,26 @@ if (args.f) {
             console.log(virheet.kasitteleVirhe(virhe, tiedosto));
             return;
         }
-        
-        // apufunktiot.nayta(ast);
-        // return;
-        
+
+        apufunktiot.nayta(ast);
+        //return;
+
         const muunnettu = muuntaja.muunna(ast);
-        
+
         // console.log(tokenit);
-    
+
         //apufunktiot.nayta(muunnettu);
-        
+
         // console.log('=======================================');
-        
+
         try {
             const suorita = !!args.e;
             const generoitu = generointi.generoi(muunnettu, suorita ? 'javascript' : (args.kieli || 'javascript'));
-            
+
             if (suorita) {
                 console.log(new vm.Script(generoitu).runInNewContext()); // Suorittaa annetun ö-tiedoston konsolissa
             } else {
-                 console.log(generoitu);   
+                 console.log(generoitu);
             }
         } catch (err) {
             console.log(err);

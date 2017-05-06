@@ -3,5 +3,4 @@ tila = ""
 ohjelma (nimi) =
   totuus = pituus(nimi) on: 0
   kysymys = kysy("Anna nimesi: ", identiteetti)
-  jossittelu = jos(totuus, kysymys)
-  muutoin(jossittelu, näytä("Terve " ++ nimi ++ "!"))
+  muutoin(jos(totuus, kysymys), näytä("Terve " ++ nimi ++ "!"))
