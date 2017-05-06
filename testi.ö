@@ -1,6 +1,1 @@
-tila = ""
-
-ohjelma (nimi) =
-  totuus = pituus(nimi) on: 0
-  kysymys = kysy("Anna nimesi: ", identiteetti)
-  muutoin(jos(totuus, kysymys), näytä("Terve " ++ nimi ++ "!"))
+foo()
