@@ -3,7 +3,7 @@
 @{%
   const _ = require('lodash');
 
-  const varattu = /[",.=]|%%%/;
+  const varattu = /[",.=; ]|%%%|\s|\t|\n|\r|infiksi/;
   const numero = /[0-9]/;
 
   function sisaltaaErikoismerkkeja(x) {
@@ -34,29 +34,25 @@
 
   const flatJoin = x => _.flattenDeep(x).join('');
 
-  const kasittele = {
-    funktioluonti(d) {
-      return { tyyppi: 'funktioluonti', arvo: d[0].arvo, parametrit: (d[4] || []).map(_.property('arvo')) };
-    },
-    funktiokutsu(d) {
-      return { tyyppi: 'funktiokutsu', arvo: d[0].arvo, argumentit: d[4] || [] };
-    }
-  };
+  const kasitteleParametrit = p =>  (p || []).map(_.property('arvo'))
 
 %}
 
 
-main -> runko {% _.head %}
+main -> runko br:* {% _.head %}
 
-runko -> ilmaisujoukko {% d => d[0] %}
+runko ->
+  "%%%{" _ ilmausjoukko _ "}%%%" {% d => d[2] %}
 
-ilmaisujoukko ->
-  ilmaisu
-  | ilmaisu _ "\n" _ ilmaisujoukko {% d => [d[0]].concat(d[4]) %}
+@{% const kasitteleIlmausjoukko = d => [d[0]].concat(d[4]); %}
+ilmausjoukko ->
+  ilmaus
+  | ilmaisu _ ";" _ ilmausjoukko {% kasitteleIlmausjoukko %}
+  | infiksifunktioluonti _ ";" _ ilmausjoukko {% kasitteleIlmausjoukko %}
 
 argumenttilista ->
-  ilmaisu
-  | ilmaisu _ "," _ argumenttilista {% d => [d[0]].concat(d[4]) %}
+  ilmaus
+  | ilmaus _ "," _ argumenttilista {% d => [d[0]].concat(d[4]) %}
 
 parametrilista ->
   muuttuja
@@ -64,16 +60,67 @@ parametrilista ->
 
 ilmaisu ->
   funktioluonti {% _.head %}
+  | muuttujaluonti {% _.head %}
+
+ilmaus ->
+  ilmausEiInfiksi {% _.head %}
+  | infiksifunktiokutsu {% _.head %}
+
+ilmausEiInfiksi ->
+  funktioluonti {% _.head %}
   | funktiokutsu {% _.head %}
   | muuttuja {% _.head %}
   | luku {% _.head %}
 
+infiksifunktioluonti ->
+  "infiksi" __ luku __ erikoismerkkijono _ "(" _ parametrilista:? _ ")" _ "=" _ runko
+  {% d => {
+      const [, , precedence, , nimi, , , , parametrit, , , , , , runko] = d;
+      return {
+        tyyppi: 'infiksifunktioluonti',
+        precedence: precedence.arvo,
+        arvo: nimi,
+        parametrit,
+        runko
+      };
+  }%}
 
-funktioluonti -> muuttuja _ "(" _ parametrilista:? _ ")" _ "="
-  {% kasittele.funktioluonti %}
+funktioluonti -> muuttuja _ "(" _ parametrilista:? _ ")" _ "=" _ runko
+  {% d => {
+    return {
+      tyyppi: 'funktioluonti',
+      arvo: d[0].arvo,
+      parametrit: kasitteleParametrit(d[4]),
+      runko: d[10]
+    };
+  }%}
+
+muuttujaluonti ->
+  muuttuja _ "=" _ ilmaus:? runko:?
+  {% function(d, pos, reject) {
+    const [nimi, , , ,ilmaus, runko] = d;
+    if (!ilmaus && !runko) return reject;
+    return {
+      tyyppi: 'muuttujaluonti',
+      arvo: nimi.arvo,
+      runko: ilmaus || runko
+    };
+  }%}
+
+infiksifunktiokutsu -> ilmaus _ erikoismerkkijono _ ilmausEiInfiksi
+  {% d => {
+      return {
+        tyyppi: 'funktiokutsu',
+        infiksi: true,
+        arvo: d[2],
+        argumentit: [d[0], d[4]]
+      };
+  }%}
 
 funktiokutsu -> muuttuja _ "(" _ argumenttilista:? _ ")"
-  {% kasittele.funktiokutsu %}
+  {% d => {
+    return { tyyppi: 'funktiokutsu', arvo: d[0].arvo, argumentit: d[4] || [] };
+  }%}
 
 muuttuja -> merkkijono {% d => ({ tyyppi: 'muuttuja', arvo: d[0] }) %}
 
@@ -99,3 +146,5 @@ merkkijono -> %merkki:* {%
 luku ->
   %numero:+ {% d => ({ tyyppi: 'numero', arvo: parseInt(d[0], 10) }) %}
   | %numero:+ "." %numero:+ {% d => ({ tyyppi: 'numero', arvo: parseFloat(flatJoin(d)) }) %}
+
+br -> [\r\n]

@@ -5,7 +5,7 @@ function id(x) {return x[0]; }
 
   const _ = require('lodash');
 
-  const varattu = /[",.=]|%%%/;
+  const varattu = /[",.=; ]|%%%|\s|\t|\n|\r|infiksi/;
   const numero = /[0-9]/;
 
   function sisaltaaErikoismerkkeja(x) {
@@ -36,16 +36,10 @@ function id(x) {return x[0]; }
 
   const flatJoin = x => _.flattenDeep(x).join('');
 
-  const kasittele = {
-    funktioluonti(d) {
-      return { tyyppi: 'funktioluonti', arvo: d[0].arvo, parametrit: (d[4] || []).map(_.property('arvo')) };
-    },
-    funktiokutsu(d) {
-      return { tyyppi: 'funktiokutsu', arvo: d[0].arvo, argumentit: d[4] || [] };
-    }
-  };
+  const kasitteleParametrit = p =>  (p || []).map(_.property('arvo'))
 
-var grammar = {
+
+ const kasitteleIlmausjoukko = d => [d[0]].concat(d[4]); var grammar = {
     Lexer: undefined,
     ParserRules: [
     {"name": "_$ebnf$1", "symbols": []},
@@ -55,24 +49,76 @@ var grammar = {
     {"name": "__$ebnf$1", "symbols": ["__$ebnf$1", "wschar"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
     {"name": "__", "symbols": ["__$ebnf$1"], "postprocess": function(d) {return null;}},
     {"name": "wschar", "symbols": [/[ \t\n\v\f]/], "postprocess": id},
-    {"name": "main", "symbols": ["runko"], "postprocess": _.head},
-    {"name": "runko", "symbols": ["ilmaisujoukko"], "postprocess": d => d[0]},
-    {"name": "ilmaisujoukko", "symbols": ["ilmaisu"]},
-    {"name": "ilmaisujoukko", "symbols": ["ilmaisu", "_", {"literal":"\n"}, "_", "ilmaisujoukko"], "postprocess": d => [d[0]].concat(d[4])},
-    {"name": "argumenttilista", "symbols": ["ilmaisu"]},
-    {"name": "argumenttilista", "symbols": ["ilmaisu", "_", {"literal":","}, "_", "argumenttilista"], "postprocess": d => [d[0]].concat(d[4])},
+    {"name": "main$ebnf$1", "symbols": []},
+    {"name": "main$ebnf$1", "symbols": ["main$ebnf$1", "br"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
+    {"name": "main", "symbols": ["runko", "main$ebnf$1"], "postprocess": _.head},
+    {"name": "runko$string$1", "symbols": [{"literal":"%"}, {"literal":"%"}, {"literal":"%"}, {"literal":"{"}], "postprocess": function joiner(d) {return d.join('');}},
+    {"name": "runko$string$2", "symbols": [{"literal":"}"}, {"literal":"%"}, {"literal":"%"}, {"literal":"%"}], "postprocess": function joiner(d) {return d.join('');}},
+    {"name": "runko", "symbols": ["runko$string$1", "_", "ilmausjoukko", "_", "runko$string$2"], "postprocess": d => d[2]},
+    {"name": "ilmausjoukko", "symbols": ["ilmaus"]},
+    {"name": "ilmausjoukko", "symbols": ["ilmaisu", "_", {"literal":";"}, "_", "ilmausjoukko"], "postprocess": kasitteleIlmausjoukko},
+    {"name": "ilmausjoukko", "symbols": ["infiksifunktioluonti", "_", {"literal":";"}, "_", "ilmausjoukko"], "postprocess": kasitteleIlmausjoukko},
+    {"name": "argumenttilista", "symbols": ["ilmaus"]},
+    {"name": "argumenttilista", "symbols": ["ilmaus", "_", {"literal":","}, "_", "argumenttilista"], "postprocess": d => [d[0]].concat(d[4])},
     {"name": "parametrilista", "symbols": ["muuttuja"]},
     {"name": "parametrilista", "symbols": ["muuttuja", "_", {"literal":","}, "_", "parametrilista"], "postprocess": d => [d[0]].concat(d[4])},
     {"name": "ilmaisu", "symbols": ["funktioluonti"], "postprocess": _.head},
-    {"name": "ilmaisu", "symbols": ["funktiokutsu"], "postprocess": _.head},
-    {"name": "ilmaisu", "symbols": ["muuttuja"], "postprocess": _.head},
-    {"name": "ilmaisu", "symbols": ["luku"], "postprocess": _.head},
+    {"name": "ilmaisu", "symbols": ["muuttujaluonti"], "postprocess": _.head},
+    {"name": "ilmaus", "symbols": ["ilmausEiInfiksi"], "postprocess": _.head},
+    {"name": "ilmaus", "symbols": ["infiksifunktiokutsu"], "postprocess": _.head},
+    {"name": "ilmausEiInfiksi", "symbols": ["funktioluonti"], "postprocess": _.head},
+    {"name": "ilmausEiInfiksi", "symbols": ["funktiokutsu"], "postprocess": _.head},
+    {"name": "ilmausEiInfiksi", "symbols": ["muuttuja"], "postprocess": _.head},
+    {"name": "ilmausEiInfiksi", "symbols": ["luku"], "postprocess": _.head},
+    {"name": "infiksifunktioluonti$string$1", "symbols": [{"literal":"i"}, {"literal":"n"}, {"literal":"f"}, {"literal":"i"}, {"literal":"k"}, {"literal":"s"}, {"literal":"i"}], "postprocess": function joiner(d) {return d.join('');}},
+    {"name": "infiksifunktioluonti$ebnf$1", "symbols": ["parametrilista"], "postprocess": id},
+    {"name": "infiksifunktioluonti$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
+    {"name": "infiksifunktioluonti", "symbols": ["infiksifunktioluonti$string$1", "__", "luku", "__", "erikoismerkkijono", "_", {"literal":"("}, "_", "infiksifunktioluonti$ebnf$1", "_", {"literal":")"}, "_", {"literal":"="}, "_", "runko"], "postprocess":  d => {
+            const [, , precedence, , nimi, , , , parametrit, , , , , , runko] = d;
+            return {
+              tyyppi: 'infiksifunktioluonti',
+              precedence: precedence.arvo,
+              arvo: nimi,
+              parametrit,
+              runko
+            };
+        }},
     {"name": "funktioluonti$ebnf$1", "symbols": ["parametrilista"], "postprocess": id},
     {"name": "funktioluonti$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "funktioluonti", "symbols": ["muuttuja", "_", {"literal":"("}, "_", "funktioluonti$ebnf$1", "_", {"literal":")"}, "_", {"literal":"="}], "postprocess": kasittele.funktioluonti},
+    {"name": "funktioluonti", "symbols": ["muuttuja", "_", {"literal":"("}, "_", "funktioluonti$ebnf$1", "_", {"literal":")"}, "_", {"literal":"="}, "_", "runko"], "postprocess":  d => {
+          return {
+            tyyppi: 'funktioluonti',
+            arvo: d[0].arvo,
+            parametrit: kasitteleParametrit(d[4]),
+            runko: d[10]
+          };
+        }},
+    {"name": "muuttujaluonti$ebnf$1", "symbols": ["ilmaus"], "postprocess": id},
+    {"name": "muuttujaluonti$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
+    {"name": "muuttujaluonti$ebnf$2", "symbols": ["runko"], "postprocess": id},
+    {"name": "muuttujaluonti$ebnf$2", "symbols": [], "postprocess": function(d) {return null;}},
+    {"name": "muuttujaluonti", "symbols": ["muuttuja", "_", {"literal":"="}, "_", "muuttujaluonti$ebnf$1", "muuttujaluonti$ebnf$2"], "postprocess":  function(d, pos, reject) {
+          const [nimi, , , ,ilmaus, runko] = d;
+          if (!ilmaus && !runko) return reject;
+          return {
+            tyyppi: 'muuttujaluonti',
+            arvo: nimi.arvo,
+            runko: ilmaus || runko
+          };
+        }},
+    {"name": "infiksifunktiokutsu", "symbols": ["ilmaus", "_", "erikoismerkkijono", "_", "ilmausEiInfiksi"], "postprocess":  d => {
+            return {
+              tyyppi: 'funktiokutsu',
+              infiksi: true,
+              arvo: d[2],
+              argumentit: [d[0], d[4]]
+            };
+        }},
     {"name": "funktiokutsu$ebnf$1", "symbols": ["argumenttilista"], "postprocess": id},
     {"name": "funktiokutsu$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "funktiokutsu", "symbols": ["muuttuja", "_", {"literal":"("}, "_", "funktiokutsu$ebnf$1", "_", {"literal":")"}], "postprocess": kasittele.funktiokutsu},
+    {"name": "funktiokutsu", "symbols": ["muuttuja", "_", {"literal":"("}, "_", "funktiokutsu$ebnf$1", "_", {"literal":")"}], "postprocess":  d => {
+          return { tyyppi: 'funktiokutsu', arvo: d[0].arvo, argumentit: d[4] || [] };
+        }},
     {"name": "muuttuja", "symbols": ["merkkijono"], "postprocess": d => ({ tyyppi: 'muuttuja', arvo: d[0] })},
     {"name": "erikoismerkkijono$ebnf$1", "symbols": []},
     {"name": "erikoismerkkijono$ebnf$1$subexpression$1", "symbols": [merkki]},
@@ -101,7 +147,8 @@ var grammar = {
     {"name": "luku$ebnf$2", "symbols": ["luku$ebnf$2", numero], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
     {"name": "luku$ebnf$3", "symbols": [numero]},
     {"name": "luku$ebnf$3", "symbols": ["luku$ebnf$3", numero], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
-    {"name": "luku", "symbols": ["luku$ebnf$2", {"literal":"."}, "luku$ebnf$3"], "postprocess": d => ({ tyyppi: 'numero', arvo: parseFloat(flatJoin(d)) })}
+    {"name": "luku", "symbols": ["luku$ebnf$2", {"literal":"."}, "luku$ebnf$3"], "postprocess": d => ({ tyyppi: 'numero', arvo: parseFloat(flatJoin(d)) })},
+    {"name": "br", "symbols": [/[\r\n]/]}
 ]
   , ParserStart: "main"
 }
