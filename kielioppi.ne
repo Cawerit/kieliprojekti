@@ -34,7 +34,7 @@
 
   const flatJoin = x => _.flattenDeep(x).join('');
 
-  const kasitteleParametrit = p =>  (p || []).map(_.property('arvo'))
+  const kasitteleParametrit = p =>  (p || []).map(_.property('arvo'));
 
 %}
 
@@ -42,31 +42,31 @@
 main -> runko br:* {% _.head %}
 
 runko ->
-  "%%%{" _ ilmausjoukko _ "}%%%" {% d => d[2] %}
+  "%%%{" _ ilmaisujoukko _ "}%%%" {% d => d[2] %}
 
-@{% const kasitteleIlmausjoukko = d => [d[0]].concat(d[4]); %}
-ilmausjoukko ->
-  ilmaus
-  | ilmaisu _ ";" _ ilmausjoukko {% kasitteleIlmausjoukko %}
-  | infiksifunktioluonti _ ";" _ ilmausjoukko {% kasitteleIlmausjoukko %}
+@{% const kasitteleilmaisujoukko = d => [d[0]].concat(d[4]); %}
+ilmaisujoukko ->
+  ilmaisu
+  | asetus _ ";" _ ilmaisujoukko {% kasitteleilmaisujoukko %}
+  | infiksifunktioluonti _ ";" _ ilmaisujoukko {% kasitteleilmaisujoukko %}
 
 argumenttilista ->
-  ilmaus
-  | ilmaus _ "," _ argumenttilista {% d => [d[0]].concat(d[4]) %}
+  ilmaisu
+  | ilmaisu _ "," _ argumenttilista {% d => [d[0]].concat(d[4]) %}
 
 parametrilista ->
   muuttuja
   | muuttuja _ "," _ parametrilista {% d => [d[0]].concat(d[4]) %}
 
-ilmaisu ->
+asetus ->
   funktioluonti {% _.head %}
   | muuttujaluonti {% _.head %}
 
-ilmaus ->
-  ilmausEiInfiksi {% _.head %}
+ilmaisu ->
+  ilmaisuEiInfiksi {% _.head %}
   | infiksifunktiokutsu {% _.head %}
 
-ilmausEiInfiksi ->
+ilmaisuEiInfiksi ->
   funktioluonti {% _.head %}
   | funktiokutsu {% _.head %}
   | muuttuja {% _.head %}
@@ -96,18 +96,18 @@ funktioluonti -> muuttuja _ "(" _ parametrilista:? _ ")" _ "=" _ runko
   }%}
 
 muuttujaluonti ->
-  muuttuja _ "=" _ ilmaus:? runko:?
+  muuttuja _ "=" _ ilmaisu:? runko:?
   {% function(d, pos, reject) {
-    const [nimi, , , ,ilmaus, runko] = d;
-    if (!ilmaus && !runko) return reject;
+    const [nimi, , , ,ilmaisu, runko] = d;
+    if (!ilmaisu && !runko) return reject;
     return {
       tyyppi: 'muuttujaluonti',
       arvo: nimi.arvo,
-      runko: ilmaus || runko
+      runko: ilmaisu || runko
     };
   }%}
 
-infiksifunktiokutsu -> ilmaus _ erikoismerkkijono _ ilmausEiInfiksi
+infiksifunktiokutsu -> ilmaisu _ erikoismerkkijono _ ilmaisuEiInfiksi
   {% d => {
       return {
         tyyppi: 'funktiokutsu',
