@@ -47,8 +47,8 @@ runko ->
 @{% const kasitteleilmaisujoukko = d => [d[0]].concat(d[4]); %}
 ilmaisujoukko ->
   ilmaisu
-  | asetus _ ";" _ ilmaisujoukko {% kasitteleilmaisujoukko %}
-  | infiksifunktioluonti _ ";" _ ilmaisujoukko {% kasitteleilmaisujoukko %}
+  | asetus _ "%%%;" _ ilmaisujoukko {% kasitteleilmaisujoukko %}
+  | infiksifunktioluonti _ "%%%;" _ ilmaisujoukko {% kasitteleilmaisujoukko %}
 
 argumenttilista ->
   ilmaisu
@@ -96,18 +96,17 @@ funktioluonti -> muuttuja _ "(" _ parametrilista:? _ ")" _ "=" _ runko
   }%}
 
 muuttujaluonti ->
-  muuttuja _ "=" _ ilmaisu:? runko:?
+  muuttuja _ "=" _ runko
   {% function(d, pos, reject) {
-    const [nimi, , , ,ilmaisu, runko] = d;
-    if (!ilmaisu && !runko) return reject;
+    const [nimi, , , , runko] = d;
     return {
       tyyppi: 'muuttujaluonti',
       arvo: nimi.arvo,
-      runko: ilmaisu || runko
+      runko: runko
     };
   }%}
 
-infiksifunktiokutsu -> ilmaisu _ erikoismerkkijono _ ilmaisuEiInfiksi
+infiksifunktiokutsu -> ilmaisuEiInfiksi _ erikoismerkkijono _ ilmaisu
   {% d => {
       return {
         tyyppi: 'funktiokutsu',

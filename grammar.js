@@ -36,10 +36,10 @@ function id(x) {return x[0]; }
 
   const flatJoin = x => _.flattenDeep(x).join('');
 
-  const kasitteleParametrit = p =>  (p || []).map(_.property('arvo'))
+  const kasitteleParametrit = p =>  (p || []).map(_.property('arvo'));
 
 
- const kasitteleIlmausjoukko = d => [d[0]].concat(d[4]); var grammar = {
+ const kasitteleilmaisujoukko = d => [d[0]].concat(d[4]); var grammar = {
     Lexer: undefined,
     ParserRules: [
     {"name": "_$ebnf$1", "symbols": []},
@@ -54,22 +54,24 @@ function id(x) {return x[0]; }
     {"name": "main", "symbols": ["runko", "main$ebnf$1"], "postprocess": _.head},
     {"name": "runko$string$1", "symbols": [{"literal":"%"}, {"literal":"%"}, {"literal":"%"}, {"literal":"{"}], "postprocess": function joiner(d) {return d.join('');}},
     {"name": "runko$string$2", "symbols": [{"literal":"}"}, {"literal":"%"}, {"literal":"%"}, {"literal":"%"}], "postprocess": function joiner(d) {return d.join('');}},
-    {"name": "runko", "symbols": ["runko$string$1", "_", "ilmausjoukko", "_", "runko$string$2"], "postprocess": d => d[2]},
-    {"name": "ilmausjoukko", "symbols": ["ilmaus"]},
-    {"name": "ilmausjoukko", "symbols": ["ilmaisu", "_", {"literal":";"}, "_", "ilmausjoukko"], "postprocess": kasitteleIlmausjoukko},
-    {"name": "ilmausjoukko", "symbols": ["infiksifunktioluonti", "_", {"literal":";"}, "_", "ilmausjoukko"], "postprocess": kasitteleIlmausjoukko},
-    {"name": "argumenttilista", "symbols": ["ilmaus"]},
-    {"name": "argumenttilista", "symbols": ["ilmaus", "_", {"literal":","}, "_", "argumenttilista"], "postprocess": d => [d[0]].concat(d[4])},
+    {"name": "runko", "symbols": ["runko$string$1", "_", "ilmaisujoukko", "_", "runko$string$2"], "postprocess": d => d[2]},
+    {"name": "ilmaisujoukko", "symbols": ["ilmaisu"]},
+    {"name": "ilmaisujoukko$string$1", "symbols": [{"literal":"%"}, {"literal":"%"}, {"literal":"%"}, {"literal":";"}], "postprocess": function joiner(d) {return d.join('');}},
+    {"name": "ilmaisujoukko", "symbols": ["asetus", "_", "ilmaisujoukko$string$1", "_", "ilmaisujoukko"], "postprocess": kasitteleilmaisujoukko},
+    {"name": "ilmaisujoukko$string$2", "symbols": [{"literal":"%"}, {"literal":"%"}, {"literal":"%"}, {"literal":";"}], "postprocess": function joiner(d) {return d.join('');}},
+    {"name": "ilmaisujoukko", "symbols": ["infiksifunktioluonti", "_", "ilmaisujoukko$string$2", "_", "ilmaisujoukko"], "postprocess": kasitteleilmaisujoukko},
+    {"name": "argumenttilista", "symbols": ["ilmaisu"]},
+    {"name": "argumenttilista", "symbols": ["ilmaisu", "_", {"literal":","}, "_", "argumenttilista"], "postprocess": d => [d[0]].concat(d[4])},
     {"name": "parametrilista", "symbols": ["muuttuja"]},
     {"name": "parametrilista", "symbols": ["muuttuja", "_", {"literal":","}, "_", "parametrilista"], "postprocess": d => [d[0]].concat(d[4])},
-    {"name": "ilmaisu", "symbols": ["funktioluonti"], "postprocess": _.head},
-    {"name": "ilmaisu", "symbols": ["muuttujaluonti"], "postprocess": _.head},
-    {"name": "ilmaus", "symbols": ["ilmausEiInfiksi"], "postprocess": _.head},
-    {"name": "ilmaus", "symbols": ["infiksifunktiokutsu"], "postprocess": _.head},
-    {"name": "ilmausEiInfiksi", "symbols": ["funktioluonti"], "postprocess": _.head},
-    {"name": "ilmausEiInfiksi", "symbols": ["funktiokutsu"], "postprocess": _.head},
-    {"name": "ilmausEiInfiksi", "symbols": ["muuttuja"], "postprocess": _.head},
-    {"name": "ilmausEiInfiksi", "symbols": ["luku"], "postprocess": _.head},
+    {"name": "asetus", "symbols": ["funktioluonti"], "postprocess": _.head},
+    {"name": "asetus", "symbols": ["muuttujaluonti"], "postprocess": _.head},
+    {"name": "ilmaisu", "symbols": ["ilmaisuEiInfiksi"], "postprocess": _.head},
+    {"name": "ilmaisu", "symbols": ["infiksifunktiokutsu"], "postprocess": _.head},
+    {"name": "ilmaisuEiInfiksi", "symbols": ["funktioluonti"], "postprocess": _.head},
+    {"name": "ilmaisuEiInfiksi", "symbols": ["funktiokutsu"], "postprocess": _.head},
+    {"name": "ilmaisuEiInfiksi", "symbols": ["muuttuja"], "postprocess": _.head},
+    {"name": "ilmaisuEiInfiksi", "symbols": ["luku"], "postprocess": _.head},
     {"name": "infiksifunktioluonti$string$1", "symbols": [{"literal":"i"}, {"literal":"n"}, {"literal":"f"}, {"literal":"i"}, {"literal":"k"}, {"literal":"s"}, {"literal":"i"}], "postprocess": function joiner(d) {return d.join('');}},
     {"name": "infiksifunktioluonti$ebnf$1", "symbols": ["parametrilista"], "postprocess": id},
     {"name": "infiksifunktioluonti$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
@@ -93,20 +95,15 @@ function id(x) {return x[0]; }
             runko: d[10]
           };
         }},
-    {"name": "muuttujaluonti$ebnf$1", "symbols": ["ilmaus"], "postprocess": id},
-    {"name": "muuttujaluonti$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "muuttujaluonti$ebnf$2", "symbols": ["runko"], "postprocess": id},
-    {"name": "muuttujaluonti$ebnf$2", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "muuttujaluonti", "symbols": ["muuttuja", "_", {"literal":"="}, "_", "muuttujaluonti$ebnf$1", "muuttujaluonti$ebnf$2"], "postprocess":  function(d, pos, reject) {
-          const [nimi, , , ,ilmaus, runko] = d;
-          if (!ilmaus && !runko) return reject;
+    {"name": "muuttujaluonti", "symbols": ["muuttuja", "_", {"literal":"="}, "_", "runko"], "postprocess":  function(d, pos, reject) {
+          const [nimi, , , , runko] = d;
           return {
             tyyppi: 'muuttujaluonti',
             arvo: nimi.arvo,
-            runko: ilmaus || runko
+            runko: runko
           };
         }},
-    {"name": "infiksifunktiokutsu", "symbols": ["ilmaus", "_", "erikoismerkkijono", "_", "ilmausEiInfiksi"], "postprocess":  d => {
+    {"name": "infiksifunktiokutsu", "symbols": ["ilmaisuEiInfiksi", "_", "erikoismerkkijono", "_", "ilmaisu"], "postprocess":  d => {
             return {
               tyyppi: 'funktiokutsu',
               infiksi: true,

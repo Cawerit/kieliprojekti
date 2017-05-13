@@ -8,7 +8,8 @@ const virheet = {
   GENEROINTI_TARVITSEE_OHJELMAN: 'Generointi tarvitsee ohjelman',
   SYNTAKSIVIRHE_INFIKSIN_LUONNISSA: 'Syntaksivirhe infiksin luonnissa',
   ODOTTAMATON_ASETUSLAUSE: 'Asetuslause vaatii muuttujan tai funktion johon arvo asetetaan',
-  ASETUS_EI_OLE_ILMAISU: 'Asetuksen oikeanpuolisen arvon tulee olla yksinkertainen ilmaisu'
+  ASETUS_EI_OLE_ILMAISU: 'Asetuksen oikeanpuolisen arvon tulee olla yksinkertainen ilmaisu',
+  SEKALAISET_VALIMERKIT: 'Käytä sisennyksiä pelkästään välilyöntejä tai sarkaimia!'
 };
 
 
