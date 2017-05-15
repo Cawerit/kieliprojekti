@@ -81,7 +81,7 @@ laskettuArvo ->
   | lambda          {% fst %}
   | muuttuja                      {% fst %}
   | "(" _ infiksifunktio _ ")"    {% third %}
-  | "(" _ eiAsetus _ ")"           {% third %}
+  | "(" _ eiAsetus _ ")"          {% d => ({ tyyppi: 'ilmaisu', runko: [d[2]] }) %}
 
 asetus ->
   funktioluonti           {% fst %}

@@ -6,6 +6,15 @@ const
  * Käytännössä muuntajalle jää tehtäväksi järjestää infiksifunktiot
  * presedenssin mukaan.
  ******************************************************************************/
+const
+  lens = indeksi => (obj, arvo) => {
+    return arvo === undefined ?
+      obj.argumentit[indeksi]
+      : (obj.argumentit[indeksi] = arvo);
+  },
+  vasen = lens(0),
+  oikea = lens(1);
+
 
 function muunna(ast) {
 
@@ -43,73 +52,98 @@ function muunna(ast) {
   // eli "1 + 2".
   //
   // Seuraavaksi siis järjestetään nämä peräkkäiset infiksikutsut uudelleen
-  // vastaamaan niiden oikeaa arvojärjestystä.
-
+  // vastaamaan niiden oikeaa arvojärjestystä:
+  //      +
+  //     / \
+  //    a   *
+  //       / \
+  //      b   c
+  //
   function muunnaRekursiivinen(solu, infiksifunktiot) {
     if (onInfiksiKutsu(solu)) {
       // Peräkkäiset infiksikutsut rakentuvat parserissa aina siten että
       // solun oikealla puolella on jokin ilmaisu (ei infiksikutsu) ja
       // vasemmalla puolella on toinen infiksikutsu.
       // Aloitetaan keräämällä kaikki peräkkäiset infiksikutsut listaan.
-      const perakkaiset = [solu];
-      let edellinen = solu.argumentit[0];
+      const perakkaiset = [oikea(solu), solu];
+      let edellinen = vasen(solu);
       while (onInfiksiKutsu(edellinen)) {
-        perakkaiset.push(edellinen);
-        edellinen._indeksi = perakkaiset.length - 1;
-        edellinen = edellinen.argumentit[0];
+        perakkaiset.push(oikea(edellinen), edellinen);
+        edellinen = vasen(edellinen);
       }
+      perakkaiset.push(edellinen);
+      perakkaiset.reverse();
 
-      // Seuraavaksi etsitään kaikki nämä infiksifunktiot
-      // kulkemalla AST:ta takaisin ylöspäin
+      const rakennaPuu = (lista) => {
+        if (lista.length === 1) {
+          return lista[0];
+        }
 
-      const puuttuvaMaarittely = _.find(perakkaiset, f => !infiksifunktiot.has(f.arvo));
-      if (puuttuvaMaarittely) {
-        virhe(virheet.PUUTTUVA_INFIKSIFUNKTIO, solu);
-      }
+        const
+          // Jokaisella loopin kierroksella etsitään joukon arvojärjestykseltään
+          // pienin solu ja tehdään siitä puun juuri.
+          // Mitä korkeammalla alkio on puussa, sitä myöhemmin se lopulta suoritetaan.
+          pienin = _.minBy(
+            _.filter(lista, onInfiksiKutsu),
+            f => {
+              if (!infiksifunktiot.has(f.arvo)) {
+                virhe(virheet.PUUTTUVA_INFIKSIFUNKTIO);
+              }
 
-      const jarjestetty =
-        _.sortBy(perakkaiset, f => infiksifunktiot.get(f.arvo).presedenssi);
+              return infiksifunktiot.get(f.arvo).presedenssi;
+            }
+          ),
+          indeksi = lista.indexOf(pienin),
+          // Lista vasemmanpuoleisista funktiokutsuista
+          a = lista.slice(0, indeksi),
+          // Lista oikeanpuoleisista funktiokutsuista
+          b = lista.slice(indeksi + 1);
 
-      _.tail(jarjestetty)
-        .reduce((edellinen, seuraava) => {
-          const
-            viereinen = perakkaiset[seuraava._indeksi + 1];
+        // Jaotellaan myös vasen ja oikea puoli funktiokutsuja rekursiivisesti
+        vasen(pienin, rakennaPuu(a));
+        oikea(pienin, rakennaPuu(b));
 
-          console.log('woop', viereinen);
+        return pienin;
+      };
 
-          if (viereinen) {
-            seuraava.argumentit[0] = viereinen.argumentit[1];
-            seuraava.argumentit[1] = edellinen;
-          }
-
-          return seuraava;
-        }, jarjestetty[0]);
-
-      console.log(_.tail(jarjestetty));
-
+      return rakennaPuu(perakkaiset);
     } else {
       if (solu.runko) {
-        // Luodaan uusi "scope" infiksifunktioille jotka määritetään tässä rungossa
-        const rungonInfiksifunktiot = new Map(infiksifunktiot);
-        asetaUudetInfiksifunktiot(rungonInfiksifunktiot);
+        if (solu.tyyppi === 'ilmaisu') {
+          // Parseri palauttaa tavalliset sulkeilla ympäröidyt ilmaisut käärittynä
+          // { tyyppi: "ilmaisu", runko: [a] } tyyppiseen objektiin.
+          // Normaalisti tällaista toimenpidettä ei edes tarvittaisi, sillä ilmaisun
+          // runko itsessään kertoo kaiken käännöksessä tarvittavan.
+          // Ylimääräinen objekti helpottaa kuitenkin tämän muuntajan työtä, sillä
+          // näin muuntajan algoritmi ei sekoita sulkeilla ympäröidyn ilmaisun
+          // siältöä viereisten ilmaisujen kanssa, vaan se voidaan käsitellä omana
+          // irrallisena kokonaisuutenaan:
+          solu = muunnaRekursiivinen(solu.runko[0], infiksifunktiot);
+        } else {
+          // Luodaan uusi "scope" infiksifunktioille jotka määritetään tässä rungossa
+          const rungonInfiksifunktiot = new Map(infiksifunktiot);
+          asetaUudetInfiksifunktiot(rungonInfiksifunktiot);
 
-        // Kutsutaan tätä metodia rekursiivisesti funktion rungolle
-        for (const s of solu.runko) muunnaRekursiivinen(s, rungonInfiksifunktiot);
+          // Kutsutaan tätä metodia rekursiivisesti funktion rungolle
+          solu.runko = solu.runko.map(__ => muunnaRekursiivinen(__, rungonInfiksifunktiot));
+        }
       }
 
       if (solu.argumentit) {
         // Kutsutaan tätä metodia rekursiivisesti funktion argumenteille
-        for (const a of solu.argumentit) muunnaRekursiivinen(a, infiksifunktiot);
+        solu.argumentit = solu.argumentit.map(__ => muunnaRekursiivinen(__, infiksifunktiot));
       }
 
       // Kutsutaan tätä metodia rekursiivisesti esimerkiksi ilmaisun arvolle
-      if (typeof solu.arvo === 'object') muunnaRekursiivinen(solu.arvo, infiksifunktiot);
+      if (typeof solu.arvo === 'object') solu.arvo = muunnaRekursiivinen(solu.arvo, infiksifunktiot);
+
+      return solu;
     }
   }
 
   const infiksifunktiot = new Map();
   asetaUudetInfiksifunktiot(ast.runko, infiksifunktiot);
-  for (const a of ast.runko) muunnaRekursiivinen(a, infiksifunktiot);
+  ast.runko = ast.runko.map(__ => muunnaRekursiivinen(__, infiksifunktiot));
 
   return ast;
 }

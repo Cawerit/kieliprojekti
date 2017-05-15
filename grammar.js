@@ -76,7 +76,7 @@ function id(x) {return x[0]; }
     {"name": "laskettuArvo", "symbols": ["lambda"], "postprocess": fst},
     {"name": "laskettuArvo", "symbols": ["muuttuja"], "postprocess": fst},
     {"name": "laskettuArvo", "symbols": [{"literal":"("}, "_", "infiksifunktio", "_", {"literal":")"}], "postprocess": third},
-    {"name": "laskettuArvo", "symbols": [{"literal":"("}, "_", "eiAsetus", "_", {"literal":")"}], "postprocess": third},
+    {"name": "laskettuArvo", "symbols": [{"literal":"("}, "_", "eiAsetus", "_", {"literal":")"}], "postprocess": d => ({ tyyppi: 'ilmaisu', runko: [d[2]] })},
     {"name": "asetus", "symbols": ["funktioluonti"], "postprocess": fst},
     {"name": "asetus", "symbols": ["muuttujaluonti"], "postprocess": fst},
     {"name": "infiksifunktioluonti$string$1", "symbols": [{"literal":"i"}, {"literal":"n"}, {"literal":"f"}, {"literal":"i"}, {"literal":"k"}, {"literal":"s"}, {"literal":"i"}], "postprocess": function joiner(d) {return d.join('');}},
