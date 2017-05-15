@@ -1,6 +1,4 @@
 @builtin "whitespace.ne"
-@builtin "string.ne"
-
 @{%
   const _ = require('lodash');
 
@@ -43,16 +41,16 @@
 %}
 
 
-main -> runko br:* {% fst %}
+main -> runko {% fst %}
 
 runko ->
   "%%%{" _ ilmaisujoukko _ "}%%%" {% d => d[2] %}
 
-@{% const kasitteleilmaisujoukko = d => [d[0]].concat(d[4]); %}
+@{% const kasitteleilmaisujoukko = d => [d[0]].concat(d[2]); %}
 ilmaisujoukko ->
   ilmaisu
-  | asetus _ "%%%;" _ ilmaisujoukko _ "%%%;":? {% kasitteleilmaisujoukko %}
-  | infiksifunktioluonti _ "%%%;" _ ilmaisujoukko "%%%;":? {% kasitteleilmaisujoukko %}
+  | asetus __ ilmaisujoukko {% kasitteleilmaisujoukko %}
+  | infiksifunktioluonti __ ilmaisujoukko {% kasitteleilmaisujoukko %}
 
 argumenttilista ->
   ilmaisu

@@ -14,6 +14,8 @@ function parse(koodi) {
 
   const esikasitelty = esikasittele(koodi);
 
+  console.log(esikasitelty);
+
   return parseri.feed(esikasitelty).results;
 }
 

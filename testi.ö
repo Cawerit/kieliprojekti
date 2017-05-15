@@ -1,5 +1,2 @@
 a =
-  "Sitten hän sanoi: \"Hahaa\" ja sitten
-
-  tuli rivinvaihto"
-Tosi
+  b = 5 + 6

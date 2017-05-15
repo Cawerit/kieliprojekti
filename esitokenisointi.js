@@ -31,6 +31,13 @@ function esikasittele(tiedosto) {
     throw err;
   }
 
+  function tyhjennaRungot() {
+    const sisennykset = rungonSisennykset;
+    rungonSisennykset = [];
+
+    return sisennykset.map(_.constant(' }%%% ')).join('');
+  }
+
   // Apufunktio. Rupeaa laskemaan sisennyksen määrää annetusta rivin alusta.
   function laskeSisennys(rivinAlku) {
     rivinAlku++;
@@ -46,6 +53,20 @@ function esikasittele(tiedosto) {
       rivinAlku++;
     }
     return valit;
+  }
+
+  function tyhjaRivi(indeksi) {
+    if (indeksi < tiedosto.length) {
+      let rivinLoppu = tiedosto.indexOf('\n', indeksi);
+
+      if (rivinLoppu === -1) {
+        rivinLoppu = tiedosto.length;
+      }
+
+      return tiedosto.slice(indeksi, rivinLoppu).trim().length === 0;
+    } else {
+      return true;
+    }
   }
 
   while(indeksi < tiedosto.length) {
@@ -88,15 +109,24 @@ function esikasittele(tiedosto) {
       }
 
       case '\n': {
+        const br = ' ';
 
         if (rungonSisennykset.length > 0) {
-          const edellinen = _.last(rungonSisennykset);
-          if (laskeSisennys(indeksi) <= edellinen) {
-            tulos.push(' }%%% %%%; ');
-            rungonSisennykset.pop();
+          if (!tyhjaRivi(indeksi + 1)) {
+            const sisennys = laskeSisennys(indeksi);
+
+            while(rungonSisennykset.length > 0) {
+              if (sisennys <= _.last(rungonSisennykset)) {
+                tulos.push(' }%%%');
+                tulos.push(br);
+                rungonSisennykset.pop();
+                continue;
+              } else {
+                tulos.push(br);
+                break;
+              }
+            }
           }
-        } else {
-          tulos.push(' %%%; ');
         }
 
         seuraava();
@@ -127,5 +157,5 @@ function esikasittele(tiedosto) {
   }
 
 
-  return '%%%{ ' + tulos.join('') + ' }%%%';
+  return '%%%{ ' + tulos.join('') + tyhjennaRungot() + ' }%%%';
 }
