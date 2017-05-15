@@ -60,21 +60,21 @@ parametrilista ->
   muuttuja
   | muuttuja _ "," _ parametrilista {% d => [d[0]].concat(d[4]) %}
 
-asetus ->
-  funktioluonti     {% fst %}
-  | muuttujaluonti  {% fst %}
-
 ilmaisu ->
   ilmaisuEiInfiksi        {% fst %}
   | infiksifunktiokutsu   {% fst %}
 
 ilmaisuEiInfiksi ->
-  funktioluonti   {% fst %}
+  asetus   {% fst %}
   | funktiokutsu  {% fst %}
   | muuttuja      {% fst %}
   | luku          {% fst %}
   | teksti        {% fst %}
   | totuusarvo    {% fst %}
+
+asetus ->
+  funktioluonti     {% fst %}
+  | muuttujaluonti  {% fst %}
 
 infiksifunktioluonti ->
   "infiksi" __ luku __ erikoismerkkijono _ "(" _ parametrilista:? _ ")" _ "=" _ runko
