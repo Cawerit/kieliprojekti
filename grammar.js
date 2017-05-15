@@ -55,7 +55,7 @@ function id(x) {return x[0]; }
     {"name": "__$ebnf$1", "symbols": ["__$ebnf$1", "wschar"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
     {"name": "__", "symbols": ["__$ebnf$1"], "postprocess": function(d) {return null;}},
     {"name": "wschar", "symbols": [/[ \t\n\v\f]/], "postprocess": id},
-    {"name": "main", "symbols": ["runko"], "postprocess": fst},
+    {"name": "main", "symbols": ["runko"], "postprocess": d => ({ tyyppi: 'ohjelma', runko: d[0] })},
     {"name": "runko", "symbols": [{"literal":"{"}, "_", "ilmaisujoukko", "_", {"literal":"}"}], "postprocess": third},
     {"name": "ilmaisujoukko", "symbols": ["ilmaisu"]},
     {"name": "ilmaisujoukko", "symbols": ["asetus", "__", "ilmaisujoukko"], "postprocess": kasitteleilmaisujoukko},
@@ -83,10 +83,10 @@ function id(x) {return x[0]; }
     {"name": "infiksifunktioluonti$ebnf$1", "symbols": ["parametrilista"], "postprocess": id},
     {"name": "infiksifunktioluonti$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
     {"name": "infiksifunktioluonti", "symbols": ["infiksifunktioluonti$string$1", "__", "luku", "__", "erikoismerkkijono", "_", {"literal":"("}, "_", "infiksifunktioluonti$ebnf$1", "_", {"literal":")"}, "_", {"literal":"="}, "_", "runko"], "postprocess":  d => {
-            const [, , precedence, , nimi, , , , parametrit, , , , , , runko] = d;
+            const [, , presedenssi, , nimi, , , , parametrit, , , , , , runko] = d;
             return {
               tyyppi: 'infiksifunktioluonti',
-              precedence: precedence.arvo,
+              presedenssi: presedenssi.arvo,
               arvo: nimi,
               parametrit,
               runko
@@ -118,7 +118,7 @@ function id(x) {return x[0]; }
             runko: runko
           };
         }},
-    {"name": "infiksifunktiokutsu", "symbols": ["yksinkertainenIlmaisu", "_", "infiksifunktio", "_", "ilmaisu"], "postprocess":  d => {
+    {"name": "infiksifunktiokutsu", "symbols": ["ilmaisu", "_", "infiksifunktio", "_", "yksinkertainenIlmaisu"], "postprocess":  d => {
             return {
               tyyppi: 'funktiokutsu',
               infiksi: true,

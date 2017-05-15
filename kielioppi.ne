@@ -43,7 +43,7 @@
 %}
 
 
-main -> runko {% fst %}
+main -> runko {% d => ({ tyyppi: 'ohjelma', runko: d[0] }) %}
 
 runko ->
   "{" _ ilmaisujoukko _ "}" {% third %}
@@ -90,10 +90,10 @@ asetus ->
 infiksifunktioluonti ->
   "infiksi" __ luku __ erikoismerkkijono _ "(" _ parametrilista:? _ ")" _ "=" _ runko
   {% d => {
-      const [, , precedence, , nimi, , , , parametrit, , , , , , runko] = d;
+      const [, , presedenssi, , nimi, , , , parametrit, , , , , , runko] = d;
       return {
         tyyppi: 'infiksifunktioluonti',
-        precedence: precedence.arvo,
+        presedenssi: presedenssi.arvo,
         arvo: nimi,
         parametrit,
         runko
@@ -134,7 +134,7 @@ muuttujaluonti ->
     };
   }%}
 
-infiksifunktiokutsu -> yksinkertainenIlmaisu _ infiksifunktio _ ilmaisu
+infiksifunktiokutsu -> ilmaisu _ infiksifunktio _ yksinkertainenIlmaisu
   {% d => {
       return {
         tyyppi: 'funktiokutsu',
