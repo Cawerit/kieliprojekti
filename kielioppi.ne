@@ -4,7 +4,7 @@
 @{%
   const _ = require('lodash');
 
-  const varattu = /[",.=; ]|%%%|\s|\t|\n|\r|infiksi/;
+  const varattu = /[",.= ]|%%%|\s|\t|\n|\r|^infiksi$|^Tosi$|^Epätosi$/;
   const numero = /[0-9]/;
 
   function sisaltaaErikoismerkkeja(x) {
@@ -37,10 +37,13 @@
 
   const kasitteleParametrit = p =>  (p || []).map(_.property('arvo'));
 
+  // Apumuuttuja joka ottaa listan ensimmäisen alkion
+  const fst = _.head;
+
 %}
 
 
-main -> runko br:* {% _.head %}
+main -> runko br:* {% fst %}
 
 runko ->
   "%%%{" _ ilmaisujoukko _ "}%%%" {% d => d[2] %}
@@ -60,19 +63,20 @@ parametrilista ->
   | muuttuja _ "," _ parametrilista {% d => [d[0]].concat(d[4]) %}
 
 asetus ->
-  funktioluonti {% _.head %}
-  | muuttujaluonti {% _.head %}
+  funktioluonti     {% fst %}
+  | muuttujaluonti  {% fst %}
 
 ilmaisu ->
-  ilmaisuEiInfiksi {% _.head %}
-  | infiksifunktiokutsu {% _.head %}
+  ilmaisuEiInfiksi        {% fst %}
+  | infiksifunktiokutsu   {% fst %}
 
 ilmaisuEiInfiksi ->
-  funktioluonti {% _.head %}
-  | funktiokutsu {% _.head %}
-  | muuttuja {% _.head %}
-  | luku {% _.head %}
-  | teksti {% _.head %}
+  funktioluonti   {% fst %}
+  | funktiokutsu  {% fst %}
+  | muuttuja      {% fst %}
+  | luku          {% fst %}
+  | teksti        {% fst %}
+  | totuusarvo    {% fst %}
 
 infiksifunktioluonti ->
   "infiksi" __ luku __ erikoismerkkijono _ "(" _ parametrilista:? _ ")" _ "=" _ runko
@@ -140,14 +144,33 @@ merkkijono -> %merkki:* {%
     const res = flatJoin(d);
     // Tarkistetaan että merkkijono sisältää jotain
     // muutakin kuin numeroita, muutoin kyseessä on tavallinen luku
-    return _.every(res, r => /[0-9.]/.test(r)) ? reject : res;
+    return varattu.test(res) || _.every(res, r => /[0-9.]/.test(r)) ? reject : res;
   }
 %}
 
-teksti -> dqstring {% d => ({ tyyppi: 'teksti', arvo: d[0] }) %}
+#teksti -> dqstring {% d => ({ tyyppi: 'teksti', arvo: d[0] }) %}
+
+teksti -> "\"" tekstiSisalto:* "\"" {% d => ({ tyyppi: 'teksti', arvo: d[1].join('') }) %}
+
+tekstiSisalto ->
+    [^\\"] {% fst %}
+    | "\\" ["\\/bfnrt] {%
+    function(d, pos, reject) {
+      try {
+        return JSON.parse('"' + d.join('') + '"');
+      } catch(e) {
+        return reject;
+      }
+    }
+%}
 
 luku ->
   %numero:+ {% d => ({ tyyppi: 'numero', arvo: parseInt(d[0], 10) }) %}
   | %numero:+ "." %numero:+ {% d => ({ tyyppi: 'numero', arvo: parseFloat(flatJoin(d)) }) %}
+
+@{% const kasitteleTotuusarvo = arvo => () => ({ tyyppi: 'totuusarvo', arvo }); %}
+totuusarvo ->
+  "Tosi" {% kasitteleTotuusarvo(true) %}
+  | "Epätosi" {% kasitteleTotuusarvo(false) %}
 
 br -> [\r\n]

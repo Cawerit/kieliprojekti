@@ -5,7 +5,7 @@ function id(x) {return x[0]; }
 
   const _ = require('lodash');
 
-  const varattu = /[",.=; ]|%%%|\s|\t|\n|\r|infiksi/;
+  const varattu = /[",.= ]|%%%|\s|\t|\n|\r|^infiksi$|^Tosi$|^Epätosi$/;
   const numero = /[0-9]/;
 
   function sisaltaaErikoismerkkeja(x) {
@@ -38,8 +38,12 @@ function id(x) {return x[0]; }
 
   const kasitteleParametrit = p =>  (p || []).map(_.property('arvo'));
 
+  // Apumuuttuja joka ottaa listan ensimmäisen alkion
+  const fst = _.head;
 
- const kasitteleilmaisujoukko = d => [d[0]].concat(d[4]); var grammar = {
+
+ const kasitteleilmaisujoukko = d => [d[0]].concat(d[4]); 
+ const kasitteleTotuusarvo = arvo => () => ({ tyyppi: 'totuusarvo', arvo }); var grammar = {
     Lexer: undefined,
     ParserRules: [
     {"name": "_$ebnf$1", "symbols": []},
@@ -76,7 +80,7 @@ function id(x) {return x[0]; }
         },
     {"name": "main$ebnf$1", "symbols": []},
     {"name": "main$ebnf$1", "symbols": ["main$ebnf$1", "br"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
-    {"name": "main", "symbols": ["runko", "main$ebnf$1"], "postprocess": _.head},
+    {"name": "main", "symbols": ["runko", "main$ebnf$1"], "postprocess": fst},
     {"name": "runko$string$1", "symbols": [{"literal":"%"}, {"literal":"%"}, {"literal":"%"}, {"literal":"{"}], "postprocess": function joiner(d) {return d.join('');}},
     {"name": "runko$string$2", "symbols": [{"literal":"}"}, {"literal":"%"}, {"literal":"%"}, {"literal":"%"}], "postprocess": function joiner(d) {return d.join('');}},
     {"name": "runko", "symbols": ["runko$string$1", "_", "ilmaisujoukko", "_", "runko$string$2"], "postprocess": d => d[2]},
@@ -95,15 +99,16 @@ function id(x) {return x[0]; }
     {"name": "argumenttilista", "symbols": ["ilmaisu", "_", {"literal":","}, "_", "argumenttilista"], "postprocess": d => [d[0]].concat(d[4])},
     {"name": "parametrilista", "symbols": ["muuttuja"]},
     {"name": "parametrilista", "symbols": ["muuttuja", "_", {"literal":","}, "_", "parametrilista"], "postprocess": d => [d[0]].concat(d[4])},
-    {"name": "asetus", "symbols": ["funktioluonti"], "postprocess": _.head},
-    {"name": "asetus", "symbols": ["muuttujaluonti"], "postprocess": _.head},
-    {"name": "ilmaisu", "symbols": ["ilmaisuEiInfiksi"], "postprocess": _.head},
-    {"name": "ilmaisu", "symbols": ["infiksifunktiokutsu"], "postprocess": _.head},
-    {"name": "ilmaisuEiInfiksi", "symbols": ["funktioluonti"], "postprocess": _.head},
-    {"name": "ilmaisuEiInfiksi", "symbols": ["funktiokutsu"], "postprocess": _.head},
-    {"name": "ilmaisuEiInfiksi", "symbols": ["muuttuja"], "postprocess": _.head},
-    {"name": "ilmaisuEiInfiksi", "symbols": ["luku"], "postprocess": _.head},
-    {"name": "ilmaisuEiInfiksi", "symbols": ["teksti"], "postprocess": _.head},
+    {"name": "asetus", "symbols": ["funktioluonti"], "postprocess": fst},
+    {"name": "asetus", "symbols": ["muuttujaluonti"], "postprocess": fst},
+    {"name": "ilmaisu", "symbols": ["ilmaisuEiInfiksi"], "postprocess": fst},
+    {"name": "ilmaisu", "symbols": ["infiksifunktiokutsu"], "postprocess": fst},
+    {"name": "ilmaisuEiInfiksi", "symbols": ["funktioluonti"], "postprocess": fst},
+    {"name": "ilmaisuEiInfiksi", "symbols": ["funktiokutsu"], "postprocess": fst},
+    {"name": "ilmaisuEiInfiksi", "symbols": ["muuttuja"], "postprocess": fst},
+    {"name": "ilmaisuEiInfiksi", "symbols": ["luku"], "postprocess": fst},
+    {"name": "ilmaisuEiInfiksi", "symbols": ["teksti"], "postprocess": fst},
+    {"name": "ilmaisuEiInfiksi", "symbols": ["totuusarvo"], "postprocess": fst},
     {"name": "infiksifunktioluonti$string$1", "symbols": [{"literal":"i"}, {"literal":"n"}, {"literal":"f"}, {"literal":"i"}, {"literal":"k"}, {"literal":"s"}, {"literal":"i"}], "postprocess": function joiner(d) {return d.join('');}},
     {"name": "infiksifunktioluonti$ebnf$1", "symbols": ["parametrilista"], "postprocess": id},
     {"name": "infiksifunktioluonti$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
@@ -166,10 +171,22 @@ function id(x) {return x[0]; }
           const res = flatJoin(d);
           // Tarkistetaan että merkkijono sisältää jotain
           // muutakin kuin numeroita, muutoin kyseessä on tavallinen luku
-          return _.every(res, r => /[0-9.]/.test(r)) ? reject : res;
+          return varattu.test(res) || _.every(res, r => /[0-9.]/.test(r)) ? reject : res;
         }
         },
-    {"name": "teksti", "symbols": ["dqstring"], "postprocess": d => ({ tyyppi: 'teksti', arvo: d[0] })},
+    {"name": "teksti$ebnf$1", "symbols": []},
+    {"name": "teksti$ebnf$1", "symbols": ["teksti$ebnf$1", "tekstiSisalto"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
+    {"name": "teksti", "symbols": [{"literal":"\""}, "teksti$ebnf$1", {"literal":"\""}], "postprocess": d => ({ tyyppi: 'teksti', arvo: d[1].join('') })},
+    {"name": "tekstiSisalto", "symbols": [/[^\\"]/], "postprocess": fst},
+    {"name": "tekstiSisalto", "symbols": [{"literal":"\\"}, /["\\\/bfnrt]/], "postprocess": 
+        function(d, pos, reject) {
+          try {
+            return JSON.parse('"' + d.join('') + '"');
+          } catch(e) {
+            return reject;
+          }
+        }
+        },
     {"name": "luku$ebnf$1", "symbols": [numero]},
     {"name": "luku$ebnf$1", "symbols": ["luku$ebnf$1", numero], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
     {"name": "luku", "symbols": ["luku$ebnf$1"], "postprocess": d => ({ tyyppi: 'numero', arvo: parseInt(d[0], 10) })},
@@ -178,6 +195,10 @@ function id(x) {return x[0]; }
     {"name": "luku$ebnf$3", "symbols": [numero]},
     {"name": "luku$ebnf$3", "symbols": ["luku$ebnf$3", numero], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
     {"name": "luku", "symbols": ["luku$ebnf$2", {"literal":"."}, "luku$ebnf$3"], "postprocess": d => ({ tyyppi: 'numero', arvo: parseFloat(flatJoin(d)) })},
+    {"name": "totuusarvo$string$1", "symbols": [{"literal":"T"}, {"literal":"o"}, {"literal":"s"}, {"literal":"i"}], "postprocess": function joiner(d) {return d.join('');}},
+    {"name": "totuusarvo", "symbols": ["totuusarvo$string$1"], "postprocess": kasitteleTotuusarvo(true)},
+    {"name": "totuusarvo$string$2", "symbols": [{"literal":"E"}, {"literal":"p"}, {"literal":"ä"}, {"literal":"t"}, {"literal":"o"}, {"literal":"s"}, {"literal":"i"}], "postprocess": function joiner(d) {return d.join('');}},
+    {"name": "totuusarvo", "symbols": ["totuusarvo$string$2"], "postprocess": kasitteleTotuusarvo(false)},
     {"name": "br", "symbols": [/[\r\n]/]}
 ]
   , ParserStart: "main"
