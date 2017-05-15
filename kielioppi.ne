@@ -187,8 +187,8 @@ tekstiSisalto ->
 %}
 
 luku ->
-  %numero:+ {% d => ({ tyyppi: 'numero', arvo: parseInt(d[0], 10) }) %}
-  | %numero:+ "." %numero:+ {% d => ({ tyyppi: 'numero', arvo: parseFloat(flatJoin(d)) }) %}
+  "-":? %numero:+ {% d => ({ tyyppi: 'numero', arvo: parseInt(flatJoin(d), 10) }) %}
+  | "-":? %numero:+ "." %numero:+ {% d => ({ tyyppi: 'numero', arvo: parseFloat(flatJoin(d)) }) %}
 
 @{% const kasitteleTotuusarvo = arvo => () => ({ tyyppi: 'totuusarvo', arvo }); %}
 totuusarvo ->

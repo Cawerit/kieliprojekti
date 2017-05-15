@@ -1,7 +1,1 @@
-tila = kokoelma (
-  nimi : eiMitään
-)
-
-ohjelma(tila) =
-  jos (pituus(nimi @ tila) < 1, kysy("Anna nimesi"))
-  muutoin: sano("Heipä hei" ++ (nimi @ tila)) sitten: lopeta
+a = 5-1
