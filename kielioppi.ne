@@ -2,23 +2,23 @@
 @{%
   const _ = require('lodash');
 
-  const varattu = /[",.= ]|%%%|\s|\t|\n|\r|^infiksi$|^Tosi$|^Epätosi$/;
+  const varattu = /[",.=(){} ]|\s|\t|\n|\r|^infiksi$|^Tosi$|^Epätosi$/;
   const numero = /[0-9]/;
+
+  const erikoismerkki = {
+	  test(x) {
+		  return !varattu.test(x) && !numero.test(x) && x !== '$' && x.toLowerCase() === x.toUpperCase();
+	  }
+  };
 
   function sisaltaaErikoismerkkeja(x) {
     if(varattu.test(x)) return false;
     for(let i = 0, n = x.length; i < n; i++) {
       const m = x[i];
-      if (!numero.test(m) && m.toLowerCase() === m.toUpperCase()) return true;
+      if (erikoismerkki.test(m)) return true;
     }
     return false;
   }
-
-  const erikoismerkki = {
-	  test(x) {
-		  return !varattu.test(x) && !numero.test(x) && x.toLowerCase() === x.toUpperCase();
-	  }
-  };
 
   const merkki = {
 	  test(x){
@@ -36,7 +36,9 @@
   const kasitteleParametrit = p =>  (p || []).map(_.property('arvo'));
 
   // Apumuuttuja joka ottaa listan ensimmäisen alkion
-  const fst = _.head;
+  const
+    fst = _.head,
+    third = d => d[2];
 
 %}
 
@@ -44,7 +46,7 @@
 main -> runko {% fst %}
 
 runko ->
-  "%%%{" _ ilmaisujoukko _ "}%%%" {% d => d[2] %}
+  "{" _ ilmaisujoukko _ "}" {% third %}
 
 @{% const kasitteleilmaisujoukko = d => [d[0]].concat(d[2]); %}
 ilmaisujoukko ->
@@ -53,28 +55,37 @@ ilmaisujoukko ->
   | infiksifunktioluonti __ ilmaisujoukko {% kasitteleilmaisujoukko %}
 
 argumenttilista ->
-  ilmaisu
-  | ilmaisu _ "," _ argumenttilista {% d => [d[0]].concat(d[4]) %}
+  eiAsetus
+  | eiAsetus _ "," _ argumenttilista {% d => [d[0]].concat(d[4]) %}
 
 parametrilista ->
   muuttuja
   | muuttuja _ "," _ parametrilista {% d => [d[0]].concat(d[4]) %}
 
 ilmaisu ->
-  ilmaisuEiInfiksi        {% fst %}
+  asetus      {% fst %}
+  | eiAsetus  {% fst %}
+
+eiAsetus ->
+  yksinkertainenIlmaisu   {% fst %}
   | infiksifunktiokutsu   {% fst %}
 
-ilmaisuEiInfiksi ->
-  asetus   {% fst %}
-  | funktiokutsu  {% fst %}
-  | muuttuja      {% fst %}
+yksinkertainenIlmaisu ->
+  laskettuArvo    {% fst %}
   | luku          {% fst %}
   | teksti        {% fst %}
   | totuusarvo    {% fst %}
 
+laskettuArvo ->
+  funktiokutsu                    {% fst %}
+  | lambda          {% fst %}
+  | muuttuja                      {% fst %}
+  | "(" _ infiksifunktio _ ")"    {% third %}
+  | "(" _ eiAsetus _ ")"           {% third %}
+
 asetus ->
-  funktioluonti     {% fst %}
-  | muuttujaluonti  {% fst %}
+  funktioluonti           {% fst %}
+  | muuttujaluonti        {% fst %}
 
 infiksifunktioluonti ->
   "infiksi" __ luku __ erikoismerkkijono _ "(" _ parametrilista:? _ ")" _ "=" _ runko
@@ -89,13 +100,26 @@ infiksifunktioluonti ->
       };
   }%}
 
-funktioluonti -> muuttuja _ "(" _ parametrilista:? _ ")" _ "=" _ runko
+# Asettaa funktion muuttujaan
+funktioluonti ->
+  muuttuja _ "(" _ parametrilista:? _ ")" _ "=" _ runko
+    {% d => {
+      return {
+        tyyppi: 'funktioluonti',
+        arvo: d[0].arvo,
+        parametrit: kasitteleParametrit(d[4]),
+        runko: d[10]
+      };
+    }%}
+
+lambda ->
+  "{" _ ilmaisu _ "}"
   {% d => {
     return {
-      tyyppi: 'funktioluonti',
-      arvo: d[0].arvo,
-      parametrit: kasitteleParametrit(d[4]),
-      runko: d[10]
+      tyyppi: 'lambda',
+      arvo: null,
+      parametrit: ['$$'],
+      runko: d[2]
     };
   }%}
 
@@ -110,20 +134,22 @@ muuttujaluonti ->
     };
   }%}
 
-infiksifunktiokutsu -> ilmaisuEiInfiksi _ erikoismerkkijono _ ilmaisu
+infiksifunktiokutsu -> yksinkertainenIlmaisu _ infiksifunktio _ ilmaisu
   {% d => {
       return {
         tyyppi: 'funktiokutsu',
         infiksi: true,
-        arvo: d[2],
+        arvo: d[2].arvo,
         argumentit: [d[0], d[4]]
       };
   }%}
 
-funktiokutsu -> muuttuja _ "(" _ argumenttilista:? _ ")"
+funktiokutsu -> laskettuArvo _ "(" _ argumenttilista:? _ ")"
   {% d => {
-    return { tyyppi: 'funktiokutsu', arvo: d[0].arvo, argumentit: d[4] || [] };
+    return { tyyppi: 'funktiokutsu', arvo: d[0], argumentit: d[4] || [] };
   }%}
+
+infiksifunktio -> erikoismerkkijono {% d => ({ tyyppi: 'infiksifunktio', arvo: d[0] }) %}
 
 muuttuja -> merkkijono {% d => ({ tyyppi: 'muuttuja', arvo: d[0] }) %}
 
@@ -145,8 +171,6 @@ merkkijono -> %merkki:* {%
     return varattu.test(res) || _.every(res, r => /[0-9.]/.test(r)) ? reject : res;
   }
 %}
-
-#teksti -> dqstring {% d => ({ tyyppi: 'teksti', arvo: d[0] }) %}
 
 teksti -> "\"" tekstiSisalto:* "\"" {% d => ({ tyyppi: 'teksti', arvo: d[1].join('') }) %}
 
