@@ -1,4 +1,5 @@
 @builtin "whitespace.ne"
+@builtin "string.ne"
 
 @{%
   const _ = require('lodash');
@@ -47,8 +48,8 @@ runko ->
 @{% const kasitteleilmaisujoukko = d => [d[0]].concat(d[4]); %}
 ilmaisujoukko ->
   ilmaisu
-  | asetus _ "%%%;" _ ilmaisujoukko {% kasitteleilmaisujoukko %}
-  | infiksifunktioluonti _ "%%%;" _ ilmaisujoukko {% kasitteleilmaisujoukko %}
+  | asetus _ "%%%;" _ ilmaisujoukko _ "%%%;":? {% kasitteleilmaisujoukko %}
+  | infiksifunktioluonti _ "%%%;" _ ilmaisujoukko "%%%;":? {% kasitteleilmaisujoukko %}
 
 argumenttilista ->
   ilmaisu
@@ -71,6 +72,7 @@ ilmaisuEiInfiksi ->
   | funktiokutsu {% _.head %}
   | muuttuja {% _.head %}
   | luku {% _.head %}
+  | teksti {% _.head %}
 
 infiksifunktioluonti ->
   "infiksi" __ luku __ erikoismerkkijono _ "(" _ parametrilista:? _ ")" _ "=" _ runko
@@ -141,6 +143,8 @@ merkkijono -> %merkki:* {%
     return _.every(res, r => /[0-9.]/.test(r)) ? reject : res;
   }
 %}
+
+teksti -> dqstring {% d => ({ tyyppi: 'teksti', arvo: d[0] }) %}
 
 luku ->
   %numero:+ {% d => ({ tyyppi: 'numero', arvo: parseInt(d[0], 10) }) %}

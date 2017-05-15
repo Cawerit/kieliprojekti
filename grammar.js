@@ -49,6 +49,31 @@ function id(x) {return x[0]; }
     {"name": "__$ebnf$1", "symbols": ["__$ebnf$1", "wschar"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
     {"name": "__", "symbols": ["__$ebnf$1"], "postprocess": function(d) {return null;}},
     {"name": "wschar", "symbols": [/[ \t\n\v\f]/], "postprocess": id},
+    {"name": "dqstring$ebnf$1", "symbols": []},
+    {"name": "dqstring$ebnf$1", "symbols": ["dqstring$ebnf$1", "dstrchar"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
+    {"name": "dqstring", "symbols": [{"literal":"\""}, "dqstring$ebnf$1", {"literal":"\""}], "postprocess": function(d) {return d[1].join(""); }},
+    {"name": "sqstring$ebnf$1", "symbols": []},
+    {"name": "sqstring$ebnf$1", "symbols": ["sqstring$ebnf$1", "sstrchar"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
+    {"name": "sqstring", "symbols": [{"literal":"'"}, "sqstring$ebnf$1", {"literal":"'"}], "postprocess": function(d) {return d[1].join(""); }},
+    {"name": "btstring$ebnf$1", "symbols": []},
+    {"name": "btstring$ebnf$1", "symbols": ["btstring$ebnf$1", /[^`]/], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
+    {"name": "btstring", "symbols": [{"literal":"`"}, "btstring$ebnf$1", {"literal":"`"}], "postprocess": function(d) {return d[1].join(""); }},
+    {"name": "dstrchar", "symbols": [/[^\\"\n]/], "postprocess": id},
+    {"name": "dstrchar", "symbols": [{"literal":"\\"}, "strescape"], "postprocess": 
+        function(d) {
+            return JSON.parse("\""+d.join("")+"\"");
+        }
+        },
+    {"name": "sstrchar", "symbols": [/[^\\\n]/], "postprocess": id},
+    {"name": "sstrchar", "symbols": [{"literal":"\\"}, "strescape"], "postprocess": function(d) { return JSON.parse("\""+d.join("")+"\""); }},
+    {"name": "sstrchar$string$1", "symbols": [{"literal":"\\"}, {"literal":"'"}], "postprocess": function joiner(d) {return d.join('');}},
+    {"name": "sstrchar", "symbols": ["sstrchar$string$1"], "postprocess": function(d) {return "'"; }},
+    {"name": "strescape", "symbols": [/["\\\/bfnrt]/], "postprocess": id},
+    {"name": "strescape", "symbols": [{"literal":"u"}, /[a-fA-F0-9]/, /[a-fA-F0-9]/, /[a-fA-F0-9]/, /[a-fA-F0-9]/], "postprocess": 
+        function(d) {
+            return d.join("");
+        }
+        },
     {"name": "main$ebnf$1", "symbols": []},
     {"name": "main$ebnf$1", "symbols": ["main$ebnf$1", "br"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
     {"name": "main", "symbols": ["runko", "main$ebnf$1"], "postprocess": _.head},
@@ -57,9 +82,15 @@ function id(x) {return x[0]; }
     {"name": "runko", "symbols": ["runko$string$1", "_", "ilmaisujoukko", "_", "runko$string$2"], "postprocess": d => d[2]},
     {"name": "ilmaisujoukko", "symbols": ["ilmaisu"]},
     {"name": "ilmaisujoukko$string$1", "symbols": [{"literal":"%"}, {"literal":"%"}, {"literal":"%"}, {"literal":";"}], "postprocess": function joiner(d) {return d.join('');}},
-    {"name": "ilmaisujoukko", "symbols": ["asetus", "_", "ilmaisujoukko$string$1", "_", "ilmaisujoukko"], "postprocess": kasitteleilmaisujoukko},
+    {"name": "ilmaisujoukko$ebnf$1$string$1", "symbols": [{"literal":"%"}, {"literal":"%"}, {"literal":"%"}, {"literal":";"}], "postprocess": function joiner(d) {return d.join('');}},
+    {"name": "ilmaisujoukko$ebnf$1", "symbols": ["ilmaisujoukko$ebnf$1$string$1"], "postprocess": id},
+    {"name": "ilmaisujoukko$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
+    {"name": "ilmaisujoukko", "symbols": ["asetus", "_", "ilmaisujoukko$string$1", "_", "ilmaisujoukko", "_", "ilmaisujoukko$ebnf$1"], "postprocess": kasitteleilmaisujoukko},
     {"name": "ilmaisujoukko$string$2", "symbols": [{"literal":"%"}, {"literal":"%"}, {"literal":"%"}, {"literal":";"}], "postprocess": function joiner(d) {return d.join('');}},
-    {"name": "ilmaisujoukko", "symbols": ["infiksifunktioluonti", "_", "ilmaisujoukko$string$2", "_", "ilmaisujoukko"], "postprocess": kasitteleilmaisujoukko},
+    {"name": "ilmaisujoukko$ebnf$2$string$1", "symbols": [{"literal":"%"}, {"literal":"%"}, {"literal":"%"}, {"literal":";"}], "postprocess": function joiner(d) {return d.join('');}},
+    {"name": "ilmaisujoukko$ebnf$2", "symbols": ["ilmaisujoukko$ebnf$2$string$1"], "postprocess": id},
+    {"name": "ilmaisujoukko$ebnf$2", "symbols": [], "postprocess": function(d) {return null;}},
+    {"name": "ilmaisujoukko", "symbols": ["infiksifunktioluonti", "_", "ilmaisujoukko$string$2", "_", "ilmaisujoukko", "ilmaisujoukko$ebnf$2"], "postprocess": kasitteleilmaisujoukko},
     {"name": "argumenttilista", "symbols": ["ilmaisu"]},
     {"name": "argumenttilista", "symbols": ["ilmaisu", "_", {"literal":","}, "_", "argumenttilista"], "postprocess": d => [d[0]].concat(d[4])},
     {"name": "parametrilista", "symbols": ["muuttuja"]},
@@ -72,6 +103,7 @@ function id(x) {return x[0]; }
     {"name": "ilmaisuEiInfiksi", "symbols": ["funktiokutsu"], "postprocess": _.head},
     {"name": "ilmaisuEiInfiksi", "symbols": ["muuttuja"], "postprocess": _.head},
     {"name": "ilmaisuEiInfiksi", "symbols": ["luku"], "postprocess": _.head},
+    {"name": "ilmaisuEiInfiksi", "symbols": ["teksti"], "postprocess": _.head},
     {"name": "infiksifunktioluonti$string$1", "symbols": [{"literal":"i"}, {"literal":"n"}, {"literal":"f"}, {"literal":"i"}, {"literal":"k"}, {"literal":"s"}, {"literal":"i"}], "postprocess": function joiner(d) {return d.join('');}},
     {"name": "infiksifunktioluonti$ebnf$1", "symbols": ["parametrilista"], "postprocess": id},
     {"name": "infiksifunktioluonti$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
@@ -137,6 +169,7 @@ function id(x) {return x[0]; }
           return _.every(res, r => /[0-9.]/.test(r)) ? reject : res;
         }
         },
+    {"name": "teksti", "symbols": ["dqstring"], "postprocess": d => ({ tyyppi: 'teksti', arvo: d[0] })},
     {"name": "luku$ebnf$1", "symbols": [numero]},
     {"name": "luku$ebnf$1", "symbols": ["luku$ebnf$1", numero], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
     {"name": "luku", "symbols": ["luku$ebnf$1"], "postprocess": d => ({ tyyppi: 'numero', arvo: parseInt(d[0], 10) })},

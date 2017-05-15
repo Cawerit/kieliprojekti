@@ -1,7 +1,7 @@
-var args = require('yargs').argv,
-    path = require('path'),
-    fs = require('fs'),
-    esitokenisointi = require('./esitokenisointi.js')
+var args      = require('yargs').argv,
+    fs        = require('fs'),
+    parseri   = require('./parseri.js'),
+    apufunktiot = require('./apufunktiot.js')
     ;
 
 
@@ -12,8 +12,8 @@ if (args.f) {
             return;
         }
 
-        const esikasittely = esitokenisointi(tiedosto);
-        
-        console.log(esikasittely);
+        const parsittu = parseri(tiedosto);
+
+        apufunktiot.nayta(parsittu);
     });
 }
