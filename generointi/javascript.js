@@ -1,38 +1,38 @@
-var P = require('../parserityypit.js');
-var beautify = require('js-beautify').js_beautify;
-var base32 = require('base32');
-var _ = require('lodash');
 
-// ö-kieli tukee muuttujanimissä symboleita ja avainsanoja joita kohdekielet
-// eivät tue. base32-enkoodaus on helppo tapa muuntaa muuttujanimet varmasti "turvallisiksi"
-const enk = n => 'm_' + base32.encode(n) + `/*${n.replace(/\*\//g, '* /')}*/`;
+const
+  beautify    = require('js-beautify').js_beautify,
+  base32      = require('base32'),
+  apufunktiot = require('../apufunktiot.js'),
+  _           = require('lodash');
 
-const generoiFunktioluonti = kavely => {
-  const solmu = kavely.solmu;
-  const parametrit = solmu.parametrit.ilmaisut.map(i => enk(i[0].arvo)).join(', ');
-  const runko = solmu.runko.map(n => kavely.kavele(n) + ';');
-  if (runko.length) {
+const muuttuja = apufunktiot.muuttujanimiGeneraattori();
+
+// Pieni apufunktio funktion rungon muodostamiseen
+const muodostaRunko = (solmu, kavele) => {
+  const runko = solmu
+  .runko
+  .map(kavele)
+  .map(s => s + ';\n');
+  
+  if (runko.length > 0) {
     runko[runko.length - 1] = 'return ' + runko[runko.length - 1];
   }
-
-  return (
-`
-function ${enk(solmu.arvo)} (${parametrit}) { ${runko.join('')} }`);
-
+  
+  return runko;
 };
 
 module.exports = {
 
-  [P.OHJELMA]: kavely => {
-    const solmu = kavely.solmu,
-      tulos = solmu.runko.map(kavely.kavele).join('; '),
-      kaunistettu = beautify(tulos),
-      ohjelmaNimi = enk('ohjelma'),
-      tilaNimi = enk('tila')
-    ;
+  ohjelma(kavely) {
+    const
+      solmu         = kavely.solmu,
+      tulos         = solmu.runko.map(kavely.kavele).join('; '),
+      kaunistettu   = beautify(tulos),
+      ohjelmaNimi   = muuttuja('ohjelma'),
+      tilaNimi      = muuttuja('tila');
 
     return kavely.vaadiOhjelma ? kaunistettu : `
-
+(function() {
 ${kaunistettu}
 ;
 
@@ -41,40 +41,44 @@ if (typeof ${ohjelmaNimi} !== 'function' || typeof ${tilaNimi} === 'undefined') 
 } else {
   standardikirjasto.suorita(${ohjelmaNimi}, ${tilaNimi});
 }
+})();
 
     `;
   },
-
-  [P.FUNKTIOLUONTI]: generoiFunktioluonti,
-
-  [P.INFIKSIFUNKTIOLUONTI]: kavely => {
-    return generoiFunktioluonti({ kavele: kavely.kavele, solmu: kavely.solmu.runko[0] });
-  },
-
-  [P.FUNKTIOKUTSU]: ({ solmu, kavele }) => {
-    solmu.arvo === 'jos' && console.log(solmu.argumentit.ilmaisut);
-    const argumentit = _.map(_.head(solmu.argumentit.ilmaisut), i => kavele(i)).join(',');
-
-    return `${enk(solmu.arvo)}(${argumentit})`
-  },
-
-  [P.MUUTTUJA]: ({solmu}) => enk(solmu.arvo),
-
-  [P.NATIIVIKUTSU]: ({solmu, kavele}) => {
-    const arvo = solmu.arvo.replace(/%%%/g, '');
-
-    if (solmu.argumentit) {
-      const argumentit = solmu.argumentit.ilmaisut.map(i => kavele(i[0])).join(',');
-      return `standardikirjasto.${arvo}(${argumentit})`;
-    } else {
-      return `standardikirjasto.${arvo}`;
+  
+  funktioluonti({ solmu, kavele }) {
+    const
+      parametrit = solmu.parametrit.map(muuttuja),
+      
+      runko = muodostaRunko(solmu, kavele),
+        
+      nimi = solmu.arvo ? muuttuja(solmu.arvo) : '';
+    
+    // Jos argumentit ovat [a, b, c],
+    // Niin luodaan funktio
+    // function (a) { return function(b) { return function(c) { runko } } }
+    
+    if (parametrit.length === 0) {
+      parametrit.push('');
     }
+    
+    return _.reduceRight(parametrit, (edellinen, seuraava) => {
+      return `function ${nimi} (${seuraava}) { ${edellinen} }`; 
+    }, runko.join(''));
   },
-
-  [P.NUMERO]: ({solmu}) => parseFloat(solmu.arvo),
-
-  [P.TEKSTI]: ({solmu}) => '"' + (solmu.arvo) + '"',
-
-  [P.ASETUSLAUSE]: ({solmu, kavele}) => `var ${enk(solmu.arvo)} = (${solmu.runko.map(kavele)});`
-
+  
+  muuttujaluonti({ solmu, kavele }) {
+    const runko = muodostaRunko(solmu, kavele);
+    
+    return `var ${muuttuja(solmu.arvo)} = (function (){ ${ runko } })();`
+  },
+  
+  muuttuja({ solmu }) {
+    return muuttuja(solmu.arvo);
+  },
+  
+  numero({ solmu }) {
+    return solmu.arvo;
+  }
+  
 };

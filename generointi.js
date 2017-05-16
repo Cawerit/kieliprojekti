@@ -12,7 +12,7 @@ module.exports = function(koodi, kohdekieli = 'javascript') {
         parsittuStandardikirjasto = muunnos(parseri(standardikirjasto)),
         parsittuKoodi = muunnos(parseri(koodi), parsittuStandardikirjasto);
         
-    return parsittuKoodi;
+    return generoi(parsittuKoodi, kohdekieli);
 };
 
 function generoi(ast, kohdekieli, vaadiOhjelma = false) {
@@ -33,5 +33,5 @@ function generoi(ast, kohdekieli, vaadiOhjelma = false) {
        }
     };
     
-    return kavele(ast[0]);
+    return kavele(ast);
 }

@@ -15,6 +15,6 @@ if (args.f) {
         const
             generoitu = generoi(tiedosto);
 
-        apufunktiot.nayta(generoitu);
+        console.log(generoitu);
     });
 }
