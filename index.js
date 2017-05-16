@@ -1,7 +1,6 @@
 var args      = require('yargs').argv,
     fs        = require('fs'),
-    parseri   = require('./parseri.js'),
-    muunnos   = require('./muunnos.js'),
+    generoi   = require('./generointi.js'),
     apufunktiot = require('./apufunktiot.js')
     ;
 
@@ -14,9 +13,8 @@ if (args.f) {
         }
 
         const
-          parsittu = parseri(tiedosto),
-          muunnettu = muunnos(parsittu);
+            generoitu = generoi(tiedosto);
 
-        apufunktiot.nayta(muunnettu);
+        apufunktiot.nayta(generoitu);
     });
 }

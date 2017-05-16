@@ -16,7 +16,7 @@ const
   oikea = lens(1);
 
 
-function muunna(ast) {
+function muunna(ast, tuotuAst) {
 
   function virhe(viesti, solu) {
     const err = Object.assign(new Error(viesti), { solu });
@@ -141,6 +141,9 @@ function muunna(ast) {
   }
 
   const infiksifunktiot = new Map();
+  if (tuotuAst) {
+    asetaUudetInfiksifunktiot(tuotuAst.runko, infiksifunktiot);
+  }
   asetaUudetInfiksifunktiot(ast.runko, infiksifunktiot);
   ast.runko = ast.runko.map(__ => muunnaRekursiivinen(__, infiksifunktiot));
 

@@ -4,8 +4,7 @@ const
   esikasittele    = require('./esitokenisointi.js');
 
 /**
- * Parseri huolehtii tokenisoinnista saatujen tokeni-listojen järjestämisestä
- * asymmetriseksi syntaksipuuksi. Asymmetrinen syntaksipuu
+ * Parseri on aika turha.
  **/
 
 function parse(koodi) {

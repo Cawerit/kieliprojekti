@@ -175,5 +175,5 @@ function esikasittele(tiedosto) {
   }
 
 
-  return RUNKO_ALKU + tulos.join('') + tyhjennaRungot() + RUNKO_LOPPU;
+  return RUNKO_ALKU +tulos.join('') + tyhjennaRungot() + RUNKO_LOPPU;
 }

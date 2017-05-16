@@ -1,29 +1,22 @@
-var parseriTyypit = require('./parserityypit.js');
 var virheet = require('./virheviestit.js');
 var fs = require('fs');
 var path = require('path');
-var tokenisointi = require('./tokenisointi.js');
 var parseri = require('./parseri.js');
 var muunnos = require('./muunnos.js');
 var _ = require('lodash');
 
-const kasittele = _.flow([tokenisointi.tokenisoi, n => parseri.parse(n, true), muunnos.muunna]);
-
-module.exports.generoi = function(ast, kohdekieli) {
-    const standardikirjastoJs = fs.readFileSync(path.join(__dirname, 'kirjastot', 'standardikirjasto.js'), 'utf8');
-    const standardikirjasto = fs.readFileSync(path.join(__dirname, 'kirjastot', 'standardikirjasto.ö'), 'utf8');
-    
-    return standardikirjastoJs + '\n' +
-        generoi(kasittele(standardikirjasto), kohdekieli, true) + '\n' +
-        generoi(ast, kohdekieli);
+module.exports = function(koodi, kohdekieli = 'javascript') {
+    const
+        standardikirjastoJs = fs.readFileSync(path.join(__dirname, 'kirjastot', 'standardikirjasto.js'), 'utf8'),
+        standardikirjasto = fs.readFileSync(path.join(__dirname, 'kirjastot', 'standardikirjasto.ö'), 'utf8'),
+        parsittuStandardikirjasto = muunnos(parseri(standardikirjasto)),
+        parsittuKoodi = muunnos(parseri(koodi), parsittuStandardikirjasto);
+        
+    return parsittuKoodi;
 };
 
 function generoi(ast, kohdekieli, vaadiOhjelma = false) {
     const generoija = require('./generointi/' + kohdekieli + '.js');
-    
-    if (!ast.length === 1 || ast[0].tyyppi !== parseriTyypit.OHJELMA) {
-        throw new Error(virheet.GENEROINTI_TARVITSEE_OHJELMAN);
-    }
     
     const kavele = solmu => {
       const koodari = generoija[solmu.tyyppi];
