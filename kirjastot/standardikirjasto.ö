@@ -1,40 +1,40 @@
-tyyppi(a) = 
-  %%%tyyppi%%%(a)
+tyyppi(a) =
+  standardikirjasto(0, "tyyppi", a)
 
-infiksi 5 + (a, b) = 
-  %%%summaa%%%(a, b)
+infiksi 5 + (a, b) =
+  standardikirjasto(0, "summaa", a, b)
 
-infiksi 5 - (a, b) = 
-  %%%vahenna%%%(a, b)
-  
-infiksi 10 * (a, b) = %%%kerro%%%(a, b)
+infiksi 5 - (a, b) =
+  standardikirjasto(0, "vahenna", a, b)
 
-infiksi 10 / (a, b) = %%%jaa%%%(a, b)
+infiksi 10 * (a, b) = standardikirjasto(0, "kerro", a, b)
 
-infiksi 5 ++ (a, b) = %%%yhdistaTekstit%%%(a, b)
+infiksi 10 / (a, b) = standardikirjasto(0, "jaa", a, b)
 
-infiksi 10 % (a, b) = %%%jakojaannos%%%(a, b)
+infiksi 5 ++ (a, b) = standardikirjasto(0, "yhdistaTekstit", a, b)
 
-infiksi 11 ^ (a, b) = %%%potenssiinKorotus%%%(a, b)
+infiksi 10 % (a, b) = standardikirjasto(0, "jakojaannos", a, b)
 
-on(a, b) = %%%on%%%(a, b)
+infiksi 11 ^ (a, b) = standardikirjasto(0, "potenssiinKorotus", a, b)
 
-infiksi 2 on: (a, b) = %%%on%%%(a, b)
+on(a, b) = standardikirjasto(0, "on", a, b)
 
-näytä(teksti, tila) = %%%nayta%%%(teksti, tila)
+infiksi 2 on: (a, b) = standardikirjasto(0, "on", a, b)
 
-tämä(arvo) = %%%tama%%%(arvo)
+näytä(teksti, tila) = standardikirjasto(0, "nayta", teksti, tila)
 
-eiMitään = %%%eiMitaan%%%
+tämä(arvo) = standardikirjasto(0, "tama", arvo)
 
-pituus(jono) = %%%pituus%%%(jono)
+eiMitään = standardikirjasto(1, "eiMitään")
 
-jos(ehto, arvo) = %%%jos%%%(ehto, arvo)
+pituus(jono) = standardikirjasto(0, "pituus", jono)
 
-infiksi 1 muutoin: (ehkäArvo, taiSitten) = %%%muutoin%%%(ehkäArvo, taiSitten)
+jos(ehto, arvo) = standardikirjasto(0, "jos", ehto, arvo)
 
-muutoin(ehkäArvo, taiSitten) = %%%muutoin%%%(ehkäArvo, taiSitten)
+infiksi 1 muutoin: (ehkäArvo, taiSitten) = standardikirjasto(0, "muutoin", ehkäArvo, taiSitten)
 
-kysy(kysymys, tilanMuokkaus) = %%%kysy%%%(kysymys, tilanMuokkaus)
+muutoin(ehkäArvo, taiSitten) = standardikirjasto(0, "muutoin", ehkäArvo, taiSitten)
+
+kysy(kysymys, tilanMuokkaus) = standardikirjasto(0, "kysy", kysymys, tilanMuokkaus)
 
 identiteetti(a) = a

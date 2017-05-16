@@ -1,7 +1,4 @@
-tila = ""
+infiksi 2 * (a, b) = kerro(a, b)
+infiksi 1 + (a, b) = summaa(a, b)
 
-ohjelma (nimi) =
-  totuus = pituus(nimi) on: 0
-  kysymys = kysy("Anna nimesi: ", identiteetti)
-  jossittelu = jos(totuus, kysymys)
-  muutoin(jossittelu, näytä("Terve " ++ nimi ++ "!"))
+a + b * c

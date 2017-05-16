@@ -4,7 +4,10 @@
   "description": "Yolo",
   "main": "index.js",
   "scripts": {
-    "test": "jest ; exit 0;"
+    "test": "jest ; exit 0;",
+    "build": "nearleyc kielioppi.ne > grammar.js",
+    "predebug": "npm run build",
+    "debug": "node index.js --f=testi.ö || exit 0;"
   },
   "author": "Oskari Noppa, Aleksi Kyllönen, Villeveikko Sula",
   "license": "ISC",
@@ -12,6 +15,7 @@
     "base32": "0.0.6",
     "js-beautify": "^1.6.12",
     "lodash": "^4.17.4",
+    "nearley": "^2.9.2",
     "yargs": "^7.0.2"
   },
   "devDependencies": {
