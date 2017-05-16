@@ -190,7 +190,7 @@ var standardikirjasto;
         }
     }
     
-    standardikirjasto = {
+    var api = {
         summaa: summaa,
         jaa: jaa,
         tyyppi: tyyppi,
@@ -204,6 +204,34 @@ var standardikirjasto;
         muutoin: muutoin,
         kysy: kysy,
         on: on
+    };
+    
+    standardikirjasto = function(funktio, argumenit) {
+        var tulos, i, n;
+        if (funktio === standardikirjasto) {
+            var nimi = argumenit[1];
+            
+            if (argumenit[0] === 0) {
+                var args = [];
+                for (i = 2, n = argumenit.length; i < n; i++) {
+                    args.push(argumenit[i]);
+                }
+                
+                return api[nimi].apply(null, args);
+            } else {
+                return api[nimi];
+            }
+        } else {
+            if (argumenit.length > 0) {
+                tulos = funktio;
+                for(i = 0, n = argumenit.length; i < n; i++) {
+                    tulos = tulos(argumenit[i]);
+                }
+                return tulos;
+            } else {
+                return funktio();
+            }
+        }
     };
     
 })();

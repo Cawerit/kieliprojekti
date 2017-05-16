@@ -1,3 +1,3 @@
-tila = 1
+tila = "Heippa hei!"
 
-ohjelma(tila) = tila
+ohjelma(tila) = näytä(tila)

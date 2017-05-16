@@ -110,7 +110,7 @@ infiksifunktioluonti ->
         tyyppi: 'infiksifunktioluonti',
         presedenssi: presedenssi.arvo,
         arvo: nimi,
-        parametrit,
+        parametrit: kasitteleParametrit(parametrit),
         runko
       };
   }%}

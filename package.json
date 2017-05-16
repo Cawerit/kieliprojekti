@@ -7,7 +7,7 @@
     "test": "jest ; exit 0;",
     "build": "nearleyc kielioppi.ne > grammar.js",
     "predebug": "npm run build",
-    "debug": "node index.js --f=testi.ö > testi.txt"
+    "debug": "node index.js --f=testi.ö > testi.js"
   },
   "author": "Oskari Noppa, Aleksi Kyllönen, Villeveikko Sula",
   "license": "ISC",

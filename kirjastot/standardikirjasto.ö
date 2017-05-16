@@ -21,7 +21,7 @@ on(a, b) = standardikirjasto(0, "on", a, b)
 
 infiksi 2 on: (a, b) = standardikirjasto(0, "on", a, b)
 
-näytä(teksti, tila) = standardikirjasto(0, "nayta", teksti, tila)
+näytä(teksti) = standardikirjasto(0, "nayta", teksti)
 
 tämä(arvo) = standardikirjasto(0, "tama", arvo)
 
