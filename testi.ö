@@ -1,4 +1,1 @@
-infiksi 2 * (a, b) = kerro(a, b)
-infiksi 1 + (a, b) = summaa(a, b)
-
-a + b * c
+foo({ map((+)(1), $$) })

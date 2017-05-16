@@ -123,7 +123,6 @@ function muunna(ast) {
           // Luodaan uusi "scope" infiksifunktioille jotka määritetään tässä rungossa
           const rungonInfiksifunktiot = new Map(infiksifunktiot);
           asetaUudetInfiksifunktiot(rungonInfiksifunktiot);
-
           // Kutsutaan tätä metodia rekursiivisesti funktion rungolle
           solu.runko = solu.runko.map(__ => muunnaRekursiivinen(__, rungonInfiksifunktiot));
         }
@@ -135,7 +134,7 @@ function muunna(ast) {
       }
 
       // Kutsutaan tätä metodia rekursiivisesti esimerkiksi ilmaisun arvolle
-      if (typeof solu.arvo === 'object') solu.arvo = muunnaRekursiivinen(solu.arvo, infiksifunktiot);
+      if (_.isObject(solu.arvo)) solu.arvo = muunnaRekursiivinen(solu.arvo, infiksifunktiot);
 
       return solu;
     }

@@ -1,3 +1,18 @@
+
+#############################################################################
+#
+# Tämä tiedosto sisältää kieliopin määrittelyn Ö-kielelle.
+# Yhdessä parseri.js-tiedoston kanssa, täällä siis hoidetaan kielen
+# parsintavaihe. Huomaa kuitenkin että seuraavat parsintaan liittyvät
+# tehtävät tehdään muualla:
+#   - Sisennysten käsittely funktioluonneissa
+#     
+# Määrittelyssä käytetään Earley-algoritmin toteuttamaa nearley.js kirjastoa.
+# nearley.js projektin kotisivu: http://nearley.js.org/
+#
+#############################################################################
+
+
 @builtin "whitespace.ne"
 @{%
   const _ = require('lodash');
@@ -119,7 +134,7 @@ lambda ->
       tyyppi: 'lambda',
       arvo: null,
       parametrit: ['$$'],
-      runko: d[2]
+      runko: [d[2]]
     };
   }%}
 
