@@ -1,3 +1,6 @@
-tila = "Heippa hei!"
+tila = kokoelma("nimi" : eiMitään)
 
-ohjelma(tila) = näytä(tila)
+ohjelma(tila) =
+  nimi = arvo(tila @ "nimi")
+  jos(nimi on: eiMitään,  { kysy("Nimi: ", { kokoelma("nimi" : $) }) })
+  muutoin:                { näytä("Terve " ++ nimi) sitten: lopeta }

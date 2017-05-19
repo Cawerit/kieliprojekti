@@ -1,25 +1,25 @@
 tyyppi(a) =
   standardikirjasto(0, "tyyppi", a)
 
-infiksi 5 + (a, b) =
+infiksi 10 + (a, b) =
   standardikirjasto(0, "summaa", a, b)
 
-infiksi 5 - (a, b) =
+infiksi 10 - (a, b) =
   standardikirjasto(0, "vahenna", a, b)
 
-infiksi 10 * (a, b) = standardikirjasto(0, "kerro", a, b)
+infiksi 11 * (a, b) = standardikirjasto(0, "kerro", a, b)
 
-infiksi 10 / (a, b) = standardikirjasto(0, "jaa", a, b)
+infiksi 11 / (a, b) = standardikirjasto(0, "jaa", a, b)
 
-infiksi 5 ++ (a, b) = standardikirjasto(0, "yhdistaTekstit", a, b)
+infiksi 10 ++ (a, b) = standardikirjasto(0, "yhdistaTekstit", a, b)
 
-infiksi 10 % (a, b) = standardikirjasto(0, "jakojaannos", a, b)
+infiksi 11 % (a, b) = standardikirjasto(0, "jakojaannos", a, b)
 
-infiksi 11 ^ (a, b) = standardikirjasto(0, "potenssiinKorotus", a, b)
+infiksi 12 ^ (a, b) = standardikirjasto(0, "potenssiinKorotus", a, b)
 
 on(a, b) = standardikirjasto(0, "on", a, b)
 
-infiksi 2 on: (a, b) = standardikirjasto(0, "on", a, b)
+infiksi 8 on: (a, b) = standardikirjasto(0, "on", a, b)
 
 näytä(teksti) = standardikirjasto(0, "nayta", teksti)
 
@@ -38,3 +38,29 @@ muutoin(ehkäArvo, taiSitten) = standardikirjasto(0, "muutoin", ehkäArvo, taiSi
 kysy(kysymys, tilanMuokkaus) = standardikirjasto(0, "kysy", kysymys, tilanMuokkaus)
 
 identiteetti(a) = a
+
+pari(a, b) = standardikirjasto(0, "pari", a, b)
+
+infiksi 4 : (a, b) = standardikirjasto(0, "pari", a, b)
+
+infiksi 20 @ (kokoelma, indeksi) = standardikirjasto(0, "lueIndeksi", kokoelma, indeksi)
+
+lista = standardikirjasto(1, "lista")
+
+kokoelma = standardikirjasto(1, "kokoelma")
+
+infiksi 6 && (a, b) = standardikirjasto(1, "&&", a, b)
+
+infiksi 5 || (a, b) = standardikirjasto(1, "||", a, b)
+
+ehkä(fn, lista) = standardikirjasto(0, "ehka", fn, lista)
+
+eiMitään = standardikirjasto(1, "eiMitaan")
+
+tämä(arvo) = standardikirjasto(0, "tama", arvo)
+
+arvo(a) = standardikirjasto(0, "arvo", a)
+
+infiksi 4 sitten: (a, b) = standardikirjasto(0, "sitten", a, b)
+
+lopeta = standardikirjasto(1, "lopeta")

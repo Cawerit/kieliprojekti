@@ -86,11 +86,11 @@ function muunna(ast, tuotuAst) {
           pienin = _.minBy(
             _.filter(lista, onInfiksiKutsu),
             f => {
-              if (!infiksifunktiot.has(f.arvo)) {
+              if (!infiksifunktiot.has(f.arvo.arvo)) {
                 virhe(virheet.PUUTTUVA_INFIKSIFUNKTIO);
               }
 
-              return infiksifunktiot.get(f.arvo).presedenssi;
+              return infiksifunktiot.get(f.arvo.arvo).presedenssi;
             }
           ),
           indeksi = lista.indexOf(pienin),

@@ -6,7 +6,7 @@
 # parsintavaihe. Huomaa kuitenkin että seuraavat parsintaan liittyvät
 # tehtävät tehdään muualla:
 #   - Sisennysten käsittely funktioluonneissa
-#     
+#
 # Määrittelyssä käytetään Earley-algoritmin toteuttamaa nearley.js kirjastoa.
 # nearley.js projektin kotisivu: http://nearley.js.org/
 #
@@ -133,7 +133,7 @@ lambda ->
     return {
       tyyppi: 'lambda',
       arvo: null,
-      parametrit: ['$$'],
+      parametrit: ['$'],
       runko: [d[2]]
     };
   }%}
@@ -154,7 +154,7 @@ infiksifunktiokutsu -> ilmaisu _ infiksifunktio _ yksinkertainenIlmaisu
       return {
         tyyppi: 'funktiokutsu',
         infiksi: true,
-        arvo: d[2].arvo,
+        arvo: d[2],
         argumentit: [d[0], d[4]]
       };
   }%}

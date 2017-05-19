@@ -9,15 +9,24 @@ var standardikirjasto;
     /**
      * Yhteenlasku numeroilla
      */
-    var summaa  = fn('+', ['Numero', 'Numero'], function(a, b){ return a + b; });
+    var summaa  = fn('+', ['numero', 'numero'], function(a, b){ return a + b; });
+
+    /**
+     * Vähennyslasku numeroilla
+     */
+    var vahenna  = fn('-', ['numero', 'numero'], function(a, b){ return a - b; });
+
     /**
      * Jakolasku numeroilla
      */
-    var jaa = fn('/', ['Numero', 'Numero'], function(a, b){ return a / b; });
+    var jaa = fn('/', ['numero', 'numero'], function(a, b){ return a / b; });
     /**
      * Yhdistää kaksi tekstiä toisiinsa
      */
-    var yhdistaTekstit = fn('++', ['Teksti', 'Teksti'], function(a, b) { return a + b; });
+    var yhdistaTekstit = fn('++', ['teksti', 'teksti'], function(a, b) { return a + b; });
+
+    var T = function() { return true; };
+
     /**
     * Kahden arvon samanarvoisuutta testaava funktio
     */
@@ -61,13 +70,17 @@ var standardikirjasto;
         }
     }
 
-    var jos = fn('jos', ['Totuusarvo', '*'], function(ehto, arvo) {
+    var jos = fn('jos', ['totuusarvo', T], function(ehto, laiskaArvo) {
         if(ehto) {
-            return new Tama(arvo);
+            return new Tama(typeof laiskaArvo === 'function' ? standardikirjasto(laiskaArvo, []) : laiskaArvo);
         } else {
             return new EiMitaan();
         }
     });
+
+    var ja = fn('&&', ['totuusarvo', 'totuusarvo'], function(a, b){ return a && b; });
+
+    var tai = fn('||', ['totuusarvo', 'totuusarvo'], function(a, b){ return a || b; });
 
     function muutoin(ehkaArvo, taiSitten) {
         if (!ehkaArvo || !(ehkaArvo instanceof Ehka)) {
@@ -75,9 +88,8 @@ var standardikirjasto;
         } else if (taiSitten === undefined) {
             argumenttiVirhe('muutoin:', 1, taiSitten, 'jotakin');
         } else {
-
-            return ehkaArvo instanceof Tama ? ehkaArvo.arvo : taiSitten;
-
+            return ehkaArvo instanceof Tama ? ehkaArvo.arvo
+              : typeof taiSitten === 'function' ? standardikirjasto(taiSitten, []) : taiSitten;
         }
     }
 
@@ -100,6 +112,21 @@ var standardikirjasto;
     function Tama (arvo) { Ehka.call(this); this.arvo = arvo; }
     function EiMitaan () { Ehka.call(this); }
 
+    var onArvo = fn('onArvo', [constr(Ehka)], function(a) {
+      return a instanceof Tama;
+    });
+
+    var ehka = fn('ehkä', ['funktio', constr(Ehka)], function(fn, a) {
+      return onArvo(a) ? new Tama(fn(a)) : new EiMitaan();
+    });
+
+    function tekstiksi(a) {
+      return Array.isArray(a) ?
+        a.map(tekstiksi).join(', ')
+        : typeof a === 'string' ? JSON.stringify(a)
+        : a.toString();
+    }
+
     // Luokat "Tama" ja "EiMitaan" perivät
     // abstraktin luokan "Ehka".
     // Tämä helpottaa tarkistuksia joissa halutaan tietää
@@ -109,8 +136,10 @@ var standardikirjasto;
     Tama.prototype.constructor = Tama;
     EiMitaan.prototype.constructor = EiMitaan;
 
-    Tama.prototype.toString = function() { return 'tämä(' + this.arvo + ')'; };
+    Tama.prototype.toString = function() { return 'tämä(' + tekstiksi(this.arvo) + ')'; };
+    Tama.prototype._lueIndeksi = function(indeksi) { return lueIndeksi(this.arvo, indeksi); };
     EiMitaan.prototype.toString = function() { return 'eiMitaan'; };
+    EiMitaan.prototype._lueIndeksi = function() { return null; }
 
     /**
     * Tämän kirjaston sisäisiin equals-tarkistuksiin
@@ -118,6 +147,68 @@ var standardikirjasto;
     */
     Tama.prototype._on = function(b) { return !!b && b instanceof Tama && on(b.arvo, this.arvo); };
     EiMitaan.prototype._on = function(b) { return !!b && b instanceof EiMitaan; };
+
+    var tama = fn('tämä', [T], function(a) { return new Tama(a); });
+
+    var arvo = fn('arvo', [constr(Tama)], function(a){ return a.arvo; });
+
+    function Pari(a, b) {
+      this[0] = a;
+      this[1] = b;
+    }
+    Pari.prototype.toString = function() { return '(' + tekstiksi(this[0]) + ' : ' + tekstiksi(this[1]) + ')'; };
+    Pari.prototype._lueIndeksi = function(indeksi) {
+      if (indeksi !== 0 && indeksi !== 1) {
+        argumenttiVirhe('@', 1, indeksi, '0 tai 1');
+      } else {
+        return this[indeksi];
+      }
+    };
+
+    var pari = fn(':', [T, T], function(a, b) { return new Pari(a, b); });
+
+    function Lista(alkiot) {
+      this.alkiot = alkiot;
+    }
+    Lista.prototype.toString = function() {
+      return 'lista(' + tekstiksi(this.alkiot) + ')';
+    }
+    Lista.prototype._lueIndeksi = function(i) {
+      return this.alkiot[i];
+    };
+
+    function lista(alkiot) {
+      return new Lista(Array.prototype.slice.call(alkiot));
+    }
+
+    function Kokoelma(alkiot) {
+      this.alkiot = alkiot;
+    }
+    Kokoelma.prototype.toString = function() {
+      return 'kokoelma(' + tekstiksi(this.alkiot) + ')';
+    };
+    Kokoelma.prototype._lueIndeksi = function(indeksi) {
+      for (var i = 0, n = this.alkiot.length; i < n; i++) {
+        if (on(this.alkiot[i][0], indeksi)) {
+          return this.alkiot[i][1];
+        }
+      }
+    };
+
+    function kokoelma(alkiot) {
+      return new Kokoelma(alkiot);
+    }
+
+    function lueIndeksi(listaTaiKokoelma, indeksi) {
+      let tulos;
+      if (typeof listaTaiKokoelma._lueIndeksi === 'function') {
+        tulos = listaTaiKokoelma._lueIndeksi(indeksi);
+      } else {
+        argumenttiVirhe('@', 0, listaTaiKokoelma, 'lista, kokoelma tai pari');
+      }
+
+      return tulos == null ? new EiMitaan() : new Tama(tulos);
+    }
 
     /**
     * @class Komento
@@ -143,7 +234,7 @@ var standardikirjasto;
     Komento.prototype.tilanMuokkaus = function(komennonTulos, vanhaTila) {
         if (typeof this._tilanMuokkaus === 'function') {
             try {
-                return suorita(this.tilanMuokkaus, [komennonTulos, vanhaTila]);
+                return standardikirjasto(this._tilanMuokkaus, [komennonTulos]);
             } catch (err) {
                 console.log(err);
             }
@@ -174,39 +265,66 @@ var standardikirjasto;
         }, tilanMuokkaus);
     }
 
-    var nayta = fn('nayta', ['Teksti'], function(viesti) {
-        return new Komento(function() { console.log(viesti); }, undefined);
+    function nayta(viesti) {
+        return new Komento(function() { console.log(tekstiksi(viesti)); }, undefined);
+    }
+
+    var sitten = fn('sitten:', [constr(Komento), constr(Komento)], function(a, b) {
+      return new Komento(function() {
+        return a.tehtava().then(function() { return b.tehtava(); });
+      });
     });
+
+    var
+      LOPETA_TOKEN = function() {},
+      lopeta = new Komento(function() { return LOPETA_TOKEN; });
 
     function tyyppi(a) {
         switch(typeof a) {
-            case 'number': return 'Numero';
-            case 'string': return 'Teksti';
+            case 'number': return 'numero';
+            case 'string': return 'teksti';
             case 'object':
               if (a !== null && a.toString !== Object.prototype.toString) {
                 return a.toString();
               } else {
-                return 'Objekti';
+                return 'objekti';
               }
-            case 'function': return 'Funktio';
-            case 'boolean': return 'Totuusarvo';
+            case 'function': return 'funktio';
+            case 'boolean': return 'totuusarvo';
         }
     }
 
     function argumenttiVirhe(nimi, indeksi, argumentti, tyyppi) {
-        throw new Error(`Huono argumentti funktioon ${nimi}. Argumentin ${indeksi + 1} pitäisi olla ${tyyppi}, mutta se oli ${argumentti}`);
+        throw new Error(`Huono argumentti funktioon ${nimi}. ` +
+          `Argumentin ${indeksi + 1} pitäisi olla tyyppiä ${tyyppi}, mutta se oli ${tekstiksi(argumentti)}`);
     }
 
     function fn(nimi, argTyypit, f) {
         return function() {
             var args = Array.prototype.slice.call(arguments);
             for(var i = 0, n = args.length; i < n; i++) {
-                if (argTyypit[i] !== '*' && argTyypit[i] !== tyyppi(args[i])) {
+                var virhe = args[i] == null || (typeof argTyypit[i] === 'string' ?
+                  argTyypit[i] !== tyyppi(args[i])
+                  : !(argTyypit[i](args[i])));
+
+                if (virhe) {
                     argumenttiVirhe(nimi, i, args[i], argTyypit[i]);
                 }
             }
             return f.apply(this, args);
         }
+    }
+
+    // Pieni apufunktio joka palauttaa testausfunktion
+    // arvon prototyypin testaamiseen
+    function constr(c) {
+      var res = function(arvo) {
+        return arvo instanceof c;
+      };
+      res.toString = function() {
+        return c.name || c.toString();
+      };
+      return res;
     }
 
     function suorita(ohjelma, tila) {
@@ -215,9 +333,9 @@ var standardikirjasto;
             if (tulos && tulos instanceof Komento) {
                 var tehtavanTulos = tulos.tehtava();
                 tehtavanTulos.then(function(t) {
-                    var uusiTila = tulos.tilanMuokkaus(tila, t);
-                    if (uusiTila !== undefined) {
-                        suorita(ohjelma, uusiTila);
+                    if (t !== LOPETA_TOKEN) {
+                      var uusiTila = tulos.tilanMuokkaus(t, tila);
+                      suorita(ohjelma, uusiTila || tila);
                     }
                 });
             }
@@ -228,18 +346,29 @@ var standardikirjasto;
 
     var api = {
         summaa: summaa,
+        vahenna: vahenna,
         jaa: jaa,
         tyyppi: tyyppi,
         yhdistaTekstit: yhdistaTekstit,
         nayta: nayta,
         suorita: suorita,
-        tama: function(a) { return new Tama(a); },
+        tama: tama,
         eiMitaan: new EiMitaan(),
         pituus: pituus,
         jos: jos,
         muutoin: muutoin,
+        ehka: ehka,
         kysy: kysy,
-        on: on
+        on: on,
+        pari: pari,
+        lista: lista,
+        kokoelma: kokoelma,
+        ja: ja,
+        tai: tai,
+        lueIndeksi: lueIndeksi,
+        arvo: arvo,
+        sitten: sitten,
+        lopeta: lopeta
     };
 
     standardikirjasto = function(funktio, argumenit) {
@@ -257,6 +386,8 @@ var standardikirjasto;
             } else {
                 return api[nimi];
             }
+        } else if (funktio === api.lista || funktio === api.kokoelma) {
+          return funktio(argumenit);
         } else {
             if (argumenit.length > 0) {
                 tulos = funktio;
