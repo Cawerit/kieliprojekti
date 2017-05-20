@@ -22,7 +22,11 @@
 
   const erikoismerkki = {
 	  test(x) {
-		  return !varattu.test(x) && !numero.test(x) && x !== '$' && x.toLowerCase() === x.toUpperCase();
+		  return !varattu.test(x) &&
+		    !numero.test(x) &&
+		    x !== '$'       &&
+		    x !== '_'       &&
+		    x.toLowerCase() === x.toUpperCase();
 	  }
   };
 

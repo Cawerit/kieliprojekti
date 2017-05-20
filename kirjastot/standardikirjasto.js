@@ -1,4 +1,4 @@
-var standardikirjasto;
+var standardikirjasto; // Ö-kielen standardikirjasto
 
 (function() {
     ////////////////////////////////////////////////////////////////////////////
@@ -72,7 +72,7 @@ var standardikirjasto;
 
     var jos = fn('jos', ['totuusarvo', T], function(ehto, laiskaArvo) {
         if(ehto) {
-            return new Tama(typeof laiskaArvo === 'function' ? standardikirjasto(laiskaArvo, []) : laiskaArvo);
+            return new Tama(typeof laiskaArvo === 'function' ? laiskaArvo() : laiskaArvo);
         } else {
             return new EiMitaan();
         }
@@ -89,7 +89,7 @@ var standardikirjasto;
             argumenttiVirhe('muutoin:', 1, taiSitten, 'jotakin');
         } else {
             return ehkaArvo instanceof Tama ? ehkaArvo.arvo
-              : typeof taiSitten === 'function' ? standardikirjasto(taiSitten, []) : taiSitten;
+              : typeof taiSitten === 'function' ? taiSitten() : taiSitten;
         }
     }
 
@@ -98,6 +98,11 @@ var standardikirjasto;
     // Tyyppiluokat
     //
     ///////////////////////////////////////////////////////////////////////////
+    
+    var tyypit = {
+      LISTA: 1,
+      KOKOELMA: 2
+    };
 
     /**
     * @class Ehkä
@@ -167,37 +172,53 @@ var standardikirjasto;
 
     var pari = fn(':', [T, T], function(a, b) { return new Pari(a, b); });
 
-    function Lista(alkiot) {
-      this.alkiot = alkiot;
+    /**
+     * Listat
+     * TODO: Parempi toteutus, linked list?
+     */
+    function lista(alkio) {
+      var l = function(alkio) {
+        l._data.push(alkio);
+        return l;
+      };
+      l._data = [alkio];
+      l._tyyppi = tyypit.LISTA;
+      l.toString = lista_toString;
+      l._lueIndeksi = lista_lueIndeksi;
+      return l;
     }
-    Lista.prototype.toString = function() {
-      return 'lista(' + tekstiksi(this.alkiot) + ')';
+    
+    function lista_toString() {
+      return 'lista(' + tekstiksi(this._data) + ')';
     }
-    Lista.prototype._lueIndeksi = function(i) {
-      return this.alkiot[i];
-    };
+    
+    function lista_lueIndeksi(i) {
+      return this._data[i];
+    }
 
-    function lista(alkiot) {
-      return new Lista(Array.prototype.slice.call(alkiot));
+    function kokoelma(pari) {
+      var k = function(pari) {
+        k._data.push(pari);
+        return k;
+      };
+      k._data = [pari];
+      k._tyyppi = tyypit.KOKOELMA;
+      k.toString = kokoelma_toString;
+      k._lueIndeksi = kokoelma_lueIndeksi;
+      return k;
     }
 
-    function Kokoelma(alkiot) {
-      this.alkiot = alkiot;
-    }
-    Kokoelma.prototype.toString = function() {
-      return 'kokoelma(' + tekstiksi(this.alkiot) + ')';
+    function kokoelma_toString() {
+      return 'kokoelma(' + tekstiksi(this._data) + ')';
     };
-    Kokoelma.prototype._lueIndeksi = function(indeksi) {
-      for (var i = 0, n = this.alkiot.length; i < n; i++) {
-        if (on(this.alkiot[i][0], indeksi)) {
-          return this.alkiot[i][1];
+    
+    function kokoelma_lueIndeksi(indeksi) {
+      for (var i = 0, n = this._data.length; i < n; i++) {
+        if (on(this._data[i][0], indeksi)) {
+          return this._data[i][1];
         }
       }
     };
-
-    function kokoelma(alkiot) {
-      return new Kokoelma(alkiot);
-    }
 
     function lueIndeksi(listaTaiKokoelma, indeksi) {
       let tulos;
@@ -234,7 +255,7 @@ var standardikirjasto;
     Komento.prototype.tilanMuokkaus = function(komennonTulos, vanhaTila) {
         if (typeof this._tilanMuokkaus === 'function') {
             try {
-                return standardikirjasto(this._tilanMuokkaus, [komennonTulos]);
+                return this._tilanMuokkaus(komennonTulos);
             } catch (err) {
                 console.log(err);
             }
@@ -371,34 +392,17 @@ var standardikirjasto;
         lopeta: lopeta
     };
 
-    standardikirjasto = function(funktio, argumenit) {
-        var tulos, i, n;
-        if (funktio === standardikirjasto) {
-            var nimi = argumenit[1];
-
-            if (argumenit[0] === 0) {
-                var args = [];
-                for (i = 2, n = argumenit.length; i < n; i++) {
-                    args.push(argumenit[i]);
-                }
-
-                return api[nimi].apply(null, args);
-            } else {
-                return api[nimi];
-            }
-        } else if (funktio === api.lista || funktio === api.kokoelma) {
-          return funktio(argumenit);
-        } else {
-            if (argumenit.length > 0) {
-                tulos = funktio;
-                for(i = 0, n = argumenit.length; i < n; i++) {
-                    tulos = tulos(argumenit[i]);
-                }
-                return tulos;
-            } else {
-                return funktio();
-            }
+    standardikirjasto = function(tyyppi, nimi) {
+      if (tyyppi === 1) {
+        return api[nimi];
+      } else {
+        var args = [];
+        for (var i = 2, n = arguments.length; i < n; i++) {
+          args.push(arguments[i]);
         }
-    };
+        
+        return api[nimi].apply(undefined, args);
+      }
+    }
 
 })();

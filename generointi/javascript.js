@@ -36,7 +36,7 @@ module.exports = asetukset => {
     }
 
     return _.reduceRight(parametrit, (edellinen, seuraava) => {
-      const sisalto = edellinen === null ? runko.join(' ') : `return ${edellinen}`;
+      const sisalto = edellinen === null ? runko.join(' ') : `return ${edellinen};`;
 
       return `function ${nimi} (${seuraava}) { ${sisalto} }`;
     }, null);
@@ -47,24 +47,23 @@ module.exports = asetukset => {
     ohjelma(kavely) {
       const
         solmu         = kavely.solmu,
-        tulos         = solmu.runko.map(kavely.kavele).join('; '),
-        kaunistettu   = beautify(tulos),
+        tulos         = solmu.runko.map(kavely.kavele).map(x => x + ';').join('\n'),
         ohjelmaNimi   = muuttuja('ohjelma'),
         tilaNimi      = muuttuja('tila');
 
-      return asetukset.vaadiOhjelma === false ? kaunistettu : `
+      return beautify(asetukset.vaadiOhjelma === false ? tulos : `
 (function() {
-${kaunistettu}
+${tulos}
 ;
 
 if (typeof ${ohjelmaNimi} !== 'function' || typeof ${tilaNimi} === 'undefined') {
   throw new Error('Ö-ohjelma vaatii funktion nimeltä "ohjelma" ja tilan');
 } else {
-  standardikirjasto(standardikirjasto, [0, "suorita", ${ohjelmaNimi}, ${tilaNimi}]);
+  standardikirjasto(0, "suorita", ${ohjelmaNimi}, ${tilaNimi});
 }
 })();
 
-    `;
+    `);
     },
 
     funktioluonti,
@@ -74,9 +73,13 @@ if (typeof ${ohjelmaNimi} !== 'function' || typeof ${tilaNimi} === 'undefined') 
     lambda: funktioluonti,
 
     muuttujaluonti({ solmu, kavele }) {
-      const runko = muodostaRunko(solmu, kavele);
-
-      return `var ${muuttuja(solmu.arvo)} = (function (){ ${ runko } })();`
+      if (solmu.runko.length === 1 && solmu.runko[0].tyyppi !== funktioluonti) {
+        return `var ${muuttuja(solmu.arvo)} = ${kavele(solmu.runko[0])}`;
+      } else {
+        const runko = muodostaRunko(solmu, kavele);
+  
+        return `var ${muuttuja(solmu.arvo)} = (function (){ ${ runko } })()`;
+      }
     },
 
     muuttuja({ solmu }) {
@@ -92,11 +95,21 @@ if (typeof ${ohjelmaNimi} !== 'function' || typeof ${tilaNimi} === 'undefined') 
     },
 
     funktiokutsu({ solmu, kavele }) {
-      const
-        arvo = kavele(solmu.arvo),
-        argumentit = solmu.argumentit.map(kavele);
-
-      return `standardikirjasto(typeof ${arvo} !== 'undefined' ? ${arvo} : undefined, [ ${argumentit.join(', ')} ])`
+      const arvo = kavele(solmu.arvo);
+      let argumentit = solmu
+          .argumentit
+          .map(kavele);
+          
+      if (arvo === 'standardikirjasto') {
+        argumentit = '(' + argumentit
+          .join(', ') + ')';
+      } else {
+        argumentit = argumentit
+          .map(x => '(' + x + ')')
+          .join('');
+      }
+      
+      return arvo + argumentit;
     },
 
     teksti({ solmu }) {
