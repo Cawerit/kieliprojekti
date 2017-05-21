@@ -36,7 +36,7 @@ module.exports = asetukset => {
     }
 
     return _.reduceRight(parametrit, (edellinen, seuraava) => {
-      const sisalto = edellinen === null ? runko.join(' ') : `return ${edellinen};`;
+      const sisalto = edellinen === null ? runko.join(' ') : `return ${edellinen}`;
 
       return `function ${nimi} (${seuraava}) { ${sisalto} }`;
     }, null);

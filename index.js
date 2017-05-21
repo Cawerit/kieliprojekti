@@ -1,7 +1,8 @@
 var args      = require('yargs').argv,
     fs        = require('fs'),
     generoi   = require('./generointi.js'),
-    apufunktiot = require('./apufunktiot.js')
+    apufunktiot = require('./apufunktiot.js'),
+    virheviestit  = require('./virheviestit.js')
     ;
 
 
@@ -11,10 +12,13 @@ if (args.f) {
             console.error(virhe);
             return;
         }
-
-        const
-            generoitu = generoi(tiedosto);
-
-        console.log(generoitu);
+    
+        try {
+            const generoitu = generoi(tiedosto);
+            
+            console.log(generoitu);
+        } catch (err) {
+            console.error(virheviestit.kasitteleVirhe(err, tiedosto));
+        }
     });
 }

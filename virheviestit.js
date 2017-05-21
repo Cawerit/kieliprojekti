@@ -16,20 +16,60 @@ const virheet = {
 
 module.exports = virheet;
 
+const merkki = (i, koodi) => {
+  return koodi[i] || '';
+};
 
 module.exports.kasitteleVirhe = (virhe, koodi) => {
-  if(!virhe || !virhe.sijainti) {
-    return virhe;
+  let msg = virhe.message;
+  
+  if (virhe.type === 'TokenisointiVirhe') {
+    const i = virhe.sijainti.indeksi;
+    // Tämä virhe tulee esitokenisointivaiheessa
+    msg = `Virhe ohjelman tokenisoinnissa: odottamaton merkki "${merkki(i, koodi)}" kohdassa ${i}`;
+  } else if (virhe.type === 'ParseriVirhe') {
+    // Tämä virhe tulee Nearley-parserilta.
+    // Yritetään parsia Nearleyn virheviestistä relevantti ilmoitus
+    // ja positio koodista. Virhettä ei tee mieli suoraan näyttää
+    // käyttäjälle koska esikäsittelyn jäljilta koodi on melko
+    // obfuskoitunutta.
+    
+    // Yritetään lukea viestistä kodat:
+    // "Invalid syntax at line x col y" ja
+    // "Unexpected z"
+    // jotta saadaan kohta koodissa ja ongelman aiheuttama merkki
+    const 
+      sijainti = msg.match(/invalid syntax at line ([0-9]+) col ([0-9]+)/),
+      selitys = msg.match(/Unexpected (.*)/);
+    
+    if (sijainti) {
+      // Nearleyn saamassa koodissa on vain yksi rivi,
+      // selvitetään alkuperäinen rivi kolumnin perusteella
+      let col = parseInt(sijainti[2]);
+      
+      if (!isNaN(col)) {
+        let
+          riviNro = 0,
+          pos = 0,
+          rivit = koodi.split('\n');
+          
+        for (let rivi of rivit) {
+          riviNro++;
+          const pos_ = pos + rivi.length;
+          if (pos_ > col) {
+            // Tässä on oikea kohta
+            col = col - pos;
+            break;
+          } else {
+            pos = pos_;  
+          }
+        }
+      
+        msg = `Virhe ohjelman tokenisoinnissa: odottamaton ${selitys[1]} rivillä ${riviNro}, kolumnissa ${col}`;
+      }
+    }
   }
-
-  const indeksi = virhe.sijainti.indeksi;
-  const kohta = koodi.slice(0, indeksi);
-  const rivinvaihdot = kohta.split('\n');
-  const riviNro = rivinvaihdot.length;
-  const kolumni = rivinvaihdot[rivinvaihdot.length - 1].length + 1;
-
-  return `
-Virhe koodin käsittelyssä sijainnissa ${riviNro}:${kolumni}: "${koodi[indeksi]}"
-  ${virhe.message}
-  `;
+  
+  
+  return msg;
 };

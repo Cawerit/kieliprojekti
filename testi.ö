@@ -1,6 +1,6 @@
-tila = kokoelma("nimi" : eiMitään)
+tila = kokoelma("nimi" : "")
 
 ohjelma(tila) =
-  nimi = arvo(tila @ "nimi")
-  jos(nimi on: eiMitään,  { kysy("Nimi: ", { kokoelma("nimi" : $) }) })
-  muutoin:                { näytä("Terve " ++ nimi) sitten: lopeta }
+  nimi = tila @ "nimi"
+  kun pituus(nimi) on 0 niin kysy("Nimi: ", { kokoelma("nimi": $) })
+  tai sano("Hei" + nimi) muutoin

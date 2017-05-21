@@ -17,7 +17,7 @@
 @{%
   const _ = require('lodash');
 
-  const varattu = /[",.=(){} ]|\s|\t|\n|\r|^infiksi$|^Tosi$|^Epätosi$/;
+  const varattu = /[",.=(){} ]|\s|\t|\n|\r|^infiksi$|^Tosi$|^Epätosi$|^kun$|^muutoin$|^on$/;
   const numero = /[0-9]/;
 
   const erikoismerkki = {
@@ -43,11 +43,6 @@
 	  test(x){
 	  	return !varattu.test(x) && !erikoismerkki.test(x);
   	}
-  };
-
-  const count = (l, pred) => {
-    if (typeof pred !== 'function') pred = x => x === pred;
-    return _.filter(l, pred).length;
   };
 
   const flatJoin = x => _.flattenDeep(x).join('');
@@ -97,10 +92,24 @@ yksinkertainenIlmaisu ->
 
 laskettuArvo ->
   funktiokutsu                    {% fst %}
-  | lambda          {% fst %}
+  | lambda                        {% fst %}
+  | sovituslausejoukko            {% fst %}
   | muuttuja                      {% fst %}
   | "(" _ infiksifunktio _ ")"    {% third %}
   | "(" _ eiAsetus _ ")"          {% d => ({ tyyppi: 'ilmaisu', runko: [d[2]] }) %}
+  
+
+sovituslausejoukko ->
+  "kun" __ eiAsetus __ sovituslause:+ "tai" __ eiAsetus __ "muutoin"
+  {% d => {
+    return { tyyppi: 'sovituslausejoukko', arvo: d[2], runko: d[3], oletusArvo: d[6] }; 
+  }%}
+  
+sovituslause ->
+  "on" __ eiAsetus __ "niin" __ eiAsetus __
+  {% d => {
+    return { tyyppi: 'sovituslause', ehto: d[2], arvo: d[5] };
+  }%}
 
 asetus ->
   funktioluonti           {% fst %}

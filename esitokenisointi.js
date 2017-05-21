@@ -35,7 +35,7 @@ function esikasittele(tiedosto) {
     Object.assign(err, {
       sijainti: { indeksi },
       token,
-      type: 'Tokenisointivirhe'
+      type: 'TokenisointiVirhe'
     });
     throw err;
   }

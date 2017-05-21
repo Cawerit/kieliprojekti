@@ -1,11 +1,8 @@
 tyyppi(a) =
   standardikirjasto(0, "tyyppi", a)
-
+ 
 infiksi 10 + (a, b) =
   standardikirjasto(0, "summaa", a, b)
-
-infiksi 10 - (a, b) =
-  standardikirjasto(0, "vahenna", a, b)
 
 infiksi 11 * (a, b) = standardikirjasto(0, "kerro", a, b)
 
@@ -16,8 +13,6 @@ infiksi 10 ++ (a, b) = standardikirjasto(0, "yhdistaTekstit", a, b)
 infiksi 11 % (a, b) = standardikirjasto(0, "jakojaannos", a, b)
 
 infiksi 12 ^ (a, b) = standardikirjasto(0, "potenssiinKorotus", a, b)
-
-on(a, b) = standardikirjasto(0, "on", a, b)
 
 infiksi 8 on: (a, b) = standardikirjasto(0, "on", a, b)
 
@@ -32,8 +27,6 @@ pituus(jono) = standardikirjasto(0, "pituus", jono)
 jos(ehto, arvo) = standardikirjasto(0, "jos", ehto, arvo)
 
 infiksi 1 muutoin: (ehkäArvo, taiSitten) = standardikirjasto(0, "muutoin", ehkäArvo, taiSitten)
-
-muutoin(ehkäArvo, taiSitten) = standardikirjasto(0, "muutoin", ehkäArvo, taiSitten)
 
 kysy(kysymys, tilanMuokkaus) = standardikirjasto(0, "kysy", kysymys, tilanMuokkaus)
 
@@ -59,8 +52,8 @@ eiMitään = standardikirjasto(1, "eiMitaan")
 
 tämä(arvo) = standardikirjasto(0, "tama", arvo)
 
-arvo(a) = standardikirjasto(0, "arvo", a)
-
 infiksi 4 sitten: (a, b) = standardikirjasto(0, "sitten", a, b)
+
+arvo(a) = standardikirjasto(0, "arvo", a)
 
 lopeta = standardikirjasto(1, "lopeta")
