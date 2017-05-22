@@ -26,7 +26,7 @@ module.exports.kasitteleVirhe = (virhe, koodi) => {
   if (virhe.type === 'TokenisointiVirhe') {
     const i = virhe.sijainti.indeksi;
     // Tämä virhe tulee esitokenisointivaiheessa
-    msg = `Virhe ohjelman tokenisoinnissa: odottamaton merkki "${merkki(i, koodi)}" kohdassa ${i}`;
+    return `Virhe ohjelman tokenisoinnissa: odottamaton merkki "${merkki(i, koodi)}" kohdassa ${i}`;
   } else if (virhe.type === 'ParseriVirhe') {
     // Tämä virhe tulee Nearley-parserilta.
     // Yritetään parsia Nearleyn virheviestistä relevantti ilmoitus
@@ -68,8 +68,10 @@ module.exports.kasitteleVirhe = (virhe, koodi) => {
         msg = `Virhe ohjelman tokenisoinnissa: odottamaton ${selitys[1]} rivillä ${riviNro}, kolumnissa ${col}`;
       }
     }
+
+    return msg;
+  } else {
+    return virhe;
   }
-  
-  
-  return msg;
 };
+

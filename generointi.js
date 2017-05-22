@@ -4,6 +4,28 @@ var parseri = require('./parseri.js');
 var muunnos = require('./muunnos.js');
 var virheet = require('./virheviestit.js');
 
+class Scope {
+
+  constructor() { this.muuttujat = []; }
+
+  muuttuja(nimiEhdotus, runko) {
+    const
+	aiemmat = this.muuttujat.filter(m => m._nimiEhdotus === nimiEhdotus).length,
+	nimi = aiemmat.length > 0 ? muuttujaNimi += '$$' + aiemmat.length : muuttujaNimi,
+        solmu = { arvo: nimi, runko, _nimiEhdotus: nimiEhdotus };
+
+    this.muuttujat.push(solmu);
+    return nimi; 
+  }
+
+  uusi() {
+    const s = new Scope();
+    s.muuttujat = this.muuttujat.slice();
+    return s;
+  }
+
+}
+
 module.exports = function(koodi, kohdekieli = 'javascript') {
     try {
         const
@@ -21,27 +43,37 @@ module.exports = function(koodi, kohdekieli = 'javascript') {
             generoituKoodi;
             
     } catch (err) {
-        err.type = 'ParseriVirhe';
+        // err.type = 'ParseriVirhe';
         throw err;
     }
 };
 
+
 function generoi(ast, kohdekieli, asetukset) {
     const generoija = require('./generointi/' + kohdekieli + '.js')(asetukset);
 
-    const kavele = solmu => {
-      const koodari = generoija[solmu.tyyppi];
-      if (koodari) {
-          return koodari({
-              solmu,
-              kavele
-          });
-      } else {
-          const err = new Error(`Ei muokkaajaa tyypille ${solmu.tyyppi}`);
-          console.log(err);
-          throw err;
-       }
+    const kavele = scope => {
+	const kaveleRekursiivinen = solmu => {
+      	  const koodari = generoija[solmu.tyyppi];
+
+      	  if (koodari) {
+            return koodari({
+                solmu,
+                kavele: kaveleRekursiivinen,
+	        uusiScope: kavele(scope.uusi()),
+	        scope
+            });
+          } else {
+            const err = new Error(`Ei muokkaajaa tyypille ${solmu.tyyppi}`);
+            console.log(err);
+            throw err;
+          }
+        };
+
+	kaveleRekursiivinen.scope = scope;
+        return kaveleRekursiivinen;
     };
 
-    return kavele(ast);
+    return kavele(new Scope())(ast);
 }
+

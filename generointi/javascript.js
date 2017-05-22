@@ -21,10 +21,17 @@ module.exports = asetukset => {
     return runko;
   };
 
-  const funktioluonti = ({ solmu, kavele }) => {
+  const funktioluonti = ({ solmu, kavele, scope }) => {
+    console.log('what', typeof scope.uusi);
+
+    const
+      uusiScope = scope.uusi();
+
+    console.log('woop', typeof uusiScope.uusi);
+
     const
       parametrit = solmu.parametrit.map(muuttuja),
-      runko = muodostaRunko(solmu, kavele),
+      runko = muodostaRunko(solmu, a => kavele(a, uusiScope)),
       nimi = solmu.arvo ? muuttuja(solmu.arvo) : '';
 
     // Jos argumentit ovat [a, b, c],
@@ -92,6 +99,20 @@ if (typeof ${ohjelmaNimi} !== 'function' || typeof ${tilaNimi} === 'undefined') 
 
     numero({ solmu }) {
       return solmu.arvo;
+    },
+
+    sovituslausejoukko({ solmu, kavele, scope }) {
+      const arvo = scope.muuttuja('$ehtolause_arvo', [solmu.arvo]);
+      const vertailut = solmu
+	      .runko
+	      .map(s => {
+		const ehto = scope.muuttuja('$ehtolause_ehto', [s.ehto]);
+ 		const tulos = kavele(s.arvo);
+		return `(typeof ${ehto} == 'function' ? ${ehto}(${arvo}) : ${ehto}) ? (${tulos})`;
+	      })
+	      .join(' : ');
+
+      return vertailut;
     },
 
     funktiokutsu({ solmu, kavele }) {
