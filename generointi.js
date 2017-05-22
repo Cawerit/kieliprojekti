@@ -17,17 +17,14 @@ class Scope {
       solmu = {
         arvo: nimi,
         runko,
+        tyyppi: 'muuttujaluonti',
+        // Kertoo generoijalle että nimeä ei tarvitse obfuskoida jms
+        _sisainenMuuttuja: true,
         _nimiEhdotus: nimiEhdotus
       };
 
     this.muuttujat.push(solmu);
     return nimi;
-  }
-
-  uusi() {
-    const s = new Scope();
-    s.muuttujat = this.muuttujat.slice();
-    return s;
   }
 
 }
@@ -68,7 +65,7 @@ function generoi(ast, kohdekieli, asetukset) {
         return koodari({
           solmu,
           kavele: kaveleRekursiivinen,
-          uusiScope: () => kavele(scope.uusi()),
+          uusiScope: () => kavele(new Scope()),
           scope
         });
       } else {

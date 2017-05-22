@@ -1,6 +1,6 @@
 tila = kokoelma("nimi" : "")
 
 ohjelma(tila) =
-  nimi = tila @ "nimi"
+  nimi = arvo(tila @ "nimi")
   kun pituus(nimi) on 0 niin kysy("Nimi: ", { kokoelma("nimi": $) })
-  tai sano("Hei" + nimi) muutoin
+  tai näytä("Hei " ++ nimi) muutoin

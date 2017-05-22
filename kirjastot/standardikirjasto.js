@@ -93,12 +93,31 @@ var standardikirjasto; // Ö-kielen standardikirjasto
         }
     }
 
+    /**
+    * Funktio jota generoitu koodi kutsuu konditionaalirakenteessa
+    * `kun oikeaArvo on odotettuArvo niin ..`
+    *
+    * Ö kieli ei tue funktioiden vertailua normaaliin vertailuun
+    * tarkoitetulla `on:`-funktiolla. Mikäli `odotettuArvo` on funktio,
+    * palautusarvo on `odotettuArvo(oikeaArvo)`, eli käyttäjä voi helposti
+    * siirtää tarkistuksen jollekin toiselle funktiolle.
+    * Muussa tapauksessa tulos on normaalilla vertailulla
+    * tehty `on(odotettuArvo, oikeaArvo)`.
+    *
+    * @private
+    */
+    function vertaaEhtoArvoja(odotettuArvo, oikeaArvo) {
+      return typeof odotettuArvo === 'function' ?
+        odotettuArvo(oikeaArvo)
+        : on(odotettuArvo, oikeaArvo);
+    }
+
     ////////////////////////////////////////////////////////////////////////////
     //
     // Tyyppiluokat
     //
     ///////////////////////////////////////////////////////////////////////////
-    
+
     var tyypit = {
       LISTA: 1,
       KOKOELMA: 2
@@ -187,11 +206,11 @@ var standardikirjasto; // Ö-kielen standardikirjasto
       l._lueIndeksi = lista_lueIndeksi;
       return l;
     }
-    
+
     function lista_toString() {
       return 'lista(' + tekstiksi(this._data) + ')';
     }
-    
+
     function lista_lueIndeksi(i) {
       return this._data[i];
     }
@@ -210,15 +229,15 @@ var standardikirjasto; // Ö-kielen standardikirjasto
 
     function kokoelma_toString() {
       return 'kokoelma(' + tekstiksi(this._data) + ')';
-    };
-    
+    }
+
     function kokoelma_lueIndeksi(indeksi) {
       for (var i = 0, n = this._data.length; i < n; i++) {
         if (on(this._data[i][0], indeksi)) {
           return this._data[i][1];
         }
       }
-    };
+    }
 
     function lueIndeksi(listaTaiKokoelma, indeksi) {
       let tulos;
@@ -297,8 +316,11 @@ var standardikirjasto; // Ö-kielen standardikirjasto
     });
 
     var
-      LOPETA_TOKEN = function() {},
-      lopeta = new Komento(function() { return LOPETA_TOKEN; });
+      symbolTuettu = typeof Symbol !== 'undefined',
+      LOPETA_TOKEN = symbolTuettu ? Symbol('komennot/lopeta') : function() {/* Komento: Lopeta */},
+      JATKA_TOKEN  = symbolTuettu ? Symbol('komennot/jatka') : function() {/* Komento: Jatka */},
+      lopeta = new Komento(function() { return LOPETA_TOKEN; }),
+      jatka = new Komento(function() { return JATKA_TOKEN; });
 
     function tyyppi(a) {
         switch(typeof a) {
@@ -356,7 +378,12 @@ var standardikirjasto; // Ö-kielen standardikirjasto
                 tehtavanTulos.then(function(t) {
                     if (t !== LOPETA_TOKEN) {
                       var uusiTila = tulos.tilanMuokkaus(t, tila);
-                      suorita(ohjelma, uusiTila || tila);
+
+                      if (!on(uusiTila, tila) || t === JATKA_TOKEN) {
+                        setTimeout(function() {
+                          suorita(ohjelma, uusiTila);
+                        });
+                      }
                     }
                 });
             }
@@ -389,7 +416,8 @@ var standardikirjasto; // Ö-kielen standardikirjasto
         lueIndeksi: lueIndeksi,
         arvo: arvo,
         sitten: sitten,
-        lopeta: lopeta
+        lopeta: lopeta,
+        jatka: jatka
     };
 
     standardikirjasto = function(tyyppi, nimi) {
@@ -400,9 +428,12 @@ var standardikirjasto; // Ö-kielen standardikirjasto
         for (var i = 2, n = arguments.length; i < n; i++) {
           args.push(arguments[i]);
         }
-        
+
         return api[nimi].apply(undefined, args);
       }
-    }
+    };
+
+    standardikirjasto.suorita = suorita;
+    standardikirjasto.vrt = vertaaEhtoArvoja;
 
 })();

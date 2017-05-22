@@ -21,8 +21,21 @@ module.exports = asetukset => {
     const
       kavele      = uusiScope(),
       parametrit  = solmu.parametrit.map(muuttuja),
-      runko       = muodostaRunko(solmu, kavele),
-      nimi        = solmu.arvo ? muuttuja(solmu.arvo) : '';
+      nimi        = solmu.arvo ? muuttuja(solmu.arvo) : '',
+
+      [muuttujat, muut] = _.partition(solmu.runko, r => r.tyyppi === 'muuttujaluonti'),
+      muuttujatGen      = muuttujat.map(kavele),
+      muutGen           = muut.map(kavele),
+      apumuuttujatGen   = kavele.scope.muuttujat.map(kavele);
+
+    const runko = muuttujatGen
+      .concat(apumuuttujatGen)
+      .concat(muutGen)
+      .map(s => s + ';\n');
+
+    if (runko.length > 0) {
+      runko[runko.length - 1] = 'return ' + runko[runko.length - 1];
+    }
 
     // Jos argumentit ovat [a, b, c],
     // Niin luodaan funktio
@@ -59,7 +72,7 @@ ${tulos}
 if (typeof ${ohjelmaNimi} !== 'function' || typeof ${tilaNimi} === 'undefined') {
   throw new Error('Ö-ohjelma vaatii funktion nimeltä "ohjelma" ja tilan');
 } else {
-  standardikirjasto(0, "suorita", ${ohjelmaNimi}, ${tilaNimi});
+  standardikirjasto.suorita(${ohjelmaNimi}, ${tilaNimi});
 }
 })();
 
@@ -73,12 +86,16 @@ if (typeof ${ohjelmaNimi} !== 'function' || typeof ${tilaNimi} === 'undefined') 
     lambda: funktioluonti,
 
     muuttujaluonti({solmu, kavele}) {
+      // Apufunktio joka turvaa muuttujanimen jos solmua ei ole
+      // määritetty generoinnin "sisäiseksi" muuttujaksi
+      const luoMuuttuja = solmu._sisainenMuuttuja ? _.identity : muuttuja;
+
       if (solmu.runko.length === 1 && solmu.runko[0].tyyppi !== funktioluonti) {
-        return `var ${muuttuja(solmu.arvo)} = ${kavele(solmu.runko[0])}`;
+        return `var ${luoMuuttuja(solmu.arvo)} = ${kavele(solmu.runko[0])}`;
       } else {
         const runko = muodostaRunko(solmu, kavele);
 
-        return `var ${muuttuja(solmu.arvo)} = (function (){ ${runko} })()`;
+        return `var ${luoMuuttuja(solmu.arvo)} = (function (){ ${runko} })()`;
       }
     },
 
@@ -96,13 +113,16 @@ if (typeof ${ohjelmaNimi} !== 'function' || typeof ${tilaNimi} === 'undefined') 
 
     sovituslausejoukko({solmu, kavele, scope}) {
       const arvo = scope.muuttuja('$ehtolause_arvo', [solmu.arvo]);
-      const vertailut = solmu.runko.map(s => {
-        const ehto = scope.muuttuja('$ehtolause_ehto', [s.ehto]);
-        const tulos = kavele(s.arvo);
-        return `(typeof ${ehto} == 'function' ? ${ehto}(${arvo}) : ${ehto}) ? (${tulos})`;
-      }).join(' : ');
 
-      return vertailut;
+      const vertailut = solmu.runko.map(s => {
+        const
+          ehto  = kavele(s.ehto),
+          tulos = kavele(s.arvo);
+
+        return `standardikirjasto.vrt(${ehto}, ${arvo}) ? (${tulos})`;
+      });
+
+      return vertailut.join(' : ') + ` : ${ kavele(solmu.oletusArvo) }`;
     },
 
     funktiokutsu({solmu, kavele}) {

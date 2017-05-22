@@ -1,6 +1,6 @@
 tyyppi(a) =
   standardikirjasto(0, "tyyppi", a)
- 
+
 infiksi 10 + (a, b) =
   standardikirjasto(0, "summaa", a, b)
 
@@ -57,3 +57,5 @@ infiksi 4 sitten: (a, b) = standardikirjasto(0, "sitten", a, b)
 arvo(a) = standardikirjasto(0, "arvo", a)
 
 lopeta = standardikirjasto(1, "lopeta")
+
+jatka = standardikirjasto(1, "jatka")
