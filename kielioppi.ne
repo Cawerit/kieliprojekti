@@ -97,18 +97,18 @@ laskettuArvo ->
   | muuttuja                      {% fst %}
   | "(" _ infiksifunktio _ ")"    {% third %}
   | "(" _ eiAsetus _ ")"          {% d => ({ tyyppi: 'ilmaisu', runko: [d[2]] }) %}
-  
+
 
 sovituslausejoukko ->
   "kun" __ eiAsetus __ sovituslause:+ "tai" __ eiAsetus __ "muutoin"
   {% d => {
-    return { tyyppi: 'sovituslausejoukko', arvo: d[2], runko: d[3], oletusArvo: d[6] }; 
+    return { tyyppi: 'sovituslausejoukko', arvo: d[2], runko: d[4], oletusArvo: d[7] };
   }%}
-  
+
 sovituslause ->
   "on" __ eiAsetus __ "niin" __ eiAsetus __
   {% d => {
-    return { tyyppi: 'sovituslause', ehto: d[2], arvo: d[5] };
+    return { tyyppi: 'sovituslause', ehto: d[2], arvo: d[6] };
   }%}
 
 asetus ->
