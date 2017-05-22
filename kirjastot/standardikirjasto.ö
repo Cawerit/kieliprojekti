@@ -42,9 +42,13 @@ lista = standardikirjasto(1, "lista")
 
 kokoelma = standardikirjasto(1, "kokoelma")
 
-infiksi 6 && (a, b) = standardikirjasto(1, "&&", a, b)
+infiksi 6 && (a, b) = standardikirjasto(0, "ja", a, b)
 
-infiksi 5 || (a, b) = standardikirjasto(1, "||", a, b)
+infiksi 5 || (a, b) = standardikirjasto(0, "tai", a, b)
+
+infiksi 8 > (a, b) = standardikirjasto(0, "suurempi", a, b)
+
+infiksi 8 < (a, b) = standardikirjasto(0, "pienempi", a, b)
 
 ehkä(fn, lista) = standardikirjasto(0, "ehka", fn, lista)
 

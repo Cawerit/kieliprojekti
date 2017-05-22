@@ -82,6 +82,10 @@ var standardikirjasto; // Ö-kielen standardikirjasto
 
     var tai = fn('||', ['totuusarvo', 'totuusarvo'], function(a, b){ return a || b; });
 
+    var suurempi = fn('>', ['numero', 'numero'], function(a, b){ return a > b; });
+
+    var pienempi = fn('<', ['numero', 'numero'], function(a, b){ return a < b; });
+
     function muutoin(ehkaArvo, taiSitten) {
         if (!ehkaArvo || !(ehkaArvo instanceof Ehka)) {
             argumenttiVirhe('muutoin:', 0, ehkaArvo, 'tämä(arvo) tai eiMitään');
@@ -413,6 +417,8 @@ var standardikirjasto; // Ö-kielen standardikirjasto
         kokoelma: kokoelma,
         ja: ja,
         tai: tai,
+        suurempi: suurempi,
+        pienempi: pienempi,
         lueIndeksi: lueIndeksi,
         arvo: arvo,
         sitten: sitten,

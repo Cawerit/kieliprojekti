@@ -12,7 +12,7 @@ const
     // hieman base32-enkoodausta siistinpään muotoon
     yleisetOperaattorit     = {
         op:     ['+',       '-',        '*',        '/',    '^',          '$',  '++',      ':'],
-        nimi:   ['plus',    'miinus',   'kerro',    'jaa',  'potenssiin', 'a',  'yhdista', 'pari']
+        nimi:   ['plus',    'miinus',   'kerro',    'jaa',  'potenssiin', 'x',  'yhdista', 'pari']
     },
     viimeinenKaksoispiste   = /:$/;
 

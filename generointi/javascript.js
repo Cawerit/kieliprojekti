@@ -111,6 +111,10 @@ if (typeof ${ohjelmaNimi} !== 'function' || typeof ${tilaNimi} === 'undefined') 
       return solmu.arvo;
     },
 
+    /**
+    * Konditionaalien rakenne:
+    * `kun x on y niin .. on z niin .. tai e muutoin`
+    */
     sovituslausejoukko({solmu, kavele, scope}) {
       const arvo = scope.muuttuja('$ehtolause_arvo', [solmu.arvo]);
 
@@ -120,9 +124,9 @@ if (typeof ${ohjelmaNimi} !== 'function' || typeof ${tilaNimi} === 'undefined') 
           tulos = kavele(s.arvo);
 
         return `standardikirjasto.vrt(${ehto}, ${arvo}) ? (${tulos})`;
-      });
+      }).join(' : ');
 
-      return vertailut.join(' : ') + ` : ${ kavele(solmu.oletusArvo) }`;
+      return vertailut + ` : ${ kavele(solmu.oletusArvo) }`;
     },
 
     funktiokutsu({solmu, kavele}) {

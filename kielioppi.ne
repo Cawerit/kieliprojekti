@@ -123,7 +123,7 @@ infiksifunktioluonti ->
         tyyppi: 'infiksifunktioluonti',
         presedenssi: presedenssi.arvo,
         arvo: nimi,
-        parametrit: kasitteleParametrit(parametrit),
+        parametrit: kasitteleParametrit(parametrit).reverse(),
         runko
       };
   }%}
@@ -168,7 +168,7 @@ infiksifunktiokutsu -> ilmaisu _ infiksifunktio _ yksinkertainenIlmaisu
         tyyppi: 'funktiokutsu',
         infiksi: true,
         arvo: d[2],
-        argumentit: [d[0], d[4]]
+        argumentit: [d[4], d[0]]
       };
   }%}
 
