@@ -148,6 +148,11 @@ if (typeof ${ohjelmaNimi} !== 'function' || typeof ${tilaNimi} === 'undefined') 
 
     ilmaisu({solmu, kavele}) {
       return kavele(solmu.runko[0]);
+    },
+    
+    totuusarvo({solmu}) {
+      return solmu.arvo.toString();
     }
+    
   };
 };

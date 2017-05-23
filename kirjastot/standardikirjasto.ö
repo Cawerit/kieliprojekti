@@ -65,3 +65,13 @@ arvo(a) = standardikirjasto(0, "arvo", a)
 lopeta = standardikirjasto(1, "lopeta")
 
 jatka = standardikirjasto(1, "jatka")
+
+silmukka(lista) = standardikirjasto(0, "silmukka", lista)
+
+etsi(ehto, lista) = standardikirjasto(0, "etsi", ehto, lista)
+
+etsiIndeksi(ehto, lista) = standardikirjasto(0, "etsiIndeksi", ehto, lista)
+
+elem(alkio, lista) = etsiIndeksi((on:)(alkio), lista) > -1
+
+ei(totuusarvo) = kun totuusarvo on Tosi niin Epätosi tai Tosi muutoin

@@ -29,6 +29,23 @@ var standardikirjasto; // Ö-kielen standardikirjasto
      * Yhdistää kaksi tekstiä toisiinsa
      */
     var yhdistaTekstit = fn('++', ['teksti', 'teksti'], function(a, b) { return a + b; });
+    
+    var etsiIndeksi = fn('etsiIndeksi', ['funktio', tyyppiOn('lista')], function(fn, lista){
+      var data = lista._data;
+      for (var i = 0, n = data.length; i < n; i++) {
+        if (fn(data[i])) {
+          return i;
+        }
+      }
+      
+      return -1;
+    });
+    
+    var etsi = fn('etsi', ['funktio', tyyppiOn('lista')], function(fn, lista) {
+      var tulos = etsiIndeksi(fn, lista);
+      if (tulos === -1) return new EiMitaan();
+      else return tama(tulos);
+    });
 
     var T = function() { return true; };
 
@@ -227,14 +244,26 @@ var standardikirjasto; // Ö-kielen standardikirjasto
      */
     function lista(alkio) {
       var l = function(alkio) {
-        l._data.push(alkio);
-        return l;
+        var uusi = lista(alkio);
+        uusi._data = l._data.concat(uusi._data);
+        uusi._syklinen = l._syklinen;
+        
+        return uusi;
       };
+      
       l._data = [alkio];
       l._tyyppi = tyypit.LISTA;
       l.toString = lista_toString;
       l._lueIndeksi = lista_lueIndeksi;
+      l._syklinen = false;
       return l;
+    }
+    
+    function silmukka(l) {
+      var uusi = lista();
+      uusi._data = l._data;
+      uusi._syklinen = true;
+      return uusi;
     }
 
     function lista_toString() {
@@ -242,7 +271,15 @@ var standardikirjasto; // Ö-kielen standardikirjasto
     }
 
     function lista_lueIndeksi(i) {
-      return this._data[i];
+      if (i >= this._data.length) {
+        if (this._syklinen) {
+          return lista_lueIndeksi.call(this, i - this._data.length);
+        } else {
+          return undefined;
+        }
+      } else {
+        return this._data[i]; 
+      }
     }
 
     function kokoelma(pari) {
@@ -474,7 +511,10 @@ var standardikirjasto; // Ö-kielen standardikirjasto
         sitten: sitten,
         lopeta: lopeta,
         jatka: jatka,
-        muokkaa: muokkaa
+        muokkaa: muokkaa,
+        silmukka: silmukka,
+        etsi: etsi,
+        etsiIndeksi: etsiIndeksi
     };
 
     standardikirjasto = function(tyyppi, nimi) {

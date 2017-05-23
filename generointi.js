@@ -3,6 +3,10 @@ var path = require('path');
 var parseri = require('./parseri.js');
 var muunnos = require('./muunnos.js');
 
+/*******************************************************************************
+ * 
+ *******************************************************************************/
+
 class Scope {
 
   constructor() {
@@ -11,8 +15,8 @@ class Scope {
 
   muuttuja(nimiEhdotus, runko) {
     const aiemmat = this.muuttujat.filter(m => m._nimiEhdotus === nimiEhdotus).length,
-      nimi = aiemmat.length > 0
-        ? nimiEhdotus += '$$' + aiemmat.length
+      nimi = aiemmat > 0
+        ? nimiEhdotus + '$$' + aiemmat
         : nimiEhdotus,
       solmu = {
         arvo: nimi,
@@ -22,7 +26,7 @@ class Scope {
         _sisainenMuuttuja: true,
         _nimiEhdotus: nimiEhdotus
       };
-
+      
     this.muuttujat.push(solmu);
     return nimi;
   }
