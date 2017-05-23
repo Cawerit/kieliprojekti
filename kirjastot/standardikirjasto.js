@@ -1,6 +1,11 @@
 var standardikirjasto; // Ö-kielen standardikirjasto
 
 (function() {
+    var tyypit = {
+      LISTA: 'lista',
+      KOKOELMA: 'kokoelma'
+    };
+    
     ////////////////////////////////////////////////////////////////////////////
     //
     // Yleiset funktiot
@@ -24,6 +29,23 @@ var standardikirjasto; // Ö-kielen standardikirjasto
      * Yhdistää kaksi tekstiä toisiinsa
      */
     var yhdistaTekstit = fn('++', ['teksti', 'teksti'], function(a, b) { return a + b; });
+    
+    var etsiIndeksi = fn('etsiIndeksi', ['funktio', tyyppiOn('lista')], function(fn, lista){
+      var data = lista._data;
+      for (var i = 0, n = data.length; i < n; i++) {
+        if (fn(data[i])) {
+          return i;
+        }
+      }
+      
+      return -1;
+    });
+    
+    var etsi = fn('etsi', ['funktio', tyyppiOn('lista')], function(fn, lista) {
+      var tulos = etsiIndeksi(fn, lista);
+      if (tulos === -1) return new EiMitaan();
+      else return tama(tulos);
+    });
 
     var T = function() { return true; };
 
@@ -82,6 +104,36 @@ var standardikirjasto; // Ö-kielen standardikirjasto
 
     var tai = fn('||', ['totuusarvo', 'totuusarvo'], function(a, b){ return a || b; });
 
+    var suurempi = fn('>', ['numero', 'numero'], function(a, b){ return a > b; });
+
+    var pienempi = fn('<', ['numero', 'numero'], function(a, b){ return a < b; });
+    
+    var muokkaa = fn('|', [tyyppiOn(tyypit.KOKOELMA), constr(Pari)], function(obj, pari){
+      var
+        uusiData = [],
+        data = obj._data,
+        avain = pari._lueIndeksi(0),
+        osuma = false;
+      
+      for (var i = 0, n = data.length; i < n; i++) {
+        var d = data[i];
+        if (!osuma && on(avain, d._lueIndeksi(0))) {
+          uusiData.push(new Pari(avain, pari._lueIndeksi(1)));
+          osuma = true;
+        } else {
+          uusiData.push(d);
+        }
+      }
+      
+      if (!osuma) {
+        uusiData.push(new Pari(avain, pari._lueIndeksi(1)));
+      }
+      
+      var k = kokoelma();
+      k._data = uusiData;
+      return k;
+    });
+
     function muutoin(ehkaArvo, taiSitten) {
         if (!ehkaArvo || !(ehkaArvo instanceof Ehka)) {
             argumenttiVirhe('muutoin:', 0, ehkaArvo, 'tämä(arvo) tai eiMitään');
@@ -93,16 +145,30 @@ var standardikirjasto; // Ö-kielen standardikirjasto
         }
     }
 
+    /**
+    * Funktio jota generoitu koodi kutsuu konditionaalirakenteessa
+    * `kun oikeaArvo on odotettuArvo niin ..`
+    *
+    * Ö kieli ei tue funktioiden vertailua normaaliin vertailuun
+    * tarkoitetulla `on:`-funktiolla. Mikäli `odotettuArvo` on funktio,
+    * palautusarvo on `odotettuArvo(oikeaArvo)`, eli käyttäjä voi helposti
+    * siirtää tarkistuksen jollekin toiselle funktiolle.
+    * Muussa tapauksessa tulos on normaalilla vertailulla
+    * tehty `on(odotettuArvo, oikeaArvo)`.
+    *
+    * @private
+    */
+    function vertaaEhtoArvoja(odotettuArvo, oikeaArvo) {
+      return typeof odotettuArvo === 'function' ?
+        odotettuArvo(oikeaArvo)
+        : on(odotettuArvo, oikeaArvo);
+    }
+
     ////////////////////////////////////////////////////////////////////////////
     //
     // Tyyppiluokat
     //
     ///////////////////////////////////////////////////////////////////////////
-    
-    var tyypit = {
-      LISTA: 1,
-      KOKOELMA: 2
-    };
 
     /**
     * @class Ehkä
@@ -178,22 +244,42 @@ var standardikirjasto; // Ö-kielen standardikirjasto
      */
     function lista(alkio) {
       var l = function(alkio) {
-        l._data.push(alkio);
-        return l;
+        var uusi = lista(alkio);
+        uusi._data = l._data.concat(uusi._data);
+        uusi._syklinen = l._syklinen;
+        
+        return uusi;
       };
+      
       l._data = [alkio];
       l._tyyppi = tyypit.LISTA;
       l.toString = lista_toString;
       l._lueIndeksi = lista_lueIndeksi;
+      l._syklinen = false;
       return l;
     }
     
+    function silmukka(l) {
+      var uusi = lista();
+      uusi._data = l._data;
+      uusi._syklinen = true;
+      return uusi;
+    }
+
     function lista_toString() {
       return 'lista(' + tekstiksi(this._data) + ')';
     }
-    
+
     function lista_lueIndeksi(i) {
-      return this._data[i];
+      if (i >= this._data.length) {
+        if (this._syklinen) {
+          return lista_lueIndeksi.call(this, i - this._data.length);
+        } else {
+          return undefined;
+        }
+      } else {
+        return this._data[i]; 
+      }
     }
 
     function kokoelma(pari) {
@@ -210,15 +296,15 @@ var standardikirjasto; // Ö-kielen standardikirjasto
 
     function kokoelma_toString() {
       return 'kokoelma(' + tekstiksi(this._data) + ')';
-    };
-    
+    }
+
     function kokoelma_lueIndeksi(indeksi) {
       for (var i = 0, n = this._data.length; i < n; i++) {
         if (on(this._data[i][0], indeksi)) {
           return this._data[i][1];
         }
       }
-    };
+    }
 
     function lueIndeksi(listaTaiKokoelma, indeksi) {
       let tulos;
@@ -243,9 +329,9 @@ var standardikirjasto; // Ö-kielen standardikirjasto
         this._tilanMuokkaus = tilanMuokkaus;
     }
 
-    Komento.prototype.tehtava = function() {
+    Komento.prototype.tehtava = function(vanhaTila) {
       try {
-          var tulos = this._tehtava();
+          var tulos = this._tehtava(vanhaTila);
           return Promise.resolve(tulos);
       } catch (err) {
           return Promise.reject(err);
@@ -290,15 +376,32 @@ var standardikirjasto; // Ö-kielen standardikirjasto
         return new Komento(function() { console.log(tekstiksi(viesti)); }, undefined);
     }
 
-    var sitten = fn('sitten:', [constr(Komento), constr(Komento)], function(a, b) {
-      return new Komento(function() {
-        return a.tehtava().then(function() { return b.tehtava(); });
+    var sitten = fn('sitten:', [constr(Komento), 'funktio'], function(a, b) {
+      var tilaBJalkeen;
+      return new Komento(function(vanhaTila) {
+        return a.tehtava(vanhaTila)
+          .then(function(tulos) {
+            var uusiTila = a.tilanMuokkaus(tulos, vanhaTila);
+            var bKomento = b(uusiTila);
+            
+            return bKomento
+              .tehtava(uusiTila)
+              .then(function(tulos) {
+                tilaBJalkeen = bKomento.tilanMuokkaus(tulos, uusiTila);
+                return tulos;
+              });
+          });
+      }, function() {
+        return tilaBJalkeen;
       });
     });
 
     var
-      LOPETA_TOKEN = function() {},
-      lopeta = new Komento(function() { return LOPETA_TOKEN; });
+      symbolTuettu = typeof Symbol !== 'undefined',
+      LOPETA_TOKEN = symbolTuettu ? Symbol('komennot/lopeta') : function() {/* Komento: Lopeta */},
+      JATKA_TOKEN  = symbolTuettu ? Symbol('komennot/jatka') : function() {/* Komento: Jatka */},
+      lopeta = new Komento(function() { return LOPETA_TOKEN; }),
+      jatka = new Komento(function() { return JATKA_TOKEN; });
 
     function tyyppi(a) {
         switch(typeof a) {
@@ -347,16 +450,31 @@ var standardikirjasto; // Ö-kielen standardikirjasto
       };
       return res;
     }
-
+    
+    function tyyppiOn(t) {
+      var res = function(arvo) {
+        return arvo._tyyppi === t;
+      };
+      res.toString = function() {
+        return t;
+      };
+      
+      return res;
+    }
+ 
     function suorita(ohjelma, tila) {
         try {
             var tulos = ohjelma(tila);
             if (tulos && tulos instanceof Komento) {
-                var tehtavanTulos = tulos.tehtava();
+                var tehtavanTulos = tulos.tehtava(tila);
                 tehtavanTulos.then(function(t) {
                     if (t !== LOPETA_TOKEN) {
                       var uusiTila = tulos.tilanMuokkaus(t, tila);
-                      suorita(ohjelma, uusiTila || tila);
+                      if (!on(uusiTila, tila) || t === JATKA_TOKEN) {
+                        setTimeout(function() {
+                          suorita(ohjelma, uusiTila);
+                        });
+                      }
                     }
                 });
             }
@@ -386,10 +504,17 @@ var standardikirjasto; // Ö-kielen standardikirjasto
         kokoelma: kokoelma,
         ja: ja,
         tai: tai,
+        suurempi: suurempi,
+        pienempi: pienempi,
         lueIndeksi: lueIndeksi,
         arvo: arvo,
         sitten: sitten,
-        lopeta: lopeta
+        lopeta: lopeta,
+        jatka: jatka,
+        muokkaa: muokkaa,
+        silmukka: silmukka,
+        etsi: etsi,
+        etsiIndeksi: etsiIndeksi
     };
 
     standardikirjasto = function(tyyppi, nimi) {
@@ -400,9 +525,12 @@ var standardikirjasto; // Ö-kielen standardikirjasto
         for (var i = 2, n = arguments.length; i < n; i++) {
           args.push(arguments[i]);
         }
-        
+
         return api[nimi].apply(undefined, args);
       }
-    }
+    };
+
+    standardikirjasto.suorita = suorita;
+    standardikirjasto.vrt = vertaaEhtoArvoja;
 
 })();

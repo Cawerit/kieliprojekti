@@ -11,8 +11,8 @@ const
     // Näitä nimiä vastaavat muuttujanimet voidaan helposti vaihtaa
     // hieman base32-enkoodausta siistinpään muotoon
     yleisetOperaattorit     = {
-        op:     ['+',       '-',        '*',        '/',    '^'],
-        nimi:   ['plus',    'miinus',   'kerro',    'jaa',  'potenssiin']
+        op:     ['+',       '-',        '*',        '/',    '^',          '$',  '++',      ':'],
+        nimi:   ['plus',    'miinus',   'kerro',    'jaa',  'potenssiin', 'x',  'yhdista', 'pari']
     },
     viimeinenKaksoispiste   = /:$/;
 
@@ -48,7 +48,7 @@ const muuttujanimiGeneraattori = (ohita = []) => nimi => {
             huonoAloitus.test(nimi)
             || yleisetOperaattorit.nimi.indexOf(nimi) !== -1
             || (ohita.indexOf(nimi) === -1 && varattu.indexOf(nimi) !== -1);
-            
+
         if (eiSallittu) {
             return '$' + nimi;
         } else {
@@ -68,7 +68,7 @@ const muuttujanimiGeneraattori = (ohita = []) => nimi => {
         if (hyvaksytytMerkit.test(korvattuKaksoispiste)) {
             return muuttujanimiGeneraattori(ohita)(korvattuKaksoispiste) + '$';
         }
-        
+
         // Paremmat muunnokset eivät riittäneet, base32-endkoodataan
         // muuttuja jotta se on varmasti "turvallinen"
         return 'm_' + base32.encode(nimi) + `/*${nimi.replace(/\*\//g, '* /')}*/`;

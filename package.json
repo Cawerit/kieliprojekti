@@ -19,7 +19,6 @@
     "yargs": "^7.0.2"
   },
   "devDependencies": {
-    "globby": "^6.1.0",
-    "jest": "^19.0.2"
+    "globby": "^6.1.0"
   }
 }

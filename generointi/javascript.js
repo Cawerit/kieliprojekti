@@ -1,18 +1,14 @@
-
-const
-  beautify    = require('js-beautify').js_beautify,
+const beautify = require('js-beautify').js_beautify,
   apufunktiot = require('../apufunktiot.js'),
-  _           = require('lodash');
+  _ = require('lodash');
 
 module.exports = asetukset => {
-  const muuttuja = apufunktiot.muuttujanimiGeneraattori(asetukset.salliStandardikirjasto ? ['standardikirjasto'] : []);
+  const muuttuja = apufunktiot
+    .muuttujanimiGeneraattori(asetukset.salliStandardikirjasto ? ['standardikirjasto'] : []);
 
   // Pieni apufunktio funktion rungon muodostamiseen
   const muodostaRunko = (solmu, kavele) => {
-    const runko = solmu
-    .runko
-    .map(kavele)
-    .map(s => s + ';\n');
+    const runko = solmu.runko.map(kavele).map(s => s + ';\n');
 
     if (runko.length > 0) {
       runko[runko.length - 1] = 'return ' + runko[runko.length - 1];
@@ -21,11 +17,25 @@ module.exports = asetukset => {
     return runko;
   };
 
-  const funktioluonti = ({ solmu, kavele }) => {
+  const funktioluonti = ({ solmu, uusiScope }) => {
     const
-      parametrit = solmu.parametrit.map(muuttuja),
-      runko = muodostaRunko(solmu, kavele),
-      nimi = solmu.arvo ? muuttuja(solmu.arvo) : '';
+      kavele      = uusiScope(),
+      parametrit  = solmu.parametrit.map(muuttuja),
+      nimi        = solmu.arvo ? muuttuja(solmu.arvo) : '',
+
+      [muuttujat, muut] = _.partition(solmu.runko, r => r.tyyppi === 'muuttujaluonti'),
+      muuttujatGen      = muuttujat.map(kavele),
+      muutGen           = muut.map(kavele),
+      apumuuttujatGen   = kavele.scope.muuttujat.map(kavele);
+
+    const runko = muuttujatGen
+      .concat(apumuuttujatGen)
+      .concat(muutGen)
+      .map(s => s + ';\n');
+
+    if (runko.length > 0) {
+      runko[runko.length - 1] = 'return ' + runko[runko.length - 1];
+    }
 
     // Jos argumentit ovat [a, b, c],
     // Niin luodaan funktio
@@ -36,7 +46,9 @@ module.exports = asetukset => {
     }
 
     return _.reduceRight(parametrit, (edellinen, seuraava) => {
-      const sisalto = edellinen === null ? runko.join(' ') : `return ${edellinen};`;
+      const sisalto = edellinen === null
+        ? runko.join(' ')
+        : `return ${edellinen}`;
 
       return `function ${nimi} (${seuraava}) { ${sisalto} }`;
     }, null);
@@ -45,13 +57,14 @@ module.exports = asetukset => {
   return {
 
     ohjelma(kavely) {
-      const
-        solmu         = kavely.solmu,
-        tulos         = solmu.runko.map(kavely.kavele).map(x => x + ';').join('\n'),
-        ohjelmaNimi   = muuttuja('ohjelma'),
-        tilaNimi      = muuttuja('tila');
+      const solmu = kavely.solmu,
+        tulos = solmu.runko.map(kavely.kavele).map(x => x + ';').join('\n'),
+        ohjelmaNimi = muuttuja('ohjelma'),
+        tilaNimi = muuttuja('tila');
 
-      return beautify(asetukset.vaadiOhjelma === false ? tulos : `
+      return beautify(asetukset.vaadiOhjelma === false
+        ? tulos
+        : `
 (function() {
 ${tulos}
 ;
@@ -59,7 +72,7 @@ ${tulos}
 if (typeof ${ohjelmaNimi} !== 'function' || typeof ${tilaNimi} === 'undefined') {
   throw new Error('Ö-ohjelma vaatii funktion nimeltä "ohjelma" ja tilan');
 } else {
-  standardikirjasto(0, "suorita", ${ohjelmaNimi}, ${tilaNimi});
+  standardikirjasto.suorita(${ohjelmaNimi}, ${tilaNimi});
 }
 })();
 
@@ -72,53 +85,74 @@ if (typeof ${ohjelmaNimi} !== 'function' || typeof ${tilaNimi} === 'undefined') 
 
     lambda: funktioluonti,
 
-    muuttujaluonti({ solmu, kavele }) {
+    muuttujaluonti({solmu, kavele}) {
+      // Apufunktio joka turvaa muuttujanimen jos solmua ei ole
+      // määritetty generoinnin "sisäiseksi" muuttujaksi
+      const luoMuuttuja = solmu._sisainenMuuttuja ? _.identity : muuttuja;
+
       if (solmu.runko.length === 1 && solmu.runko[0].tyyppi !== funktioluonti) {
-        return `var ${muuttuja(solmu.arvo)} = ${kavele(solmu.runko[0])}`;
+        return `var ${luoMuuttuja(solmu.arvo)} = ${kavele(solmu.runko[0])}`;
       } else {
         const runko = muodostaRunko(solmu, kavele);
-  
-        return `var ${muuttuja(solmu.arvo)} = (function (){ ${ runko } })()`;
+
+        return `var ${luoMuuttuja(solmu.arvo)} = (function (){ ${runko} })()`;
       }
     },
 
-    muuttuja({ solmu }) {
+    muuttuja({solmu}) {
       return muuttuja(solmu.arvo);
     },
 
-    infiksifunktio({ solmu }) {
+    infiksifunktio({solmu}) {
       return muuttuja(solmu.arvo);
     },
 
-    numero({ solmu }) {
+    numero({solmu}) {
       return solmu.arvo;
     },
 
-    funktiokutsu({ solmu, kavele }) {
+    /**
+    * Konditionaalien rakenne:
+    * `kun x on y niin .. on z niin .. tai e muutoin`
+    */
+    sovituslausejoukko({solmu, kavele, scope}) {
+      const arvo = scope.muuttuja('$ehtolause_arvo', [solmu.arvo]);
+
+      const vertailut = solmu.runko.map(s => {
+        const
+          ehto  = kavele(s.ehto),
+          tulos = kavele(s.arvo);
+
+        return `standardikirjasto.vrt(${ehto}, ${arvo}) ? (${tulos})`;
+      }).join(' : ');
+
+      return vertailut + ` : ${ kavele(solmu.oletusArvo) }`;
+    },
+
+    funktiokutsu({solmu, kavele}) {
       const arvo = kavele(solmu.arvo);
-      let argumentit = solmu
-          .argumentit
-          .map(kavele);
-          
+      let argumentit = solmu.argumentit.map(kavele);
+
       if (arvo === 'standardikirjasto') {
-        argumentit = '(' + argumentit
-          .join(', ') + ')';
+        argumentit = '(' + argumentit.join(', ') + ')';
       } else {
-        argumentit = argumentit
-          .map(x => '(' + x + ')')
-          .join('');
+        argumentit = argumentit.map(x => '(' + x + ')').join('');
       }
-      
+
       return arvo + argumentit;
     },
 
-    teksti({ solmu }) {
+    teksti({solmu}) {
       return JSON.stringify(solmu.arvo);
     },
 
-    ilmaisu({ solmu, kavele }) {
+    ilmaisu({solmu, kavele}) {
       return kavele(solmu.runko[0]);
     },
-
+    
+    totuusarvo({solmu}) {
+      return solmu.arvo.toString();
+    }
+    
   };
 };

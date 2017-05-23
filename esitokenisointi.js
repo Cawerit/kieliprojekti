@@ -35,7 +35,7 @@ function esikasittele(tiedosto) {
     Object.assign(err, {
       sijainti: { indeksi },
       token,
-      type: 'Tokenisointivirhe'
+      type: 'TokenisointiVirhe'
     });
     throw err;
   }
@@ -152,21 +152,25 @@ function esikasittele(tiedosto) {
 
       // Sisennyksiä tarvitsee käsitellä vain asetuslauseiden jälkeen!
       case YHTASUURUUS: {
-        // Etsitään mistä nykyinen rivi on alkanut
-        let rivinAlku = indeksi;
-        while(rivinAlku > 0 && tiedosto[rivinAlku] !== RIVINVAIHTO) {
-          rivinAlku--;
+        const edellinen = tiedosto[indeksi - 1];
+        if (edellinen && (edellinen === ' ' || edellinen === ')' || edellinen.toLowerCase() !== edellinen.toUpperCase())) {
+          // Etsitään mistä nykyinen rivi on alkanut
+          let rivinAlku = indeksi;
+          while(rivinAlku > 0 && tiedosto[rivinAlku] !== RIVINVAIHTO) {
+            rivinAlku--;
+          }
+
+          tulos.push(`${YHTASUURUUS} ${RUNKO_ALKU}`);
+
+          // Lasketaan monellako välillä rivi alkoi
+          rungonSisennykset.push(laskeSisennys(rivinAlku));
+          seuraava();
+          break;
         }
-
-        tulos.push(`${YHTASUURUUS} ${RUNKO_ALKU}`);
-
-        // Lasketaan monellako välillä rivi alkoi
-        rungonSisennykset.push(laskeSisennys(rivinAlku));
-        seuraava();
-        break;
+        // break; puuttuu tarkoituksella
       }
 
-      default: {
+      default: {  // eslint-disable-line no-fallthrough
         tulos.push(token);
         seuraava();
         break;

@@ -12,7 +12,7 @@ function parse(koodi) {
     parseri = new nearley.Parser(kielioppi.ParserRules, kielioppi.ParserStart);
 
   const esikasitelty = esikasittele(koodi);
-
+  
   return parseri.feed(esikasitelty).results[0];
 }
 
