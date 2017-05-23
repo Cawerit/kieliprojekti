@@ -1,6 +1,11 @@
 var standardikirjasto; // Ö-kielen standardikirjasto
 
 (function() {
+    var tyypit = {
+      LISTA: 'lista',
+      KOKOELMA: 'kokoelma'
+    };
+    
     ////////////////////////////////////////////////////////////////////////////
     //
     // Yleiset funktiot
@@ -85,6 +90,32 @@ var standardikirjasto; // Ö-kielen standardikirjasto
     var suurempi = fn('>', ['numero', 'numero'], function(a, b){ return a > b; });
 
     var pienempi = fn('<', ['numero', 'numero'], function(a, b){ return a < b; });
+    
+    var muokkaa = fn('|', [tyyppiOn(tyypit.KOKOELMA), constr(Pari)], function(obj, pari){
+      var
+        uusiData = [],
+        data = obj._data,
+        avain = pari._lueIndeksi(0),
+        osuma = false;
+      
+      for (var i = 0, n = data.length; i < n; i++) {
+        var d = data[i];
+        if (!osuma && on(avain, d._lueIndeksi(0))) {
+          uusiData.push(new Pari(avain, pari._lueIndeksi(1)));
+          osuma = true;
+        } else {
+          uusiData.push(d);
+        }
+      }
+      
+      if (!osuma) {
+        uusiData.push(new Pari(avain, pari._lueIndeksi(1)));
+      }
+      
+      var k = kokoelma();
+      k._data = uusiData;
+      return k;
+    });
 
     function muutoin(ehkaArvo, taiSitten) {
         if (!ehkaArvo || !(ehkaArvo instanceof Ehka)) {
@@ -121,11 +152,6 @@ var standardikirjasto; // Ö-kielen standardikirjasto
     // Tyyppiluokat
     //
     ///////////////////////////////////////////////////////////////////////////
-
-    var tyypit = {
-      LISTA: 1,
-      KOKOELMA: 2
-    };
 
     /**
     * @class Ehkä
@@ -266,9 +292,9 @@ var standardikirjasto; // Ö-kielen standardikirjasto
         this._tilanMuokkaus = tilanMuokkaus;
     }
 
-    Komento.prototype.tehtava = function() {
+    Komento.prototype.tehtava = function(vanhaTila) {
       try {
-          var tulos = this._tehtava();
+          var tulos = this._tehtava(vanhaTila);
           return Promise.resolve(tulos);
       } catch (err) {
           return Promise.reject(err);
@@ -313,9 +339,23 @@ var standardikirjasto; // Ö-kielen standardikirjasto
         return new Komento(function() { console.log(tekstiksi(viesti)); }, undefined);
     }
 
-    var sitten = fn('sitten:', [constr(Komento), constr(Komento)], function(a, b) {
-      return new Komento(function() {
-        return a.tehtava().then(function() { return b.tehtava(); });
+    var sitten = fn('sitten:', [constr(Komento), 'funktio'], function(a, b) {
+      var tilaBJalkeen;
+      return new Komento(function(vanhaTila) {
+        return a.tehtava(vanhaTila)
+          .then(function(tulos) {
+            var uusiTila = a.tilanMuokkaus(tulos, vanhaTila);
+            var bKomento = b(uusiTila);
+            
+            return bKomento
+              .tehtava(uusiTila)
+              .then(function(tulos) {
+                tilaBJalkeen = bKomento.tilanMuokkaus(tulos, uusiTila);
+                return tulos;
+              });
+          });
+      }, function() {
+        return tilaBJalkeen;
       });
     });
 
@@ -373,16 +413,26 @@ var standardikirjasto; // Ö-kielen standardikirjasto
       };
       return res;
     }
-
+    
+    function tyyppiOn(t) {
+      var res = function(arvo) {
+        return arvo._tyyppi === t;
+      };
+      res.toString = function() {
+        return t;
+      };
+      
+      return res;
+    }
+ 
     function suorita(ohjelma, tila) {
         try {
             var tulos = ohjelma(tila);
             if (tulos && tulos instanceof Komento) {
-                var tehtavanTulos = tulos.tehtava();
+                var tehtavanTulos = tulos.tehtava(tila);
                 tehtavanTulos.then(function(t) {
                     if (t !== LOPETA_TOKEN) {
                       var uusiTila = tulos.tilanMuokkaus(t, tila);
-
                       if (!on(uusiTila, tila) || t === JATKA_TOKEN) {
                         setTimeout(function() {
                           suorita(ohjelma, uusiTila);
@@ -423,7 +473,8 @@ var standardikirjasto; // Ö-kielen standardikirjasto
         arvo: arvo,
         sitten: sitten,
         lopeta: lopeta,
-        jatka: jatka
+        jatka: jatka,
+        muokkaa: muokkaa
     };
 
     standardikirjasto = function(tyyppi, nimi) {

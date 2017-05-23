@@ -58,6 +58,8 @@ tämä(arvo) = standardikirjasto(0, "tama", arvo)
 
 infiksi 4 sitten: (a, b) = standardikirjasto(0, "sitten", a, b)
 
+infiksi 3 | (kokoelma, pari) = standardikirjasto(0, "muokkaa", kokoelma, pari)
+
 arvo(a) = standardikirjasto(0, "arvo", a)
 
 lopeta = standardikirjasto(1, "lopeta")

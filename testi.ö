@@ -1,7 +1,22 @@
-tila = kokoelma("nimi" : "")
+tila = kokoelma("nimi1" : "", "nimi2" : "", "kps1" : "", "kps2" : "")
+
+kysyNimi(nro, tila) =
+  avain = "nimi" ++ nro
+  kysymys = "Nimi pelaajalle " ++ nro ++ ": "
+  nimi = arvo(tila @ avain)
+  tilanMuokkaus(arvo) =
+    (tila | (avain : arvo))
+  
+  kun nimi
+    on "" niin kysy(kysymys, tilanMuokkaus)
+    tai näytä("Pelaaja " ++ nimi ++ " rekisteröity!") muutoin
 
 ohjelma(tila) =
-  nimi = arvo(tila @ "nimi")
-  kun pituus(nimi)
-    on (<)(1) niin  kysy("Nimi: ", { kokoelma("nimi": $) })
-    tai             näytä("Hei " ++ nimi) muutoin
+  nimi1 = arvo(tila @ "nimi1")
+  nimi2 = arvo(tila @ "nimi2")
+  kps1 = arvo(tila @ "kps1")
+  kps2 = arvo(tila @ "kps2")
+  
+  kysyNimi("1", tila) sitten: kysyNimi("2")
+    
+  
