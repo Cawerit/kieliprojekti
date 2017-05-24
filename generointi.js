@@ -2,6 +2,7 @@ var fs = require('fs');
 var path = require('path');
 var parseri = require('./parseri.js');
 var muunnos = require('./muunnos.js');
+var _ = require('lodash');
 
 /*******************************************************************************
  * 
@@ -68,11 +69,24 @@ class Scope {
       throw new Error(`Muuttujanimi ${arvo} on määritetty kahdesti samassa rungossa`);
     }
     
+    maaritys.viittaukset = 0;
+    
     this.muuttujat.push(maaritys);
   }
   
   viittaus({arvo}) {
+    const
+      onSama = m => m.arvo === arvo,
+      // Etsitään mihin muuttujaan / funktioon arvo viittaa
+      kohde =
+        _.findLast(this.muuttujat, onSama)
+        || _.findLast(this.peritytMuuttujat, onSama);
+        
+    if (kohde) {
+      throw new Error(`Muuttuja ${arvo} ei ole määritetty`);
+    }
     
+    kohde.viittaukset++;
   }
 
 }

@@ -16,19 +16,69 @@ module.exports = asetukset => {
 
     return runko;
   };
+  
+  const onAsetuslause = solmu => /luonti$/.test(solmu.arvo);
 
   const funktioluonti = ({ solmu, uusiScope }) => {
     const
       kavele      = uusiScope(),
       parametrit  = solmu.parametrit.map(muuttuja),
       nimi        = solmu.arvo ? muuttuja(solmu.arvo) : '',
+      [asetukset, muut] = _.partition(solmu.runko, onAsetuslause);
+      
+    // Seuraava vaihe on muuttujien järjestäminen.
+    //
+    // olkoot a = b + c
+    // olkoot c = 5
+    // olkoot b = c
+    //
+    // Tällöin riippuvuudet voidaan kuvata seuraavasti
+    //
+    //      c
+    //      ^
+    //   ---|-- b
+    //  |       ^
+    //  a ------|
+    
+    // Rekisteröidään kaikki asetuslauseet scopeen niin että niitä voidaan seurata
+    asetukset
+      .forEach(a => {
+        kavele.scope.muuttuja(a);
+        // Apumuuttuja jota tullaan käyttämään hyödyksi seuraavassa vaiheessa,
+        // kun muuttujien viittauksia toisiinsa aletaan jäljittää
+        a._edellinenViittaukset = a.viittaukset;
+        a.riippuvuudet = [];
+      });
+    
+    let asetuksetGen = asetukset.map(a => {
+      // Generoidaan asetuslauseen koodi.
+      // Sivuvaikutuksena joidenkin muiden muuttujien
+      // "viittaukset" laskurin arvo saattaa kasvaa.
+      const generoitu = kavele(a);
+      
+      for (let i = 0, n = asetukset.length; i < n; i++) {
+        const b = asetukset[i];
+        if (b.edellinenViittaukset < b.viittaukset) {
+          // Kyseiseen asetukseen on ilmestynyt uusia viittauksia a-soluun.
+          // Merkataan että "b" --riippuu--> "a"
+          if (b !== a) {
+            b.riippuvuudet.push(a);
+          }
+          // Päivitetään property _edellinenViittaukset jotta logiikka
+          // toimii myös seuraavaa muuttujaa käsiteltäessä
+          b._edellinenViittaukset = b.viittaukset;
+        }
+      }
+      
+      
+    });
+    
+    // Kaikki ei-asetukset voidaan yksinkertaisesti generoida kävele-funktiolla  
+    const
+      muutGen         = muut.map(kavele),
+      apumuuttujatGen = kavele.scope.muuttujat.map(kavele);
 
-      [muuttujat, muut] = _.partition(solmu.runko, r => r.tyyppi === 'muuttujaluonti'),
-      muuttujatGen      = muuttujat.map(kavele),
-      muutGen           = muut.map(kavele),
-      apumuuttujatGen   = kavele.scope.muuttujat.map(kavele);
-
-    const runko = muuttujatGen
+    const runko = asetuksetGen
       .concat(apumuuttujatGen)
       .concat(muutGen)
       .map(s => s + ';\n');
