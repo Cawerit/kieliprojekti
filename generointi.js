@@ -9,12 +9,33 @@ var muunnos = require('./muunnos.js');
 
 class Scope {
 
-  constructor() {
+  constructor(parent = null) {
     this.muuttujat = [];
+    this.parent = parent;
+    
+    if (parent) {
+      this.peritytMuuttujat = parent
+        .peritytMuuttujat
+        .concat(parent.muuttujat);
+    } else {
+      this.peritytMuuttujat = [];
+    }
+  }
+  
+  sisaisetMuuttujat() {
+    return this.muuttujat
+      .filter(m => m._sisainenMuuttuja);
   }
 
-  muuttuja(nimiEhdotus, runko) {
-    const aiemmat = this.muuttujat.filter(m => m._nimiEhdotus === nimiEhdotus).length,
+  /**
+   * Rekisteröi generoijan luoman apumuuttujan
+   */
+  sisainenMuuttuja(nimiEhdotus, runko) {
+    const
+      aiemmat =
+        this.sisaisetMuuttujat()
+        .filter(m => m._nimiEhdotus === nimiEhdotus)
+        .length,
       nimi = aiemmat > 0
         ? nimiEhdotus + '$$' + aiemmat
         : nimiEhdotus,
@@ -29,6 +50,29 @@ class Scope {
       
     this.muuttujat.push(solmu);
     return nimi;
+  }
+  
+  /**
+   * Rekisteröi käyttäjän koodissa luoman muuttujan.
+   * Tämän avulla voidaan muunmuassa jäljittää muuttujan
+   * riippuvuussuhteita.
+   */
+  muuttuja(maaritys) {
+    const
+      { arvo } = maaritys,
+      aiemmat = this.muuttujat
+        .filter(m => !m._sisainenMuuttuja && m.arvo === arvo)
+        .length;
+    
+    if (aiemmat !== 0) {
+      throw new Error(`Muuttujanimi ${arvo} on määritetty kahdesti samassa rungossa`);
+    }
+    
+    this.muuttujat.push(maaritys);
+  }
+  
+  viittaus({arvo}) {
+    
   }
 
 }
