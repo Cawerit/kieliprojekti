@@ -94,10 +94,7 @@ function generoiRunko(solmu, kavele) {
     // Käytetään Kahnin algoritmia järjestämiseen.
     let jarjestetty = [];
     const [eiRiippuvuuksia, onRiippuvuuksia] =
-      _.partition(asetuksetGen.concat(apumuuttujatGen), a => {
-        const r = a.asetus.viittauksenKohteena;
-        return !r || r.size === 0;
-      });
+      _.partition(asetuksetGen.concat(apumuuttujatGen), a => a.asetus.viittauksenKohteena.size === 0);
 
     while (eiRiippuvuuksia.length !== 0) {
       const n = eiRiippuvuuksia.pop();
@@ -116,15 +113,13 @@ function generoiRunko(solmu, kavele) {
       }
     }
 
-    onRiippuvuuksia.forEach(m => {
-      const o = m.asetus;
+    const syklisetViittaukset = onRiippuvuuksia
+      .filter(m => m.asetus.viittauksenKohteena.size !== 0);
 
-      if (o.viittauksenKohteena.size !== 0) {
-        const eka = o.viittauksenKohteena.values().next().value;
-
-        throw new Error(`Syklinen viittaus ${o.arvo} ja ${eka.arvo} välillä`);
-      }
-    });
+    if (syklisetViittaukset.length) {
+      console.log(syklisetViittaukset);
+      throw new Error('Syklisiä viittauksia');
+    }
 
     jarjestetty = jarjestetty.reverse();
 

@@ -112,13 +112,14 @@ module.exports = function(koodi, kohdekieli = 'javascript') {
       parsittuStandardikirjasto = muunnos(parseri(standardikirjasto)),
       parsittuKoodi = muunnos(parseri(koodi), parsittuStandardikirjasto);
 
-    const generoituStandardikirjasto = generoi(parsittuStandardikirjasto, kohdekieli, {
+    const [generoituStandardikirjasto, standardikirjastoScope] = generoi(parsittuStandardikirjasto, kohdekieli, {
         salliStandardikirjasto: true,
         vaadiOhjelma: false
       }),
-      generoituKoodi = generoi(parsittuKoodi, kohdekieli, {
+      [generoituKoodi] = generoi(parsittuKoodi, kohdekieli, {
         salliStandardikirjasto: false,
-        vaadiOhjelma: true
+        vaadiOhjelma: true,
+        perittyScope: standardikirjastoScope
       });
 
     return standardikirjastoJs + '\n\n' + generoituStandardikirjasto + '\n\n' + generoituKoodi;
@@ -153,5 +154,6 @@ function generoi(ast, kohdekieli, asetukset) {
     return kaveleRekursiivinen;
   };
 
-  return kavele(new Scope())(ast);
+  const scope = new Scope(asetukset.perittyScope || null);
+  return [kavele(scope)(ast), scope];
 }

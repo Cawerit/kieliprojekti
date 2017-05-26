@@ -73,15 +73,15 @@ if (typeof ${ohjelmaNimi} !== 'function' || typeof ${tilaNimi} === 'undefined') 
 
     lambda: funktioluonti,
 
-    muuttujaluonti({solmu, kavele}) {
+    muuttujaluonti({solmu, kavele, uusiScope}) {
       // Apufunktio joka turvaa muuttujanimen jos solmua ei ole
       // määritetty generoinnin "sisäiseksi" muuttujaksi
       const luoMuuttuja = solmu._sisainenMuuttuja ? _.identity : muuttuja;
 
-      if (solmu.runko.length === 1 && solmu.runko[0].tyyppi !== funktioluonti) {
+      if (solmu.runko.length === 1) {
         return `var ${luoMuuttuja(solmu.arvo)} = ${kavele(solmu.runko[0])}`;
       } else {
-        const runko = muodostaRunko(solmu, kavele);
+        const runko = muodostaRunko(solmu, uusiScope);
 
         return `var ${luoMuuttuja(solmu.arvo)} = (function (){ ${runko} })()`;
       }

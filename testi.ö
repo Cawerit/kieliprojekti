@@ -1,7 +1,8 @@
 tila = 1
 
 ohjelma(tila) =
-  a() =
-    kun b on 1 niin 2 tai 4 muutoin
-  b = 1
-  a()
+  foo =
+    hoo = 1
+    bar + hoo
+  bar = 2
+  bar
