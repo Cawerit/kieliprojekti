@@ -25,7 +25,8 @@ module.exports = asetukset => {
       parametrit  = solmu.parametrit.map(muuttuja),
       nimi        = solmu.arvo ? muuttuja(solmu.arvo) : '',
       [asetukset, muut] = _.partition(solmu.runko, onAsetuslause);
-      
+    
+    //
     // Seuraava vaihe on muuttujien järjestäminen.
     //
     // olkoot a = b + c
@@ -39,8 +40,21 @@ module.exports = asetukset => {
     //   ---|-- b
     //  |       ^
     //  a ------|
+    //
+    // Tavoitteena on järjestää asetukset järjestykseen
+    //
+    // olkoot c = 5
+    // olkoot b = c
+    // olkoot a = b + c
+    //
+    // käyttäen topologista järjestämisalgoritmia
+    // (https://en.wikipedia.org/wiki/Topological_sorting).
+    // Näin koodi toimii imperatiiviseen kieleen käännettynäkin.
+    //
     
-    // Rekisteröidään kaikki asetuslauseet scopeen niin että niitä voidaan seurata
+    
+    // Rekisteröidään kaikki asetuslauseet scopeen niin
+    // että niihin tehtyjä viittauksia voidaan seurata
     asetukset
       .forEach(a => {
         kavele.scope.muuttuja(a);
@@ -50,7 +64,7 @@ module.exports = asetukset => {
         a.riippuvuudet = [];
       });
     
-    let asetuksetGen = asetukset.map(a => {
+    const asetuksetGen = asetukset.map(a => {
       // Generoidaan asetuslauseen koodi.
       // Sivuvaikutuksena joidenkin muiden muuttujien
       // "viittaukset" laskurin arvo saattaa kasvaa.
@@ -70,8 +84,21 @@ module.exports = asetukset => {
         }
       }
       
-      
+      return { generoitu, asetus: a };
     });
+    
+    // Nyt jokaisen solun pitäisi sisältää "riippuvuudet"-listassa
+    // kaikki muut saman scopen muuttujat joista se riippuu
+    // Käytetään Kahnin algoritmia järjestämiseen.
+    const jarjestetty = [];
+    const [eiRiippuvuuksia, onRiippuvuuksia] =
+      _.partition(asetuksetGen, a => a.riippuvuudet.length === 0);
+      
+    while (eiRiippuvuuksia.length !== 0) {
+      const n = eiRiippuvuuksia.pop();
+      jarjestetty.push(n);
+      
+    }
     
     // Kaikki ei-asetukset voidaan yksinkertaisesti generoida kävele-funktiolla  
     const
