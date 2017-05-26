@@ -117,11 +117,23 @@ function generoiRunko(solmu, kavele) {
       .filter(m => m.asetus.viittauksenKohteena.size !== 0);
 
     if (syklisetViittaukset.length) {
-      console.log(syklisetViittaukset);
-      throw new Error('Syklisiä viittauksia');
+      const vainFunktioLuonteja = syklisetViittaukset
+        .every(({asetus}) => asetus.tyyppi === 'funktioluonti' || asetus.tyyppi === 'infiksifunktioluonti');
+
+      if (vainFunktioLuonteja) {
+        syklisetViittaukset.reverse();
+        jarjestetty = jarjestetty.concat(syklisetViittaukset);
+      } else {
+        const
+          lista = syklisetViittaukset.map(a => a.asetus.arvo).join(', '),
+          viesti = `Syklisiä viittauksia seuraavien muuttujien määrityksissä: ${lista}.\n` +
+            `Sykliset viittaukset on sallittu ainoastaan funktioiden välillä.`;
+
+        throw new Error(viesti)
+      }
     }
 
-    jarjestetty = jarjestetty.reverse();
+    jarjestetty.reverse();
 
     return jarjestetty.map(a => a.generoitu)
       .concat(muutGen)

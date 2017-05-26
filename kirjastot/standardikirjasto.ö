@@ -4,6 +4,9 @@ tyyppi(a) =
 infiksi 10 + (a, b) =
   standardikirjasto(0, "summaa", a, b)
 
+infiksi 10 - (a, b) =
+  standardikirjasto(0, "vahenna", a, b)
+
 infiksi 11 * (a, b) = standardikirjasto(0, "kerro", a, b)
 
 infiksi 11 / (a, b) = standardikirjasto(0, "jaa", a, b)

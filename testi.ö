@@ -1,8 +1,6 @@
 tila = 1
 
 ohjelma(tila) =
-  foo =
-    hoo = 1
-    bar + hoo
-  bar = 2
-  bar
+  bar = hoo + 1
+  hoo = bar + 2
+  hoo
