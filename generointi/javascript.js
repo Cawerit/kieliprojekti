@@ -16,8 +16,8 @@ module.exports = asetukset => {
 
     return runko;
   };
-  
-  const onAsetuslause = solmu => /luonti$/.test(solmu.arvo);
+
+  const onAsetuslause = solmu => /luonti$/.test(solmu.tyyppi);
 
   const funktioluonti = ({ solmu, uusiScope }) => {
     const
@@ -25,7 +25,11 @@ module.exports = asetukset => {
       parametrit  = solmu.parametrit.map(muuttuja),
       nimi        = solmu.arvo ? muuttuja(solmu.arvo) : '',
       [asetukset, muut] = _.partition(solmu.runko, onAsetuslause);
-    
+
+    solmu.parametrit.forEach(p => {
+      kavele.scope.muuttuja({ arvo: p, tyyppi: 'muuttujaluonti', runko: [] });
+    });
+
     //
     // Seuraava vaihe on muuttujien järjestäminen.
     //
@@ -51,62 +55,100 @@ module.exports = asetukset => {
     // (https://en.wikipedia.org/wiki/Topological_sorting).
     // Näin koodi toimii imperatiiviseen kieleen käännettynäkin.
     //
-    
-    
+
+
     // Rekisteröidään kaikki asetuslauseet scopeen niin
     // että niihin tehtyjä viittauksia voidaan seurata
     asetukset
       .forEach(a => {
         kavele.scope.muuttuja(a);
-        // Apumuuttuja jota tullaan käyttämään hyödyksi seuraavassa vaiheessa,
-        // kun muuttujien viittauksia toisiinsa aletaan jäljittää
-        a._edellinenViittaukset = a.viittaukset;
-        a.riippuvuudet = [];
       });
-    
-    const asetuksetGen = asetukset.map(a => {
-      // Generoidaan asetuslauseen koodi.
-      // Sivuvaikutuksena joidenkin muiden muuttujien
-      // "viittaukset" laskurin arvo saattaa kasvaa.
-      const generoitu = kavele(a);
-      
+
+    function lisaaRiippuvuudet(asetukset, a) {
       for (let i = 0, n = asetukset.length; i < n; i++) {
         const b = asetukset[i];
-        if (b.edellinenViittaukset < b.viittaukset) {
+        if (b._edellinenViittaukset < b.viittaukset) {
           // Kyseiseen asetukseen on ilmestynyt uusia viittauksia a-soluun.
           // Merkataan että "b" --riippuu--> "a"
           if (b !== a) {
-            b.riippuvuudet.push(a);
+            b.viittauksenKohteena.add(a);
           }
           // Päivitetään property _edellinenViittaukset jotta logiikka
           // toimii myös seuraavaa muuttujaa käsiteltäessä
           b._edellinenViittaukset = b.viittaukset;
         }
       }
-      
+    }
+
+    const asetuksetGen = asetukset.map(a => {
+      // Generoidaan asetuslauseen koodi.
+      // Sivuvaikutuksena joidenkin muiden muuttujien
+      // "viittaukset" laskurin arvo saattaa kasvaa.
+      const generoitu = kavele(a);
+      lisaaRiippuvuudet(asetukset, a);
+      lisaaRiippuvuudet(kavele.scope.sisaisetMuuttujat, a);
+
       return { generoitu, asetus: a };
     });
-    
+
+    // Kaikki ei-asetukset voidaan yksinkertaisesti generoida kävele-funktiolla
+    const muutGen = muut.map(kavele);
+
+    // Ei välitetä muut-listan generoinnissa tulleista viittauksista,
+    // sillä muut kuin asetuslauseet tulevat joka tapauksessa viimeiseksi
+    asetukset.forEach(a => a._edellinenViittaukset = a.viittaukset);
+
+    const apumuuttujatGen = kavele.scope
+        .sisaisetMuuttujat
+        .map(a => {
+          const generoitu = kavele(a);
+          lisaaRiippuvuudet(asetukset, a);
+
+          return { generoitu, asetus: a };
+        });
+
+
     // Nyt jokaisen solun pitäisi sisältää "riippuvuudet"-listassa
     // kaikki muut saman scopen muuttujat joista se riippuu
     // Käytetään Kahnin algoritmia järjestämiseen.
-    const jarjestetty = [];
+    let jarjestetty = [];
     const [eiRiippuvuuksia, onRiippuvuuksia] =
-      _.partition(asetuksetGen, a => a.riippuvuudet.length === 0);
-      
+      _.partition(asetuksetGen.concat(apumuuttujatGen), a => {
+        const r = a.asetus.viittauksenKohteena;
+        return !r || r.size === 0;
+      });
+
     while (eiRiippuvuuksia.length !== 0) {
       const n = eiRiippuvuuksia.pop();
       jarjestetty.push(n);
-      
-    }
-    
-    // Kaikki ei-asetukset voidaan yksinkertaisesti generoida kävele-funktiolla  
-    const
-      muutGen         = muut.map(kavele),
-      apumuuttujatGen = kavele.scope.muuttujat.map(kavele);
 
-    const runko = asetuksetGen
-      .concat(apumuuttujatGen)
+      for (let i = 0; i < onRiippuvuuksia.length; i++) {
+        const m = onRiippuvuuksia[i],
+          {viittauksenKohteena} = m.asetus;
+
+        if (viittauksenKohteena && viittauksenKohteena.has(n.asetus)) {
+          viittauksenKohteena.delete(n.asetus);
+          if (viittauksenKohteena.size === 0) {
+            eiRiippuvuuksia.push(m);
+          }
+        }
+      }
+    }
+
+    onRiippuvuuksia.forEach(m => {
+      const o = m.asetus;
+
+      if (o.viittauksenKohteena.size !== 0) {
+        const eka = o.viittauksenKohteena.values().next().value;
+
+        throw new Error(`Syklinen viittaus ${o.arvo} ja ${eka.arvo} välillä`);
+      }
+    });
+
+    jarjestetty = jarjestetty.reverse();
+
+    const runko =
+      jarjestetty.map(a => a.generoitu)
       .concat(muutGen)
       .map(s => s + ';\n');
 
@@ -176,7 +218,8 @@ if (typeof ${ohjelmaNimi} !== 'function' || typeof ${tilaNimi} === 'undefined') 
       }
     },
 
-    muuttuja({solmu}) {
+    muuttuja({ solmu, scope }) {
+      scope.viittaus(solmu);
       return muuttuja(solmu.arvo);
     },
 
@@ -193,7 +236,8 @@ if (typeof ${ohjelmaNimi} !== 'function' || typeof ${tilaNimi} === 'undefined') 
     * `kun x on y niin .. on z niin .. tai e muutoin`
     */
     sovituslausejoukko({solmu, kavele, scope}) {
-      const arvo = scope.muuttuja('$ehtolause_arvo', [solmu.arvo]);
+      const arvo = scope.sisainenMuuttuja('$ehtolause_arvo', [solmu.arvo]);
+      scope.viittaus({ arvo });
 
       const vertailut = solmu.runko.map(s => {
         const
@@ -226,10 +270,10 @@ if (typeof ${ohjelmaNimi} !== 'function' || typeof ${tilaNimi} === 'undefined') 
     ilmaisu({solmu, kavele}) {
       return kavele(solmu.runko[0]);
     },
-    
+
     totuusarvo({solmu}) {
       return solmu.arvo.toString();
     }
-    
+
   };
 };

@@ -72,6 +72,6 @@ etsi(ehto, lista) = standardikirjasto(0, "etsi", ehto, lista)
 
 etsiIndeksi(ehto, lista) = standardikirjasto(0, "etsiIndeksi", ehto, lista)
 
-elem(alkio, lista) = etsiIndeksi((on:)(alkio), lista) > -1
+-- elem(alkio, lista) = etsiIndeksi((on:)(alkio), lista) > -1
 
 ei(totuusarvo) = kun totuusarvo on Tosi niin Epätosi tai Tosi muutoin

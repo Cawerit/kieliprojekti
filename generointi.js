@@ -5,7 +5,7 @@ var muunnos = require('./muunnos.js');
 var _ = require('lodash');
 
 /*******************************************************************************
- * 
+ *
  *******************************************************************************/
 
 class Scope {
@@ -13,19 +13,20 @@ class Scope {
   constructor(parent = null) {
     this.muuttujat = [];
     this.parent = parent;
-    
+    this.sisaisetMuuttujat = [];
+
     if (parent) {
       this.peritytMuuttujat = parent
         .peritytMuuttujat
         .concat(parent.muuttujat);
+
+      this.peritytSisaisetMuuttujat = parent
+        .peritytSisaisetMuuttujat
+        .concat(parent.sisaisetMuuttujat);
     } else {
       this.peritytMuuttujat = [];
+      this.peritytSisaisetMuuttujat = [];
     }
-  }
-  
-  sisaisetMuuttujat() {
-    return this.muuttujat
-      .filter(m => m._sisainenMuuttuja);
   }
 
   /**
@@ -34,7 +35,7 @@ class Scope {
   sisainenMuuttuja(nimiEhdotus, runko) {
     const
       aiemmat =
-        this.sisaisetMuuttujat()
+        this.sisaisetMuuttujat
         .filter(m => m._nimiEhdotus === nimiEhdotus)
         .length,
       nimi = aiemmat > 0
@@ -48,11 +49,16 @@ class Scope {
         _sisainenMuuttuja: true,
         _nimiEhdotus: nimiEhdotus
       };
-      
-    this.muuttujat.push(solmu);
+
+    solmu.viittaukset = 0;
+    // Apumuuttuja jota tullaan käyttämään hyödyksi myöhemmässä vaiheessa,
+    // kun muuttujien viittauksia toisiinsa aletaan jäljittää
+    solmu._edellinenViittaukset = 0;
+    solmu.viittauksenKohteena = new Set();
+    this.sisaisetMuuttujat.push(solmu);
     return nimi;
   }
-  
+
   /**
    * Rekisteröi käyttäjän koodissa luoman muuttujan.
    * Tämän avulla voidaan muunmuassa jäljittää muuttujan
@@ -62,30 +68,37 @@ class Scope {
     const
       { arvo } = maaritys,
       aiemmat = this.muuttujat
-        .filter(m => !m._sisainenMuuttuja && m.arvo === arvo)
+        .filter(m => m.arvo === arvo)
         .length;
-    
+
     if (aiemmat !== 0) {
       throw new Error(`Muuttujanimi ${arvo} on määritetty kahdesti samassa rungossa`);
     }
-    
+
     maaritys.viittaukset = 0;
-    
+    maaritys._edellinenViittaukset = 0;
+    maaritys.viittauksenKohteena = new Set();
+
     this.muuttujat.push(maaritys);
   }
-  
+
   viittaus({arvo}) {
     const
       onSama = m => m.arvo === arvo,
       // Etsitään mihin muuttujaan / funktioon arvo viittaa
       kohde =
         _.findLast(this.muuttujat, onSama)
-        || _.findLast(this.peritytMuuttujat, onSama);
-        
-    if (kohde) {
+        || _.findLast(this.sisaisetMuuttujat, onSama)
+        || _.findLast(this.peritytMuuttujat, onSama)
+        || _.findLast(this.peritytSisaisetMuuttujat, onSama);
+
+
+    if (!kohde) {
+      if (arvo === 'standardikirjasto') return;
+      console.log(this);
       throw new Error(`Muuttuja ${arvo} ei ole määritetty`);
     }
-    
+
     kohde.viittaukset++;
   }
 
@@ -127,12 +140,11 @@ function generoi(ast, kohdekieli, asetukset) {
         return koodari({
           solmu,
           kavele: kaveleRekursiivinen,
-          uusiScope: () => kavele(new Scope()),
+          uusiScope: () => kavele(new Scope(scope)),
           scope
         });
       } else {
         const err = new Error(`Ei muokkaajaa tyypille ${solmu.tyyppi}`);
-        console.log(err);
         throw err;
       }
     };
