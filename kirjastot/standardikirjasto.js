@@ -20,6 +20,11 @@ var standardikirjasto; // Ö-kielen standardikirjasto
      * Vähennyslasku numeroilla
      */
     var vahenna  = fn('-', ['numero', 'numero'], function(a, b){ return a - b; });
+    
+    /**
+     * Kertolasku numeroilla
+     */ 
+    var kerro = fn('*', ['numero', 'numero'], function(a, b){ return a * b; });
 
     /**
      * Jakolasku numeroilla
@@ -144,6 +149,7 @@ var standardikirjasto; // Ö-kielen standardikirjasto
               : typeof taiSitten === 'function' ? taiSitten() : taiSitten;
         }
     }
+    
 
     /**
     * Funktio jota generoitu koodi kutsuu konditionaalirakenteessa
@@ -162,6 +168,12 @@ var standardikirjasto; // Ö-kielen standardikirjasto
       return typeof odotettuArvo === 'function' ?
         odotettuArvo(oikeaArvo)
         : on(odotettuArvo, oikeaArvo);
+    }
+    
+    function onOlemassaX(lista, sääntö) {
+      var totuusarvo = false
+      
+      return totuusarvo;
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -486,6 +498,7 @@ var standardikirjasto; // Ö-kielen standardikirjasto
     var api = {
         summaa: summaa,
         vahenna: vahenna,
+        kerro: kerro,
         jaa: jaa,
         tyyppi: tyyppi,
         yhdistaTekstit: yhdistaTekstit,
@@ -514,7 +527,8 @@ var standardikirjasto; // Ö-kielen standardikirjasto
         muokkaa: muokkaa,
         silmukka: silmukka,
         etsi: etsi,
-        etsiIndeksi: etsiIndeksi
+        etsiIndeksi: etsiIndeksi,
+        onOlemassaX: onOlemassaX
     };
 
     standardikirjasto = function(tyyppi, nimi) {

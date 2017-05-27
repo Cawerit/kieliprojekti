@@ -1,0 +1,58 @@
+tila = kokoelma("nimi1" : "", "nimi2" : "", "kps1" : "", "kps2" : "")
+
+vaihtoehdot = silmukka(lista("kivi", "paperi", "sakset"))
+
+infiksi 30 @! (obj, avain) = arvo(obj @ avain)
+
+kysyNimi(nro, tila) =
+  avain = "nimi" ++ nro
+  kysymys = "Nimi pelaajalle " ++ nro ++ ": "
+  tilanMuokkaus(arvo) =
+    (tila | avain : arvo)
+
+  kysy(kysymys, tilanMuokkaus)
+
+kysyPeliväline(nro, tila) =
+  avain = "kps" ++ nro
+  avain2 = "nimi" ++ nro
+  pelaajanNimi = tila @! avain2
+  kysymys = "Peliväline pelaajalle " ++ pelaajanNimi ++ " (kivi/paperi/sakset): "
+  kysy(kysymys, { tila | avain : $ })
+
+ratkaisePeli(nimi1, nimi2, kps1, kps2) =
+  seuraavaPeliväline(peliväline) =
+    vaihtoehdot @! (etsiIndeksi((on:)(peliväline), vaihtoehdot) + 1)
+
+  kun Tosi 
+  on (kps1 on: kps2) niin "Tasapeli!"
+  on seuraavaPeliväline(kps1) on: kps2 niin nimi2 ++ " voittaa!!"
+  tai nimi1 ++ " voittaa!!" muutoin
+
+kysyJatketaanko(tila) =
+  kysymys = "Uusi peli? (kyllä/ei) "
+  tilanMuokkaus(vastaus) =
+    kun vastaus
+    on "kyllä" niin
+      tila | "kps1" : "" | "kps2" : ""
+    on "ei" niin tila
+    tai tila muutoin
+  
+  kysy(kysymys, tilanMuokkaus)
+
+ohjelma(tila) =
+  nimi1 = tila @! "nimi1"
+  nimi2 = tila @! "nimi2"
+  kps1 = tila @! "kps1"
+  kps2 = tila @! "kps2"
+  
+  kun ""
+  on nimi1 niin kysyNimi("1", tila)
+  on nimi2 niin kysyNimi("2", tila)
+  tai
+    kun Epätosi
+    on sisältää(kps1, vaihtoehdot) niin kysyPeliväline("1", tila)
+    on sisältää(kps2, vaihtoehdot) niin kysyPeliväline("2", tila)
+    tai
+      näytä(ratkaisePeli(nimi1, nimi2, kps1, kps2)) sitten: kysyJatketaanko
+    muutoin
+  muutoin

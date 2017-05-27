@@ -74,3 +74,7 @@ etsiIndeksi(ehto, lista) = standardikirjasto(0, "etsiIndeksi", ehto, lista)
 sisältää(alkio, lista) = etsiIndeksi((on:)(alkio), lista) > -1
 
 ei(totuusarvo) = kun totuusarvo on Tosi niin Epätosi tai Tosi muutoin
+
+infiksi 30 ∃x (lista, sääntö) = standardikirjasto(0, "onOlemassaX", lista, sääntö)
+
+infiksi 25 ∀ (sääntö, lista) = standardikirjasto(0, "onTosiKaikilla", sääntö, lista)
