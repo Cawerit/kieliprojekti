@@ -65,39 +65,53 @@ function muunna(ast, tuotuAst) {
       // solun oikealla puolella on jokin ilmaisu (ei infiksikutsu) ja
       // vasemmalla puolella on toinen infiksikutsu.
       // Aloitetaan keräämällä kaikki peräkkäiset infiksikutsut listaan.
-      const perakkaiset = [oikea(solu), solu];
-      let edellinen = vasen(solu);
+      const perakkaiset = [vasen(solu), solu];
+      let edellinen = oikea(solu);
       while (onInfiksiKutsu(edellinen)) {
-        perakkaiset.push(oikea(edellinen), edellinen);
-        edellinen = vasen(edellinen);
+        perakkaiset.push(vasen(edellinen), edellinen);
+        edellinen = oikea(edellinen);
       }
       perakkaiset.push(edellinen);
-      perakkaiset.reverse();
 
       const rakennaPuu = (lista) => {
         if (lista.length === 1) {
           return lista[0];
         }
 
-        const
-          // Jokaisella loopin kierroksella etsitään joukon arvojärjestykseltään
-          // pienin solu ja tehdään siitä puun juuri.
-          // Mitä korkeammalla alkio on puussa, sitä myöhemmin se lopulta suoritetaan.
-          pienin = _.minBy(
-            _.filter(lista, onInfiksiKutsu),
-            f => {
-              if (!infiksifunktiot.has(f.arvo.arvo)) {
-                virhe(virheet.PUUTTUVA_INFIKSIFUNKTIO);
-              }
+        if (lista.length === 0) {
+          // Näin ei pitäisi käydä, mutta tämä bugi on tullut aiemmin vastaan (ja myös korjattu),
+          // ja mikäli tätä tarkistusta ei tehdä, kyseinen bugi ilmenee erittäin ikävänä
+          // ikuisena looppina / Maximum call stack size exceeded virheenä
+          const viesti = 'Infiksifunktioita ei pystytty järjestämään. \n' +
+            'Tämä on luultavasti bugi kääntäjässä, ei suoritettavassa koodissa. \n' +
+            'Ongelma saattaa kuitenkin kadota lisäämällä sulkuja joidenkin infiksifunktiokutsujen ympärille.';
+          throw new Error(viesti);
+        }
 
-              return infiksifunktiot.get(f.arvo.arvo).presedenssi;
+        let pieninIndeksi = -1, pieninPresedenssi;
+        for (let i = 0, n = lista.length; i < n; i++) {
+          const a = lista[i];
+          if (onInfiksiKutsu(a)) {
+            const
+              arvo = a.arvo.arvo,
+              inf = infiksifunktiot.get(arvo);
+
+            if (!inf) {
+              virhe(virheet.PUUTTUVA_INFIKSIFUNKTIO);
             }
-          ),
-          indeksi = lista.indexOf(pienin),
+
+            if (pieninIndeksi === -1 || pieninPresedenssi > inf.presedenssi) {
+              pieninIndeksi = i;
+              pieninPresedenssi = inf.presedenssi;
+            }
+          }
+        }
+
+        const pienin = lista[pieninIndeksi],
           // Lista vasemmanpuoleisista funktiokutsuista
-          a = lista.slice(0, indeksi),
+          a = lista.slice(0, pieninIndeksi),
           // Lista oikeanpuoleisista funktiokutsuista
-          b = lista.slice(indeksi + 1);
+          b = lista.slice(pieninIndeksi + 1);
 
         // Jaotellaan myös vasen ja oikea puoli funktiokutsuja rekursiivisesti
         vasen(pienin, rakennaPuu(a));
