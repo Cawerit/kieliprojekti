@@ -1,5 +1,6 @@
 const beautify = require('js-beautify').js_beautify,
   apufunktiot = require('../apufunktiot.js'),
+  generoiRunko = require('./generoi-runko.js'),
   _ = require('lodash');
 
 module.exports = asetukset => {
@@ -7,35 +8,23 @@ module.exports = asetukset => {
     .muuttujanimiGeneraattori(asetukset.salliStandardikirjasto ? ['standardikirjasto'] : []);
 
   // Pieni apufunktio funktion rungon muodostamiseen
-  const muodostaRunko = (solmu, kavele) => {
-    const runko = solmu.runko.map(kavele).map(s => s + ';\n');
+  const muodostaRunko = (solmu, uusiScope) => {
+    const runko = generoiRunko(solmu, uusiScope());
 
     if (runko.length > 0) {
       runko[runko.length - 1] = 'return ' + runko[runko.length - 1];
     }
 
-    return runko;
+    return runko
+      .join(' ');
   };
 
   const funktioluonti = ({ solmu, uusiScope }) => {
     const
-      kavele      = uusiScope(),
       parametrit  = solmu.parametrit.map(muuttuja),
-      nimi        = solmu.arvo ? muuttuja(solmu.arvo) : '',
+      nimi        = solmu.arvo ? muuttuja(solmu.arvo) : '';
 
-      [muuttujat, muut] = _.partition(solmu.runko, r => r.tyyppi === 'muuttujaluonti'),
-      muuttujatGen      = muuttujat.map(kavele),
-      muutGen           = muut.map(kavele),
-      apumuuttujatGen   = kavele.scope.muuttujat.map(kavele);
-
-    const runko = muuttujatGen
-      .concat(apumuuttujatGen)
-      .concat(muutGen)
-      .map(s => s + ';\n');
-
-    if (runko.length > 0) {
-      runko[runko.length - 1] = 'return ' + runko[runko.length - 1];
-    }
+    const runko = muodostaRunko(solmu, uusiScope);
 
     // Jos argumentit ovat [a, b, c],
     // Niin luodaan funktio
@@ -47,7 +36,7 @@ module.exports = asetukset => {
 
     return _.reduceRight(parametrit, (edellinen, seuraava) => {
       const sisalto = edellinen === null
-        ? runko.join(' ')
+        ? runko
         : `return ${edellinen}`;
 
       return `function ${nimi} (${seuraava}) { ${sisalto} }`;
@@ -58,7 +47,7 @@ module.exports = asetukset => {
 
     ohjelma(kavely) {
       const solmu = kavely.solmu,
-        tulos = solmu.runko.map(kavely.kavele).map(x => x + ';').join('\n'),
+        tulos = generoiRunko(solmu, kavely.kavele).join('\n'),
         ohjelmaNimi = muuttuja('ohjelma'),
         tilaNimi = muuttuja('tila');
 
@@ -67,10 +56,9 @@ module.exports = asetukset => {
         : `
 (function() {
 ${tulos}
-;
 
 if (typeof ${ohjelmaNimi} !== 'function' || typeof ${tilaNimi} === 'undefined') {
-  throw new Error('Ö-ohjelma vaatii funktion nimeltä "ohjelma" ja tilan');
+  throw new Error('Ö-ohjelma vaatii funktion nimeltä "ohjelma" ja muuttujan nimeltä "tila"');
 } else {
   standardikirjasto.suorita(${ohjelmaNimi}, ${tilaNimi});
 }
@@ -85,21 +73,22 @@ if (typeof ${ohjelmaNimi} !== 'function' || typeof ${tilaNimi} === 'undefined') 
 
     lambda: funktioluonti,
 
-    muuttujaluonti({solmu, kavele}) {
+    muuttujaluonti({solmu, kavele, uusiScope}) {
       // Apufunktio joka turvaa muuttujanimen jos solmua ei ole
       // määritetty generoinnin "sisäiseksi" muuttujaksi
       const luoMuuttuja = solmu._sisainenMuuttuja ? _.identity : muuttuja;
 
-      if (solmu.runko.length === 1 && solmu.runko[0].tyyppi !== funktioluonti) {
+      if (solmu.runko.length === 1) {
         return `var ${luoMuuttuja(solmu.arvo)} = ${kavele(solmu.runko[0])}`;
       } else {
-        const runko = muodostaRunko(solmu, kavele);
+        const runko = muodostaRunko(solmu, uusiScope);
 
         return `var ${luoMuuttuja(solmu.arvo)} = (function (){ ${runko} })()`;
       }
     },
 
-    muuttuja({solmu}) {
+    muuttuja({ solmu, scope }) {
+      scope.viittaus(solmu);
       return muuttuja(solmu.arvo);
     },
 
@@ -116,7 +105,8 @@ if (typeof ${ohjelmaNimi} !== 'function' || typeof ${tilaNimi} === 'undefined') 
     * `kun x on y niin .. on z niin .. tai e muutoin`
     */
     sovituslausejoukko({solmu, kavele, scope}) {
-      const arvo = scope.muuttuja('$ehtolause_arvo', [solmu.arvo]);
+      const arvo = scope.sisainenMuuttuja('$ehtolause_arvo', [solmu.arvo]);
+      scope.viittaus({ arvo });
 
       const vertailut = solmu.runko.map(s => {
         const
@@ -149,10 +139,10 @@ if (typeof ${ohjelmaNimi} !== 'function' || typeof ${tilaNimi} === 'undefined') 
     ilmaisu({solmu, kavele}) {
       return kavele(solmu.runko[0]);
     },
-    
+
     totuusarvo({solmu}) {
       return solmu.arvo.toString();
     }
-    
+
   };
 };

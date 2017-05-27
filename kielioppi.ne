@@ -57,7 +57,8 @@
 %}
 
 
-main -> runko {% d => ({ tyyppi: 'ohjelma', runko: d[0] }) %}
+main ->
+  "{" _ ylatasonIlmaisujoukko _ "}" {% d => ({ tyyppi: 'ohjelma', runko: d[2] }) %}
 
 runko ->
   "{" _ ilmaisujoukko _ "}" {% third %}
@@ -68,19 +69,21 @@ ilmaisujoukko ->
   | asetus __ ilmaisujoukko {% kasitteleilmaisujoukko %}
   | infiksifunktioluonti __ ilmaisujoukko {% kasitteleilmaisujoukko %}
 
+ylatasonIlmaisujoukko ->
+  ilmaisu
+  | asetus
+  | asetus __ ylatasonIlmaisujoukko {% kasitteleilmaisujoukko %}
+  | infiksifunktioluonti __ ylatasonIlmaisujoukko {% kasitteleilmaisujoukko %}
+
 argumenttilista ->
-  eiAsetus
-  | eiAsetus _ "," _ argumenttilista {% d => [d[0]].concat(d[4]) %}
+  ilmaisu
+  | ilmaisu _ "," _ argumenttilista {% d => [d[0]].concat(d[4]) %}
 
 parametrilista ->
   muuttuja
   | muuttuja _ "," _ parametrilista {% d => [d[0]].concat(d[4]) %}
 
 ilmaisu ->
-  asetus      {% fst %}
-  | eiAsetus  {% fst %}
-
-eiAsetus ->
   yksinkertainenIlmaisu   {% fst %}
   | infiksifunktiokutsu   {% fst %}
 
@@ -96,17 +99,17 @@ laskettuArvo ->
   | sovituslausejoukko            {% fst %}
   | muuttuja                      {% fst %}
   | "(" _ infiksifunktio _ ")"    {% third %}
-  | "(" _ eiAsetus _ ")"          {% d => ({ tyyppi: 'ilmaisu', runko: [d[2]] }) %}
+  | "(" _ ilmaisu _ ")"          {% d => ({ tyyppi: 'ilmaisu', runko: [d[2]] }) %}
 
 
 sovituslausejoukko ->
-  "kun" __ eiAsetus __ sovituslause:+ "tai" __ eiAsetus __ "muutoin"
+  "kun" __ ilmaisu __ sovituslause:+ "tai" __ ilmaisu __ "muutoin"
   {% d => {
     return { tyyppi: 'sovituslausejoukko', arvo: d[2], runko: d[4], oletusArvo: d[7] };
   }%}
 
 sovituslause ->
-  "on" __ eiAsetus __ "niin" __ eiAsetus __
+  "on" __ ilmaisu __ "niin" __ ilmaisu __
   {% d => {
     return { tyyppi: 'sovituslause', ehto: d[2], arvo: d[6] };
   }%}

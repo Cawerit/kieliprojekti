@@ -4,6 +4,9 @@ tyyppi(a) =
 infiksi 10 + (a, b) =
   standardikirjasto(0, "summaa", a, b)
 
+infiksi 10 - (a, b) =
+  standardikirjasto(0, "vahenna", a, b)
+
 infiksi 11 * (a, b) = standardikirjasto(0, "kerro", a, b)
 
 infiksi 11 / (a, b) = standardikirjasto(0, "jaa", a, b)
@@ -17,10 +20,6 @@ infiksi 12 ^ (a, b) = standardikirjasto(0, "potenssiinKorotus", a, b)
 infiksi 8 on: (a, b) = standardikirjasto(0, "on", a, b)
 
 näytä(teksti) = standardikirjasto(0, "nayta", teksti)
-
-tämä(arvo) = standardikirjasto(0, "tama", arvo)
-
-eiMitään = standardikirjasto(1, "eiMitään")
 
 pituus(jono) = standardikirjasto(0, "pituus", jono)
 
@@ -72,6 +71,6 @@ etsi(ehto, lista) = standardikirjasto(0, "etsi", ehto, lista)
 
 etsiIndeksi(ehto, lista) = standardikirjasto(0, "etsiIndeksi", ehto, lista)
 
-elem(alkio, lista) = etsiIndeksi((on:)(alkio), lista) > -1
+sisältää(alkio, lista) = etsiIndeksi((on:)(alkio), lista) > -1
 
 ei(totuusarvo) = kun totuusarvo on Tosi niin Epätosi tai Tosi muutoin

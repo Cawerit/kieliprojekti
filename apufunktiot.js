@@ -1,6 +1,5 @@
 const
-    base32 = require('base32'),
-    _ = require('lodash');
+    base32 = require('base32');
 
 const
     // RegEx muuttujanimille jotka alkavat ei-sallitulla merkillä

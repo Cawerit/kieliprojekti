@@ -2,19 +2,42 @@ var fs = require('fs');
 var path = require('path');
 var parseri = require('./parseri.js');
 var muunnos = require('./muunnos.js');
+var _ = require('lodash');
 
 /*******************************************************************************
- * 
+ *
  *******************************************************************************/
 
 class Scope {
 
-  constructor() {
+  constructor(parent = null) {
     this.muuttujat = [];
+    this.parent = parent;
+    this.sisaisetMuuttujat = [];
+
+    if (parent) {
+      this.peritytMuuttujat = parent
+        .peritytMuuttujat
+        .concat(parent.muuttujat);
+
+      this.peritytSisaisetMuuttujat = parent
+        .peritytSisaisetMuuttujat
+        .concat(parent.sisaisetMuuttujat);
+    } else {
+      this.peritytMuuttujat = [];
+      this.peritytSisaisetMuuttujat = [];
+    }
   }
 
-  muuttuja(nimiEhdotus, runko) {
-    const aiemmat = this.muuttujat.filter(m => m._nimiEhdotus === nimiEhdotus).length,
+  /**
+   * Rekisteröi generoijan luoman apumuuttujan
+   */
+  sisainenMuuttuja(nimiEhdotus, runko) {
+    const
+      aiemmat =
+        this.sisaisetMuuttujat
+        .filter(m => m._nimiEhdotus === nimiEhdotus)
+        .length,
       nimi = aiemmat > 0
         ? nimiEhdotus + '$$' + aiemmat
         : nimiEhdotus,
@@ -26,9 +49,57 @@ class Scope {
         _sisainenMuuttuja: true,
         _nimiEhdotus: nimiEhdotus
       };
-      
-    this.muuttujat.push(solmu);
+
+    solmu.viittaukset = 0;
+    // Apumuuttuja jota tullaan käyttämään hyödyksi myöhemmässä vaiheessa,
+    // kun muuttujien viittauksia toisiinsa aletaan jäljittää
+    solmu._edellinenViittaukset = 0;
+    solmu.viittauksenKohteena = new Set();
+    this.sisaisetMuuttujat.push(solmu);
     return nimi;
+  }
+
+  /**
+   * Rekisteröi käyttäjän koodissa luoman muuttujan.
+   * Tämän avulla voidaan muunmuassa jäljittää muuttujan
+   * riippuvuussuhteita.
+   */
+  muuttuja(maaritys) {
+    const
+      { arvo } = maaritys,
+      aiemmat = this.muuttujat
+        .filter(m => m.arvo === arvo)
+        .length;
+
+    if (aiemmat !== 0) {
+      throw new Error(`Muuttujanimi ${arvo} on määritetty kahdesti samassa rungossa`);
+    }
+
+    maaritys.viittaukset = 0;
+    maaritys._edellinenViittaukset = 0;
+    maaritys.viittauksenKohteena = new Set();
+
+    this.muuttujat.push(maaritys);
+  }
+
+  viittaus({arvo}) {
+    const
+      onSama = m => m.arvo === arvo,
+      // Etsitään mihin muuttujaan / funktioon arvo viittaa
+      kohde =
+        _.findLast(this.muuttujat, onSama)
+        || _.findLast(this.sisaisetMuuttujat, onSama)
+        || _.findLast(this.peritytMuuttujat, onSama)
+        || _.findLast(this.peritytSisaisetMuuttujat, onSama);
+
+
+    if (!kohde) {
+      if (arvo === 'standardikirjasto') return;
+      console.log(this);
+      throw new Error(`Muuttuja ${arvo} ei ole määritetty`);
+    }
+
+    kohde.viittaukset++;
   }
 
 }
@@ -41,13 +112,14 @@ module.exports = function(koodi, kohdekieli = 'javascript') {
       parsittuStandardikirjasto = muunnos(parseri(standardikirjasto)),
       parsittuKoodi = muunnos(parseri(koodi), parsittuStandardikirjasto);
 
-    const generoituStandardikirjasto = generoi(parsittuStandardikirjasto, kohdekieli, {
+    const [generoituStandardikirjasto, standardikirjastoScope] = generoi(parsittuStandardikirjasto, kohdekieli, {
         salliStandardikirjasto: true,
         vaadiOhjelma: false
       }),
-      generoituKoodi = generoi(parsittuKoodi, kohdekieli, {
+      [generoituKoodi] = generoi(parsittuKoodi, kohdekieli, {
         salliStandardikirjasto: false,
-        vaadiOhjelma: true
+        vaadiOhjelma: true,
+        perittyScope: standardikirjastoScope
       });
 
     return standardikirjastoJs + '\n\n' + generoituStandardikirjasto + '\n\n' + generoituKoodi;
@@ -69,12 +141,11 @@ function generoi(ast, kohdekieli, asetukset) {
         return koodari({
           solmu,
           kavele: kaveleRekursiivinen,
-          uusiScope: () => kavele(new Scope()),
+          uusiScope: () => kavele(new Scope(scope)),
           scope
         });
       } else {
         const err = new Error(`Ei muokkaajaa tyypille ${solmu.tyyppi}`);
-        console.log(err);
         throw err;
       }
     };
@@ -83,5 +154,6 @@ function generoi(ast, kohdekieli, asetukset) {
     return kaveleRekursiivinen;
   };
 
-  return kavele(new Scope())(ast);
+  const scope = new Scope(asetukset.perittyScope || null);
+  return [kavele(scope)(ast), scope];
 }

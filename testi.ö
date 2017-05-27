@@ -7,21 +7,21 @@ kysyNimi(nro, tila) =
   kysymys = "Nimi pelaajalle " ++ nro ++ ": "
   tilanMuokkaus(arvo) =
     (tila | (avain : arvo))
-  
+
   kysy(kysymys, tilanMuokkaus)
 
 kysyPeliväline(nro, tila) =
   avain = "kps" ++ nro
   kysymys = "Peliväline pelaajalle " ++ nro ++ " (kivi/paperi/sakset): "
-  kysy(kysymys, { tila | (avain : $) })
-  
+  kysy(kysymys, { tila | avain : $ })
+
 pariSama(pari) =
  (pari @ 0) on: (pari @ 1)
-  
+
 ratkaisePeli(nimi1, nimi2, kps1, kps2) =
   seuraavaPeliväline(peliväline) =
     arvo(vaihtoehdot @ (etsiIndeksi((on:)(peliväline), vaihtoehdot) + 1))
-  
+
   kun Tosi
   on pariSama(kps1 : kps2) niin "Tasapeli"
   on seuraavaPeliväline(kps1) on: kps2 niin nimi2
@@ -32,13 +32,13 @@ ohjelma(tila) =
   nimi2 = arvo(tila @ "nimi2")
   kps1 = arvo(tila @ "kps1")
   kps2 = arvo(tila @ "kps2")
-  
+
   kun nimi1 on "" niin kysyNimi("1", tila)
     tai kun nimi2 on "" niin kysyNimi("2", tila)
-      tai kun elem(kps1, vaihtoehdot) on Epätosi niin kysyPeliväline("1", tila)
-        tai kun elem(kps2, vaihtoehdot) on Epätosi niin kysyPeliväline("2", tila)
+      tai kun sisältää(kps1, vaihtoehdot) on Epätosi niin kysyPeliväline("1", tila)
+        tai kun sisältää(kps2, vaihtoehdot) on Epätosi niin kysyPeliväline("2", tila)
           tai näytä(ratkaisePeli(nimi1, nimi2, kps1, kps2))
         muutoin
       muutoin
-    muutoin 
+    muutoin
   muutoin
