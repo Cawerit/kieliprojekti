@@ -1,7 +1,7 @@
 tila = ""
 
-infiksi 30 ∀ (sääntö, lista) =  
-infiksi 30 ∃x (lista, sääntö) = 
+-- infiksi 30 ∀ (sääntö, lista) =  
+-- infiksi 30 ∃x (lista, sääntö) = 
 
 ohjelma(tila) =
-    
+   näytä(tila) 
