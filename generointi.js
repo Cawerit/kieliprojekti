@@ -1,12 +1,35 @@
-var fs = require('fs');
-var path = require('path');
-var parseri = require('./parseri.js');
-var muunnos = require('./muunnos.js');
-var _ = require('lodash');
+const parseri = require('./parseri.js');
+const muunnos = require('./muunnos.js');
+const _ = require('lodash');
 
 /*******************************************************************************
- *
+ * Kaikki generoinnin vaiheet yhteen kasaava moduuli
  *******************************************************************************/
+
+module.exports = function(koodi, kohdekieli = 'javascript', { standardikirjasto }) {
+  try {
+    const
+      parsittuStandardikirjasto = muunnos(parseri(standardikirjasto)),
+      parsittuKoodi = muunnos(parseri(koodi), parsittuStandardikirjasto);
+
+    const [generoituStandardikirjasto, standardikirjastoScope] = generoi(parsittuStandardikirjasto, kohdekieli, {
+        salliStandardikirjasto: true,
+        vaadiOhjelma: false
+      }),
+      [generoituKoodi] = generoi(parsittuKoodi, kohdekieli, {
+        salliStandardikirjasto: false,
+        vaadiOhjelma: true,
+        perittyScope: standardikirjastoScope
+      });
+
+    return { generoituStandardikirjasto, generoituKoodi };
+
+  } catch (err) {
+    // err.type = 'ParseriVirhe';
+    throw err;
+  }
+};
+
 
 class Scope {
 
@@ -101,34 +124,7 @@ class Scope {
 
     kohde.viittaukset++;
   }
-
 }
-
-module.exports = function(koodi, kohdekieli = 'javascript') {
-  try {
-    const
-      standardikirjastoJs = fs.readFileSync(path.join(__dirname, 'kirjastot', 'standardikirjasto.js'), 'utf8'),
-      standardikirjasto = fs.readFileSync(path.join(__dirname, 'kirjastot', 'standardikirjasto.ö'), 'utf8'),
-      parsittuStandardikirjasto = muunnos(parseri(standardikirjasto)),
-      parsittuKoodi = muunnos(parseri(koodi), parsittuStandardikirjasto);
-
-    const [generoituStandardikirjasto, standardikirjastoScope] = generoi(parsittuStandardikirjasto, kohdekieli, {
-        salliStandardikirjasto: true,
-        vaadiOhjelma: false
-      }),
-      [generoituKoodi] = generoi(parsittuKoodi, kohdekieli, {
-        salliStandardikirjasto: false,
-        vaadiOhjelma: true,
-        perittyScope: standardikirjastoScope
-      });
-
-    return standardikirjastoJs + '\n\n' + generoituStandardikirjasto + '\n\n' + generoituKoodi;
-
-  } catch (err) {
-    // err.type = 'ParseriVirhe';
-    throw err;
-  }
-};
 
 function generoi(ast, kohdekieli, asetukset) {
   const generoija = require('./generointi/' + kohdekieli + '.js')(asetukset);

@@ -3,9 +3,13 @@
   "version": "0.0.1",
   "description": "Yolo",
   "main": "index.js",
+  "browser": {
+    ".index.js": "./browser.js"
+  },
   "scripts": {
     "test": "jest ; exit 0;",
     "build": "nearleyc kielioppi.ne > grammar.js",
+    "prepare": "npm run build",
     "predebug": "npm run build",
     "debug": "node index.js --f=testi.ö > testi.js"
   },
