@@ -1,0 +1,18 @@
+
+-- Alustetaan ohjelman tila.
+-- Kyseisessä esimerkissä tilassa ei tarvitse olla mitään, koska
+-- ohjelma ei kysy käyttäjältään mitään, mikä muokkaisi ohjelman tilaa.
+
+tila = eiMitään
+
+-- Alustetaan muuttujat
+a = b
+b = 5
+
+-- Tavallisen kun-silmukan runko. Vaihda muuttujien arvoja kokeillaksesi silmukan  
+-- toimivuutta! Kun-rakenteen muuttujat voivat olla mitä tahansa tyyppiä.
+-- Kun-rakenne täytyy lopettaa aina "tai ... muutoin" -lauseella!
+ohjelma() =
+    kun a
+    on b niin näytä("Samat arvot!")
+    tai näytä("Eri arvot!") muutoin
