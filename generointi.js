@@ -118,7 +118,6 @@ class Scope {
 
     if (!kohde) {
       if (arvo === 'standardikirjasto') return;
-      console.log(this);
       throw new Error(`Muuttuja ${arvo} ei ole määritetty`);
     }
 
