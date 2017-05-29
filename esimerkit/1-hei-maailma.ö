@@ -1,0 +1,23 @@
+-- Tervetuloa Ö-ohjelmointikielen pariin!
+-- Tässä on hyvin yksinkertainen ohjelma joka tulostaa
+-- viestin konsoliin.
+
+-- Nämä kahdella viivalla aloitetut rivit ovat kommenntteja,
+-- jotka ovat täällä sinun apunasi eivätkä vaikuta
+-- ohjelman suoritukseen. 
+
+
+-- Tila tekee ohjelmista hyödyllisiä ja siksipä jokainen
+-- Ö-ohjelma alkaa määrittämällä sille alkutila.
+-- Tila voi olla mitä ikinä haluat, tässä esimerkissä se
+-- on iloinen teksti.
+tila = "Hei maailma!"
+
+-- Jokainen Ö-ohjelma sisältää myös funktion nimeltä "ohjelma".
+-- ohjelma-funktio saa parametrinaan tilan, joka juuri aiemmin
+-- määritettiin.
+ohjelma(tila) =
+    -- Funktion viimeinen rivi palautetaan kutsujalle.
+    -- Tässä palautamme "komennon", joka käskee suoritusympäristöä
+    -- näyttämään aiemmin määrittämämme viestin.
+    näytä(tila)

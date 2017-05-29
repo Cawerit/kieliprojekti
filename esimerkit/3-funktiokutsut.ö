@@ -1,0 +1,36 @@
+
+tila = eiMitään
+
+a = b + 1
+b = 5
+
+-- Muuttujilla voi myös olla oma runko, hieman kuin funktioilla.
+c =
+    -- Kuten "näytä"-funktion kutsusta on jo huomattu,
+    -- tavallisia Ö-kielen funktioita kutsutaan antamalla argumentit
+    -- sulkein ympäröitynä funktionimen perään: näytä("viesti")
+    apumuuttuja = vähennäKaksi(b)
+    kerroKahdella(apumuuttuja)
+
+kerroKahdella(x) = x * 2
+
+-- Ö-kielessä myös +, -, *, jne ovat funktioita, tarkemmin sanottuna
+-- infiksifunktioita. Lisäksi Ö:n funktiot ovat automaattisesti curryttuja,
+-- joten voimme tehdä vähennäKaksi funktion helposti käyttämällä
+-- avuksi valmista - funktiota käyttämällä
+vähennäKaksi = (-)(2)
+-- Voit kokeilla muokata myös kerroKahdella funktion käyttämään tätä
+-- hieman kompaktimpaa syntaksia.
+
+ohjelma() =
+    kun a
+        on c    niin näytä("Samat arvot!")
+        -- kun..on rakenne tukee totuusarvon palauttavia
+        -- funktioita testissä arvon paikalla.
+        -- Tässä on-testiin annetaan funktio joka testaa onko
+        -- sen saama argumentti, eli a, suurempi kuin valmiiksi osittaisen
+        -- funktiokutsun avulla asetettu c. 
+        on (>)(c)  niin näytä("a on isompi")
+        on (<)(c)  niin näytä("c on isompi")
+
+        tai näytä("Tähän ei kyllä pitäisi päätyä ¯\_(ツ)_/¯") muutoin

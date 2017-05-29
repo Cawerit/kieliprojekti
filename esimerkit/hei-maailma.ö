@@ -1,4 +1,0 @@
-tila = "Hei maailma!"
-
-ohjelma(tila) =
-    näytä(tila)

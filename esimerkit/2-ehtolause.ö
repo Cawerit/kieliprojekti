@@ -1,0 +1,32 @@
+
+-- Alustetaan jälleen ohjelman tila.
+-- Tällä kertaa sanotaan sen olevan "eiMitään", koska käytämme
+-- muita muuttujia tässä ohjelmassa.
+-- "eiMiään" on erityinen arvo joka merkkaa puuttuvaa arvoa.
+tila = eiMitään
+
+-- Voit myös asettaa muita muuttujia samalla syntaksilla.
+-- Muuttujanimen tulee sisältää tavallisia kirjaimia, sekä halutessasi
+-- myös numeroita ja "_" tai "$" merkkejä.
+-- Huomaa ettei muuttujien määritysjärjestyksellä ole merkitystä.
+-- Tämä ohjelma toimii vaikka "a" on määritetty ennen "b"-muuttujaa.
+a = b + 1
+b = 5
+
+-- Muuttujilla voi myös olla oma runko, hieman kuin funktioilla.
+c =
+    apumuuttuja = b - 2
+    apumuuttuja * 2
+
+ohjelma() =
+    -- Ö-kielessä ehtolauseella on seuraava rakenne:
+    -- kun arvo on a niin b on c niin d tai e muutoin
+    -- "on x niin y" pareja voi yhdistää niin monta kuin haluaa, kunhan
+    -- viimeisenä tulee "tai z muutoin". Sisennyksillä ja rivinvaihdoilla
+    -- ei tässä kohtaa ole merkitystä, kunhan lukijalle näyttää hyvältä.
+
+    -- Kokeile muuttaa ylläolevia muuttujia ja katso miten se
+    -- vaikuttaa tulokseen
+    kun a
+        on c niin näytä("Samat arvot!")
+        tai näytä("Eri arvot!") muutoin
