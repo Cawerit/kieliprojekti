@@ -60,7 +60,9 @@ infiksi 8 > (a, b) = standardikirjasto(0, "suurempi", a, b)
 
 infiksi 8 < (a, b) = standardikirjasto(0, "pienempi", a, b)
 
-infiksi 50 >> (a, b) = standardikirjasto(0, "compose", a, b)
+infiksi 1 >> (a, b) = standardikirjasto(0, "compose", a, b)
+
+infiksi 0 |> (val, fn) = standardikirjasto(0, "pipe", val, fn)
 
 ehkä(fn, lista) = standardikirjasto(0, "ehka", fn, lista)
 
@@ -93,7 +95,7 @@ numeroksi(a) = standardikirjasto(0, "numeroksi", a)
 tekstiksi(a) = standardikirjasto(0, "tekstiksi", a)
 
 -- map
-käsittele(fn, lista) = standardikirjasto(0, "käsittele", fn, lista)
+käsittele(fn, lista) = standardikirjasto(0, "kasittele", fn, lista)
 
 -- filter
 valikoi(fn, lista) = standardikirjasto(0, "valikoi", fn, lista)

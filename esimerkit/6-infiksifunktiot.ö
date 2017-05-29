@@ -39,5 +39,5 @@ ohjelma(tila) =
     -- Kysytään inputtina lukua ja tallennetaan se numerona tilaan 
     on eiMitään niin kysy("Anna numero niin kerron onko se listassani ", numeroksi)
     tai
-        näytä(tulos(lista(arvo(tila))))
+        tila |> arvo |> lista |> tulos |> näytä
     muutoin

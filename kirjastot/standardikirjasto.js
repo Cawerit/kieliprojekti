@@ -68,6 +68,10 @@ var standardikirjasto; // Ö-kielen standardikirjasto
       };
     });
 
+    var pipe = fn('|>', [T, 'funktio'], function(val, fn) {
+      return fn(val);
+    });
+
     function debug(a) {
       console.log(a);
       return debug;
@@ -311,10 +315,7 @@ var standardikirjasto; // Ö-kielen standardikirjasto
         return uusi;
       };
       
-      if (alkio != null) {
-        l._data = [alkio];
-      }
-
+      l._data = alkio == null ? [] : [alkio];
       l._tyyppi = tyypit.LISTA;
       l.toString = lista_toString;
       l._lueIndeksi = lista_lueIndeksi;
@@ -332,7 +333,7 @@ var standardikirjasto; // Ö-kielen standardikirjasto
     // Listafunktioita
 
     function nativeJsListFn(nimi, listFn, palautusarvoOnLista) {
-      return function(lista) {
+      return function(fn, lista) {
         if (lista._tyyppi !== tyypit.LISTA) {
           argumenttiVirhe(nimi, 1, lista, 'lista');
         }
@@ -384,7 +385,7 @@ var standardikirjasto; // Ö-kielen standardikirjasto
       if (arvo._tyyppi === tyypit.LISTA) {
         return uusiLista(arvo);
       } else if(typeof arvo === 'string') {
-        return Array.from(arvo);
+        return uusiLista(Array.from(arvo));
       } else {
         argumenttiVirhe('listaksi', 0, arvo, 'lista tai teksti');
       }
@@ -406,11 +407,11 @@ var standardikirjasto; // Ö-kielen standardikirjasto
         if (tyyppi === 'string') {
           r += l[i];
         } else {
-          r = r.concat(l[i]);
+          r = uusiLista(r.concat(l[i]));
         }
       }
 
-      return uusiLista(r);
+      return r;
     });
 
     function silmukka(l) {
@@ -455,7 +456,7 @@ var standardikirjasto; // Ö-kielen standardikirjasto
         k._data.push(pari);
         return k;
       };
-      k._data = [pari];
+      k._data = pari ? [pari] : [];
       k._tyyppi = tyypit.KOKOELMA;
       k.toString = kokoelma_toString;
       k._lueIndeksi = kokoelma_lueIndeksi;
@@ -665,6 +666,8 @@ var standardikirjasto; // Ö-kielen standardikirjasto
                         });
                       }
                     }
+                }, function(err) {
+                  console.error(err);
                 });
             }
         } catch (virhe) {
@@ -721,7 +724,8 @@ var standardikirjasto; // Ö-kielen standardikirjasto
         lisaaLoppuun: lisaaLoppuun,
         debug: debug,
         tekstiksi: tekstiksi,
-        compose: compose
+        compose: compose,
+        pipe: pipe
     };
 
     standardikirjasto = function(tyyppi, nimi) {

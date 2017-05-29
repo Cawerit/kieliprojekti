@@ -1,0 +1,49 @@
+
+-- Jotta ohjelmilla voisi tehdä mitään hyödyllistä, täytyy yleensä
+-- tukeutua standardikirjaston tarjoamiin funktioihin.
+-- Ö on vielä alkuvaiheissa, joten standardikirjaston dokumentaatio on
+-- harmillisen puuttuvaa.
+
+-- Helpoin tapa tutkia mitä funktioita Ö:n standardikirjastosta löytyy
+-- on tarkistaa lähdekoodista tiedosto standardikirjasto.ö
+-- https://github.com/Cawerit/kieliprojekti/blob/master/kirjastot/standardikirjasto.%C3%B6
+
+
+tila = lista(1, 2, 3, 4)
+
+-- "kokoelma"-funktio luo objektin johon voi lisätä avain-arvo-pareja
+kokoelmanKasaus() =
+    -- ":" funktio luo avain-arvo-parin ja 
+    -- "|" funktio palauttaa uuden kokoelman johon on lisätty/muokattu
+    -- kyseinen avain-arvo-pari. 
+    kokoelma() | "lista" : tila | "toinenArvo" : 42
+
+kerroKaikkiKahdella() =
+    -- "käsittele", eli "map" funktio käy listan alkiot läpi ja kutsuu
+    -- annettua funktiota niistä jokaiselle.
+    -- Tässä käytetään vielä yhtä uutta Ö:n ominaisuutta: lambdafunktiota.
+    -- Ö ei hyväksy nimettyjen funktioiden luontia tietyissä paikoissa, kuten
+    -- funktioargumenteissa, joten joskus voi olla kätevä luoda funktio syntaksilla
+    -- { ilmaisu }  ilmaisussa on myös käytössä muuttuja $ joka merkkaa
+    -- funktiolle annettua argumenttia.
+    käsittele({ $ * 2 }, tila)
+
+käännäNimi() =
+    käännettynä(nimi) =
+        nimi
+        |> listaksi
+        |> takaperin
+        |> liitä
+
+    -- Kysytään käyttäjän nimi ja asetetaan nimi ohjeman tilaksi.
+    -- identiteetti-funktio palauttaa saamansa argumentin sellaisenaan.
+    kysy("Antaisitko nimesi: ", käännettynä) sitten: näytä
+
+ohjelma() =
+    näytä(kokoelmanKasaus())
+    -- Tässä nähdään kahden laista kompositiota:
+    -- sitten: ketjuttaa komennon ja funktion palauttavan komennon
+    -- toisiinsa, ">>" puolestaan ketjuttaa kaksi funktiota peräkkkäin.
+    sitten: (kerroKaikkiKahdella >> näytä)
+    sitten: käännäNimi
+    sitten: { lopeta }
