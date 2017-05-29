@@ -30,6 +30,8 @@ function esikasittele(tiedosto) {
     KOMMENTTI   = '--',
     RIVINVAIHTO = '\n';
 
+  const rivinvaihtoReg = /\r\n|\r/g;
+
   function virhe(viesti) {
     const err = new Error(viesti);
     Object.assign(err, {
@@ -79,6 +81,13 @@ function esikasittele(tiedosto) {
   }
 
   while(indeksi < tiedosto.length) {
+    
+    // Sanity-check: Muunnetaan windows-tyyliset \r rivinvaihdot
+    // tavallisiksi \n rivinvaihdoiksi
+    if (rivinvaihtoReg.test(token)) {
+      token = RIVINVAIHTO;
+    }
+
     switch (token) {
 
       case "(": case ")": {

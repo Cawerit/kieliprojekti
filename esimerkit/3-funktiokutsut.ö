@@ -33,4 +33,4 @@ ohjelma() =
         on (>)(c)  niin näytä("a on isompi")
         on (<)(c)  niin näytä("c on isompi")
 
-        tai näytä("Tähän ei kyllä pitäisi päätyä ¯\_(ツ)_/¯") muutoin
+        tai näytä("Tähän ei kyllä pitäisi päätyä ¯\\(ツ)_/¯") muutoin
