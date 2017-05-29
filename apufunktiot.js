@@ -1,11 +1,12 @@
 const
-    base32 = require('base32');
+    base32 = require('base32'),
+    _      = require('lodash');
 
 const
     // RegEx muuttujanimille jotka alkavat ei-sallitulla merkillä
     // "m_" prefiksi on kielletty koska sitä käytetään base32-enkoodattujen
     // muuttujien aloituksessa.
-    huonoAloitus            = /^(m_|[0-9])/,
+    huonoAloitus            = /^(m_|d_|[0-9])/,
     hyvaksytytMerkit        = /^[a-zA-Z0-9_]+$/,
     // Näitä nimiä vastaavat muuttujanimet voidaan helposti vaihtaa
     // hieman base32-enkoodausta siistinpään muotoon
@@ -66,6 +67,14 @@ const muuttujanimiGeneraattori = (ohita = []) => nimi => {
         const korvattuKaksoispiste = nimi.replace(viimeinenKaksoispiste, '');
         if (hyvaksytytMerkit.test(korvattuKaksoispiste)) {
             return muuttujanimiGeneraattori(ohita)(korvattuKaksoispiste) + '$';
+        }
+
+        // Ö-kielessä käytetään usein ääkkösiä.
+        // Kokeillaan saataisiinko ne muutettua aakkosiksi ja siten
+        // tehtyä muuttujasta validi
+        const deburred = _.deburr(nimi);
+        if (hyvaksytytMerkit.test(deburred)) {
+            return '$' + muuttujanimiGeneraattori(ohita)(deburred);
         }
 
         // Paremmat muunnokset eivät riittäneet, base32-endkoodataan

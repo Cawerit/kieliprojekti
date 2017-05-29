@@ -137,7 +137,7 @@ function generoiRunko(solmu, kavele) {
 
     return jarjestetty.map(a => a.generoitu)
       .concat(muutGen)
-      .map(s => s + ';\n');
+      .map(s => s.startsWith('function') ? s + '\n' : s + ';\n');
 }
 
 module.exports = generoiRunko;

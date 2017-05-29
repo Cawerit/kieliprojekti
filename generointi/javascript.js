@@ -3,6 +3,13 @@ const beautify = require('js-beautify').js_beautify,
   generoiRunko = require('./generoi-runko.js'),
   _ = require('lodash');
 
+const beautifyOptions = {
+  jslint_happy: true,
+  indent_size: 2
+};
+
+const yksinkertainenIlmaisu = /^[a-zA-Z]+$/;
+
 module.exports = asetukset => {
   const muuttuja = apufunktiot
     .muuttujanimiGeneraattori(asetukset.salliStandardikirjasto ? ['standardikirjasto'] : []);
@@ -66,7 +73,7 @@ if (typeof ${ohjelmaNimi} !== 'function' || typeof ${tilaNimi} === 'undefined') 
 }
 })();
 
-    `);
+    `, beautifyOptions);
     },
 
     funktioluonti,
@@ -111,14 +118,18 @@ if (typeof ${ohjelmaNimi} !== 'function' || typeof ${tilaNimi} === 'undefined') 
       scope.viittaus({ arvo });
 
       const vertailut = solmu.runko.map(s => {
-        const
+        let
           ehto  = kavele(s.ehto),
           tulos = kavele(s.arvo);
 
-        return `standardikirjasto.vrt(${ehto}, ${arvo}) ? (${tulos})`;
-      }).join(' : ');
+        if (!yksinkertainenIlmaisu.test(tulos)) {
+          tulos = '(' + tulos + ')';
+        }
 
-      return vertailut + ` : ${ kavele(solmu.oletusArvo) }`;
+        return `standardikirjasto.vrt(${ehto}, ${arvo}) ?\n${tulos}`;
+      }).join(' :\n');
+
+      return vertailut + `:\n${ kavele(solmu.oletusArvo) }`;
     },
 
     funktiokutsu({solmu, kavele}) {
