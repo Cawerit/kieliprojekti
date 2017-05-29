@@ -5,7 +5,8 @@ const beautify = require('js-beautify').js_beautify,
 
 const beautifyOptions = {
   jslint_happy: true,
-  indent_size: 2
+  indent_size: 2,
+  end_with_newline: true
 };
 
 const yksinkertainenIlmaisu = /^[a-zA-Z]+$/;
