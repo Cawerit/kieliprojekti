@@ -165,7 +165,7 @@ muuttujaluonti ->
     };
   }%}
 
-infiksifunktiokutsu -> ilmaisu _ infiksifunktio _ yksinkertainenIlmaisu
+infiksifunktiokutsu -> ilmaisu __ infiksifunktio __ yksinkertainenIlmaisu
   {% d => {
       return {
         tyyppi: 'funktiokutsu',

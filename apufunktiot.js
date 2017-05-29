@@ -70,7 +70,7 @@ const muuttujanimiGeneraattori = (ohita = []) => nimi => {
 
         // Paremmat muunnokset eivät riittäneet, base32-endkoodataan
         // muuttuja jotta se on varmasti "turvallinen"
-        return 'm_' + base32.encode(nimi) + `/*${nimi.replace(/\*\//g, '* /')}*/`;
+        return 'm_' + base32.encode(nimi) + `/* ${nimi.replace(/\*\//g, '* /')} */`;
     }
 };
 

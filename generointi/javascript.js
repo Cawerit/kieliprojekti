@@ -34,12 +34,14 @@ module.exports = asetukset => {
       parametrit.push('');
     }
 
-    return _.reduceRight(parametrit, (edellinen, seuraava) => {
+    return _.reduceRight(parametrit, (edellinen, seuraava, indeksi) => {
       const sisalto = edellinen === null
         ? runko
         : `return ${edellinen}`;
 
-      return `function ${nimi} (${seuraava}) { ${sisalto} }`;
+      const nimi_ = indeksi === 0 ? nimi : '';
+
+      return `function ${nimi_} (${seuraava}) { ${sisalto} }`;
     }, null);
   };
 
@@ -125,6 +127,8 @@ if (typeof ${ohjelmaNimi} !== 'function' || typeof ${tilaNimi} === 'undefined') 
 
       if (arvo === 'standardikirjasto') {
         argumentit = '(' + argumentit.join(', ') + ')';
+      } else if (argumentit.length === 0) {
+        argumentit = '()';
       } else {
         argumentit = argumentit.map(x => '(' + x + ')').join('');
       }

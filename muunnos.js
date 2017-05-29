@@ -97,7 +97,7 @@ function muunna(ast, tuotuAst) {
               inf = infiksifunktiot.get(arvo);
 
             if (!inf) {
-              virhe(virheet.PUUTTUVA_INFIKSIFUNKTIO);
+              virhe(`Infiksifunktiota ${arvo} ei löydy`);
             }
 
             if (pieninIndeksi === -1 || pieninPresedenssi > inf.presedenssi) {

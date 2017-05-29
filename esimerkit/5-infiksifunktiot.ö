@@ -1,0 +1,43 @@
+
+tila = eiMitään
+
+numerot = lista(1, 2, 3, 4, 5)
+
+-- Ö mahdollistaa omien infiksifunktioiden luonnin ja käytön samanarvoisena
+-- osana kieltä +, - jms sisäänrakennettujen funktioiden kanssa.
+-- Huomaa että infiksifunktioiden nimen tulee sisältää vähintään yksi erikoismerkki,
+-- eli jotain muuta kuin kirjaimia tai numeroita (tai _ ja $, joita ei katsota
+-- erikoismerkeiksi). Kokeillaan luoda pari kätevää funktiota listan käsittelyyn.
+
+infiksi 2 ⊆ (subset, lista) =
+    p = pituus(subset)
+
+    -- "kokoa", eli "reduce" funktio kutsuu
+    -- tätä funktiota siten että "edellinen" on listan käsitelty osa
+    -- ja "seuraava" on listan loppuosa 
+    onSubset(tarkasteltavaOsa, loput) =
+        kun Tosi
+        on subset on: tarkasteltavaOsa niin Tosi
+        on pituus(loput) < p    niin Epätosi
+        tai
+            onSubset(siirrä((loput @ 0), tarkasteltavaOsa), loppuosa(loput))
+        muutoin
+    
+    kun p on 0 niin pituus(lista) on: 0
+    tai onSubset(ota(p, lista), loppuosa(lista)) muutoin
+
+-- Tiputtaa listasta yhden alkion pois ja laittaa uuden 
+-- arvon loppuun, säilyttäen siis listan alkuperäisen pituuden.
+siirrä(arvo, lista) =
+    loppuosa(lista) +loppuun arvo
+
+tulos(numero) =
+    kun numero ⊆ numerot on Tosi niin "Kyllä on!" tai "Ei muuten ole." muutoin
+
+ohjelma(tila) =
+    kun tila
+    -- Kysytään inputtina lukua ja tallennetaan se numerona tilaan 
+    on eiMitään niin kysy("Anna numero niin kerron onko se listassani ", numeroksi)
+    tai
+        näytä(tulos(lista(arvo(tila))))
+    muutoin

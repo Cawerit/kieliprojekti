@@ -11,7 +11,7 @@ infiksi 11 * (a, b) = standardikirjasto(0, "kerro", a, b)
 
 infiksi 11 / (a, b) = standardikirjasto(0, "jaa", a, b)
 
-infiksi 10 ++ (a, b) = standardikirjasto(0, "yhdistaTekstit", a, b)
+infiksi 10 ++ (a, b) = standardikirjasto(0, "yhdistaListat", a, b)
 
 infiksi 11 % (a, b) = standardikirjasto(0, "jakojaannos", a, b)
 
@@ -37,7 +37,18 @@ infiksi 4 : (a, b) = standardikirjasto(0, "pari", a, b)
 
 infiksi 20 @ (kokoelma, indeksi) = standardikirjasto(0, "lueIndeksi", kokoelma, indeksi)
 
+infiksi 20 @? (kokoelma, indeksi) = standardikirjasto(0, "lueIndeksiVarovasti", kokoelma, indeksi)
+
 lista = standardikirjasto(1, "lista")
+
+-- Lisää alkion a listan loppuun
+lisääLoppuun(a, lista) = standardikirjasto(0, "lisaaLoppuun", a, lista)
+
+-- Sama kuin lisääLoppuun, mutta infiksifunktiona.
+-- Huomaa myös että argumentit päinvastaisessa järjestyksessä, jotta
+-- kutsun rakenteeksi tulee helppolukuinen
+-- lista +loppuun x
+infiksi 4 +loppuun (lista, a) = standardikirjasto(0, "lisaaLoppuun", a, lista)
 
 kokoelma = standardikirjasto(1, "kokoelma")
 
@@ -48,6 +59,8 @@ infiksi 5 || (a, b) = standardikirjasto(0, "tai", a, b)
 infiksi 8 > (a, b) = standardikirjasto(0, "suurempi", a, b)
 
 infiksi 8 < (a, b) = standardikirjasto(0, "pienempi", a, b)
+
+infiksi 50 >> (a, b) = standardikirjasto(0, "compose", a, b)
 
 ehkä(fn, lista) = standardikirjasto(0, "ehka", fn, lista)
 
@@ -75,6 +88,47 @@ sisältää(alkio, lista) = etsiIndeksi((on:)(alkio), lista) > -1
 
 ei(totuusarvo) = kun totuusarvo on Tosi niin Epätosi tai Tosi muutoin
 
--- infiksi 30 ∃x (lista, sääntö) = standardikirjasto(0, "onOlemassaX", lista, sääntö)
+numeroksi(a) = standardikirjasto(0, "numeroksi", a)
 
--- infiksi 25 ∀ (sääntö, lista) = standardikirjasto(0, "onTosiKaikilla", sääntö, lista)
+tekstiksi(a) = standardikirjasto(0, "tekstiksi", a)
+
+-- map
+käsittele(fn, lista) = standardikirjasto(0, "käsittele", fn, lista)
+
+-- filter
+valikoi(fn, lista) = standardikirjasto(0, "valikoi", fn, lista)
+
+-- some
+jokin(fn, lista) = standardikirjasto(0, "jokin", fn, lista)
+
+-- every
+kaikki(fn, lista) = standardikirjasto(0, "kaikki", fn, lista)
+
+-- reverse
+takaperin(lista) = standardikirjasto(0, "takaperin", lista)
+
+-- reduce
+kokoa(fn, lista) = standardikirjasto(0, "kokoa", fn, lista)
+
+-- tail
+loppuosa(lista) = standardikirjasto(0, "loppuosa", lista)
+
+-- take
+ota(n, lista) = standardikirjasto(0, "ota", n, lista)
+
+-- drop
+pudota(n, lista) = standardikirjasto(0, "pudota", n, lista)
+
+listaksi(a) = standardikirjasto(0, "listaksi", a)
+
+liitä(lista) = standardikirjasto(0, "liita", lista)
+
+eka = (@?)(1)
+
+toka = (@?)(2)
+
+argumentitYmpäri(fn) =
+  käännetty(a, b) = fn(b, a)
+  käännetty
+
+debug = standardikirjasto(1, "debug")

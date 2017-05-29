@@ -1,8 +1,8 @@
 tila = kokoelma("nimi1" : "", "nimi2" : "", "kps1" : "", "kps2" : "")
 
+-- Luodaan "loputon" lista käyttämällä silmukka-funktiota.
+-- Tämän listan 4. alkio on uudelleen "kivi"
 vaihtoehdot = silmukka(lista("kivi", "paperi", "sakset"))
-
-infiksi 30 @! (obj, avain) = arvo(obj @ avain)
 
 kysyNimi(nro, tila) =
   avain = "nimi" ++ nro
@@ -15,13 +15,13 @@ kysyNimi(nro, tila) =
 kysyPeliväline(nro, tila) =
   avain = "kps" ++ nro
   avain2 = "nimi" ++ nro
-  pelaajanNimi = tila @! avain2
+  pelaajanNimi = tila @ avain2
   kysymys = "Peliväline pelaajalle " ++ pelaajanNimi ++ " (kivi/paperi/sakset): "
   kysy(kysymys, { tila | avain : $ })
 
 ratkaisePeli(nimi1, nimi2, kps1, kps2) =
   seuraavaPeliväline(peliväline) =
-    vaihtoehdot @! (etsiIndeksi((on:)(peliväline), vaihtoehdot) + 1)
+    vaihtoehdot @ (etsiIndeksi((on:)(peliväline), vaihtoehdot) + 1)
 
   kun Tosi 
   on (kps1 on: kps2) niin "Tasapeli!"
@@ -40,10 +40,10 @@ kysyJatketaanko(tila) =
   kysy(kysymys, tilanMuokkaus)
 
 ohjelma(tila) =
-  nimi1 = tila @! "nimi1"
-  nimi2 = tila @! "nimi2"
-  kps1 = tila @! "kps1"
-  kps2 = tila @! "kps2"
+  nimi1 = tila @ "nimi1"
+  nimi2 = tila @ "nimi2"
+  kps1 = tila @ "kps1"
+  kps2 = tila @ "kps2"
   
   kun ""
   on nimi1 niin kysyNimi("1", tila)
