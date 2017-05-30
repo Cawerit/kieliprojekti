@@ -11,7 +11,7 @@
     "build": "nearleyc kielioppi.ne > grammar.js",
     "prepare": "npm run build",
     "predebug": "npm run build",
-    "debug": "node index.js --f=testi.ö > testi.js"
+    "debug": "node index.js --f=testi.ö --kieli=clojure > testi.clj"
   },
   "author": "Oskari Noppa, Aleksi Kyllönen, Villeveikko Sula",
   "license": "ISC",

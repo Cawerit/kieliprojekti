@@ -2,15 +2,19 @@ var args      = require('yargs').argv,
     fs        = require('fs'),
     path      = require('path'),
     generoi   = require('./generointi.js'),
-    virheviestit  = require('./virheviestit.js');
+    virheviestit  = require('./virheviestit.js'),
+    kohdekielet   = require('./kohdekielet.js');
 
 function gen(tiedosto, kieli) {
     const
-        standardikirjastoJs = fs.readFileSync(path.join(__dirname, 'kirjastot', 'standardikirjasto.js'), 'utf8'),
-        standardikirjasto = fs.readFileSync(path.join(__dirname, 'kirjastot', 'standardikirjasto.ö'), 'utf8');
+        paate = kohdekielet.tiedostoPaate(kieli),
+        standardikirjastoNatiivi = fs.readFileSync(path.join(__dirname, 'kirjastot', 'standardikirjasto' + '.' + paate), 'utf8'),
+        standardikirjasto = 
+            'a = 1';    // DEBUG
+            // fs.readFileSync(path.join(__dirname, 'kirjastot', 'standardikirjasto.ö'), 'utf8');
 
     const tulos = generoi(tiedosto, kieli, { standardikirjasto });
-    tulos.standardikirjastoNatiivi = standardikirjastoJs;
+    tulos.standardikirjastoNatiivi = standardikirjastoNatiivi;
 
     return tulos;
 }
@@ -22,10 +26,12 @@ if (args.f) {
             console.error(virhe);
             return;
         }
+        
+        const kieli = (args.kieli || args.k || 'javascript').toLowerCase();
     
         try {
             const { standardikirjastoNatiivi, generoituStandardikirjasto, generoituKoodi }
-                = gen(tiedosto);
+                = gen(tiedosto, kieli);
 
             const br = '\n\n';
 
