@@ -1,4 +1,10 @@
-tila = kokoelma("nimi1" : "", "nimi2" : "", "kps1" : "", "kps2" : "", "näytettyTervehdys" : Epätosi)
+tila = kokoelma (
+    "nimi1" : "",
+    "nimi2" : "",
+    "kps1" : "",
+    "kps2" : "",
+    "näytettyTervehdys" : Epätosi
+    )
 
 -- Luodaan "loputon" lista käyttämällä silmukka-funktiota.
 -- Tämän listan 4. alkio on uudelleen "kivi"
