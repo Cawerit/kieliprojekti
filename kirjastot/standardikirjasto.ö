@@ -21,6 +21,8 @@ infiksi 8 on: (a, b) = standardikirjasto(0, "on", a, b)
 
 näytä(teksti) = standardikirjasto(0, "nayta", teksti)
 
+muokkaaTilaa(muokkaaja) = standardikirjasto(0, "muokkaaTilaa", muokkaaja)
+
 pituus(jono) = standardikirjasto(0, "pituus", jono)
 
 jos(ehto, arvo) = standardikirjasto(0, "jos", ehto, arvo)

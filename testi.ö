@@ -1,53 +1,67 @@
--- Kokeillaan tehdä ohjelma joka ottaa vastaan operaattorin
--- ja kaksi numeroa ja sitten tulostaa laskutoimituksen tuloksen.
+tila = kokoelma("nimi1" : "", "nimi2" : "", "kps1" : "", "kps2" : "", "näytettyTervehdys" : Epätosi)
 
--- Käytetään tilana "kokoelma" nimistä rakennetta, joka tallettaa
--- joukon pareja. Parit vuorostaan luodaan : funktiolla
-tila = kokoelma(
-    "a" : eiMitään,
-    "operaattori" : eiMitään,
-    "b" : eiMitään
-)
+-- Luodaan "loputon" lista käyttämällä silmukka-funktiota.
+-- Tämän listan 4. alkio on uudelleen "kivi"
+vaihtoehdot = silmukka(lista("kivi", "paperi", "sakset"))
+
+kysyNimi(nro, tila) =
+  avain = "nimi" ++ nro
+  kysymys = "Nimi pelaajalle " ++ nro ++ ": "
+  tilanMuokkaus(arvo) =
+    (tila | avain : arvo)
+
+  kysy(kysymys, tilanMuokkaus)
+
+kysyPeliväline(nro, tila) =
+  avain = "kps" ++ nro
+  avain2 = "nimi" ++ nro
+  pelaajanNimi = tila @ avain2
+  kysymys = "Peliväline pelaajalle " ++ pelaajanNimi ++ " (kivi/paperi/sakset): "
+  kysy(kysymys, { tila | avain : $ })
+
+ratkaisePeli(nimi1, nimi2, kps1, kps2) =
+  seuraavaPeliväline(peliväline) =
+    vaihtoehdot @ (etsiIndeksi((on:)(peliväline), vaihtoehdot) + 1)
+
+  kun Tosi 
+  on (kps1 on: kps2) niin "Tasapeli!"
+  on seuraavaPeliväline(kps1) on: kps2 niin nimi2 ++ " voittaa!!"
+  tai nimi1 ++ " voittaa!!" muutoin
+
+kysyJatketaanko(tila) =
+  kysymys = "Uusi peli? (kyllä/ei) "
+  tilanMuokkaus(vastaus) =
+    kun vastaus
+    on "kyllä" niin
+      tila | "kps1" : "" | "kps2" : "" | "näytettyTervehdys" : Epätosi
+    on "ei" niin tila
+    tai tila muutoin
+  
+  kysy(kysymys, tilanMuokkaus)
+  
+infiksi 5 sisältää: (peliväline, vaihtoehdot) = sisältää(peliväline, vaihtoehdot)
+
+näytäTervehdys(tila) =
+  viesti =
+    "Peli alkaa pelaajilla " ++ tila @ "nimi1" ++ " ja " ++ tila @ "nimi2" ++ "."
+  
+  näytä(viesti) sitten: muokkaaTilaa({ $ | ("näytettyTervehdys" : Tosi) })
 
 ohjelma(tila) =
-    -- Nyt päästään käyttämään monta uutta ominaisuutta
-
-    -- "kysy" on funktio joka palauttaa ohjelman suorittajalle komennon
-    -- pyytää käyttäjältä vastausta kysymykseen.
-    
-    -- kysy-funktion toinen parametri on muokkausfunktio joka ottaa vastaan
-    -- kysymyksen vastauksen ja palauttaa uuden tilan.
-    asetaA(vastaus) =
-        -- "|" on infiksifunktio joka ottaa ensimmäisenä argumenttina
-        -- kokoelman ja toisena argumenttina parin, joka korvaa jonkin
-        -- aiemman parin kokoelmasta. Tässä tapauksessa asetetaan "a"
-        -- arvoksi vastaus kysymykseen "Anna numero: ".
-        tila | "a" : numeroksi(vastaus)
-
-    asetaB(vastaus) =
-        tila | "b" : numeroksi(vastaus)
-
-    asetaOp(vastaus) =
-        -- Muodostetaan funktio jota voidaan myöhemmin käyttää laskutoimituksessa
-        op = kun vastaus
-            on "+" niin tämä((+))
-            on "-" niin tämä((-))
-            on "*" niin tämä((*))
-            on "/" niin tämä((/))
-            tai eiMitään muutoin
-
-        tila | "operaattori" : op
-
-    tulos() =
-        a = arvo(tila @ "a")
-        b = arvo(tila @ "b")
-        op = arvo(tila @ "operaattori")
-        -- Huomaa että argumentit annetaan operaattorifunktioon
-        -- "väärin päin" koska kyseessä on alun perin ollut infiksifunktio
-        op(b, a)
-
-    kun eiMitään
-    on tila @ "a" niin kysy("Anna numero: ", asetaA)
-    on tila @ "operaattori" niin kysy("Anna operaattori (+ - * tai /): ", asetaOp)
-    on tila @ "b" niin kysy("Anna toinen numero: ", asetaB)
-    tai näytä(tulos()) muutoin
+  nimi1 = tila @ "nimi1"
+  nimi2 = tila @ "nimi2"
+  kps1 = tila @ "kps1"
+  kps2 = tila @ "kps2"
+  
+  kun ""
+  on nimi1 niin kysyNimi("1", tila)
+  on nimi2 niin kysyNimi("2", tila)
+  tai
+    kun Epätosi
+    on tila @ "näytettyTervehdys" niin näytäTervehdys(tila)
+    on kps1 sisältää: vaihtoehdot niin kysyPeliväline("1", tila) sitten: jatka
+    on kps2 sisältää: vaihtoehdot niin kysyPeliväline("2", tila) sitten: jatka
+    tai
+      näytä(ratkaisePeli(nimi1, nimi2, kps1, kps2)) sitten: kysyJatketaanko
+    muutoin
+  muutoin

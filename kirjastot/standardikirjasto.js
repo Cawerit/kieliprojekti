@@ -12,7 +12,7 @@ var standardikirjasto; // Ö-kielen standardikirjasto
     //
     // Yleiset funktiot
     //
-    ///////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
     /**
      * Yhteenlasku numeroilla
      */
@@ -256,9 +256,11 @@ var standardikirjasto; // Ö-kielen standardikirjasto
         case 'string':
           return a;
         default:
-          return Array.isArray(a) ?
-            a.map(tekstiksi).join(', ')
-            : a.toString();
+          return a === null ? 'JavaScriptNativeNull'
+            : a === undefined ? 'JavaScriptNativeUndefined'
+            : Array.isArray(a) ?
+              a.map(tekstiksi).join(', ')
+              : a.toString();
       }
     }
 
@@ -565,14 +567,25 @@ var standardikirjasto; // Ö-kielen standardikirjasto
     function nayta(viesti) {
         return new Komento(function() { console.log(tekstiksi(viesti)); }, undefined);
     }
+    
+    var muokkaaTilaa = fn('muokkaaTilaa', ['funktio'], function (muokkaaja) {
+      return new Komento(function(tila) { return tila; }, muokkaaja);
+    });
 
-    var sitten = fn('sitten:', [constr(Komento), 'funktio'], function(a, b) {
+    var sitten = fn('sitten:', [constr(Komento), T], function(a, b) {
       var tilaBJalkeen;
+      
       return new Komento(function(vanhaTila) {
         return a.tehtava(vanhaTila)
           .then(function(tulos) {
             var uusiTila = a.tilanMuokkaus(tulos, vanhaTila);
-            var bKomento = b(uusiTila);
+            var bKomento = typeof b === 'function' ?
+              b(uusiTila)
+              : b;
+            
+            if (!constr(Komento)(bKomento))  {
+              argumenttiVirhe('sitten:', 1, b, 'komento tai komennon palauttava funktio');
+            }
             
             return bKomento
               .tehtava(uusiTila)
@@ -683,6 +696,7 @@ var standardikirjasto; // Ö-kielen standardikirjasto
         tyyppi: tyyppi,
         yhdistaListat: yhdistaListat,
         nayta: nayta,
+        muokkaaTilaa: muokkaaTilaa,
         suorita: suorita,
         tama: tama,
         eiMitaan: new EiMitaan(),

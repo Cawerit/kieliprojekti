@@ -46,4 +46,4 @@ ohjelma() =
     -- toisiinsa, ">>" puolestaan ketjuttaa kaksi funktiota peräkkkäin.
     sitten: (kerroKaikkiKahdella >> näytä)
     sitten: käännäNimi
-    sitten: { lopeta }
+    sitten: lopeta

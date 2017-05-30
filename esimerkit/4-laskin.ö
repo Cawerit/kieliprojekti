@@ -47,7 +47,7 @@ ohjelma(tila) =
         op(b, a)
 
     kun eiMitään
-    on tila @ "a" niin kysy("Anna numero: ", asetaA)
-    on tila @ "operaattori" niin kysy("Anna operaattori (+ - * tai /): ", asetaOp)
-    on tila @ "b" niin kysy("Anna toinen numero: ", asetaB)
+    on tila @ "a" niin kysy("Anna numero: ", asetaA) sitten: jatka
+    on tila @ "operaattori" niin kysy("Anna operaattori (+ - * tai /): ", asetaOp) sitten:jatka
+    on tila @ "b" niin kysy("Anna toinen numero: ", asetaB) sitten: jatka
     tai näytä(tulos()) muutoin
