@@ -12,9 +12,8 @@ numerot = lista(1, 2, 3, 4, 5)
 infiksi 2 ⊆ (subset, lista) =
     p = pituus(subset)
 
-    -- "kokoa", eli "reduce" funktio kutsuu
-    -- tätä funktiota siten että "edellinen" on listan käsitelty osa
-    -- ja "seuraava" on listan loppuosa 
+    -- Luodaan funktio joka kutsuu rekursiivisesti
+    -- itseään annetun listan osalla
     onSubset(tarkasteltavaOsa, loput) =
         kun Tosi
         on subset on: tarkasteltavaOsa niin Tosi

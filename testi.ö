@@ -1,7 +1,53 @@
-tila = ""
+-- Kokeillaan tehdä ohjelma joka ottaa vastaan operaattorin
+-- ja kaksi numeroa ja sitten tulostaa laskutoimituksen tuloksen.
 
--- infiksi 30 ∀ (sääntö, lista) =  
--- infiksi 30 ∃x (lista, sääntö) = 
+-- Käytetään tilana "kokoelma" nimistä rakennetta, joka tallettaa
+-- joukon pareja. Parit vuorostaan luodaan : funktiolla
+tila = kokoelma(
+    "a" : eiMitään,
+    "operaattori" : eiMitään,
+    "b" : eiMitään
+)
 
 ohjelma(tila) =
-   näytä(tila) 
+    -- Nyt päästään käyttämään monta uutta ominaisuutta
+
+    -- "kysy" on funktio joka palauttaa ohjelman suorittajalle komennon
+    -- pyytää käyttäjältä vastausta kysymykseen.
+    
+    -- kysy-funktion toinen parametri on muokkausfunktio joka ottaa vastaan
+    -- kysymyksen vastauksen ja palauttaa uuden tilan.
+    asetaA(vastaus) =
+        -- "|" on infiksifunktio joka ottaa ensimmäisenä argumenttina
+        -- kokoelman ja toisena argumenttina parin, joka korvaa jonkin
+        -- aiemman parin kokoelmasta. Tässä tapauksessa asetetaan "a"
+        -- arvoksi vastaus kysymykseen "Anna numero: ".
+        tila | "a" : numeroksi(vastaus)
+
+    asetaB(vastaus) =
+        tila | "b" : numeroksi(vastaus)
+
+    asetaOp(vastaus) =
+        -- Muodostetaan funktio jota voidaan myöhemmin käyttää laskutoimituksessa
+        op = kun vastaus
+            on "+" niin tämä((+))
+            on "-" niin tämä((-))
+            on "*" niin tämä((*))
+            on "/" niin tämä((/))
+            tai eiMitään muutoin
+
+        tila | "operaattori" : op
+
+    tulos() =
+        a = arvo(tila @ "a")
+        b = arvo(tila @ "b")
+        op = arvo(tila @ "operaattori")
+        -- Huomaa että argumentit annetaan operaattorifunktioon
+        -- "väärin päin" koska kyseessä on alun perin ollut infiksifunktio
+        op(b, a)
+
+    kun eiMitään
+    on tila @ "a" niin kysy("Anna numero: ", asetaA)
+    on tila @ "operaattori" niin kysy("Anna operaattori (+ - * tai /): ", asetaOp)
+    on tila @ "b" niin kysy("Anna toinen numero: ", asetaB)
+    tai näytä(tulos()) muutoin
