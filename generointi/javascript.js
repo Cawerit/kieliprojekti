@@ -13,9 +13,16 @@ const kasitteleRungonRivi = s => s.startsWith('function') ? s + '\n' : s + ';\n'
 
 const yksinkertainenIlmaisu = /^[a-zA-Z]+$/;
 
+const jsKommentti = k => `/* ${k.replace(/\*\//g, '* /')} */`;
+
 module.exports = asetukset => {
-  const muuttuja = apufunktiot
-    .muuttujanimiGeneraattori(asetukset.salliStandardikirjasto ? ['standardikirjasto'] : []);
+  const
+    generaattoriAsetukset = {
+      ohita: asetukset.salliStandardikirjasto ? ['standardikirjasto'] : [],
+      kommentoi: jsKommentti
+    },
+    muuttuja = apufunktiot
+      .muuttujanimiGeneraattori(generaattoriAsetukset);
 
   // Pieni apufunktio funktion rungon muodostamiseen
   const muodostaRunko = (solmu, uusiScope) => {

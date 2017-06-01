@@ -3,21 +3,29 @@ const
     generoiRunko    = require('./generoi-runko.js'),
     _               = require('lodash');
 
+const clojureKommentti = _.constant('');
+
 module.exports = asetukset => {
-    const muuttuja = apufunktiot
-        .muuttujanimiGeneraattori(asetukset.salliStandardikirjasto ? ['standardikirjasto'] : []);
+    const
+        generaattoriAsetukset = {
+          ohita: asetukset.salliStandardikirjasto ? ['standardikirjasto'] : [],
+          kommentoi: clojureKommentti
+        },
+        muuttuja = apufunktiot
+            .muuttujanimiGeneraattori(generaattoriAsetukset);
   
     const muodostaRunko = (solmu, uusiScope) => {
         const runko = generoiRunko(solmu, uusiScope());
         
         return runko
-          .join(' ');
+            .map((r, i) => '  '.repeat(i) + r)
+            .join('\n');
     };
   
     const funktioluonti = ({ solmu, uusiScope }) => {
         const
           parametrit  = solmu.parametrit.map(muuttuja),
-          nimi        = solmu.arvo ? muuttuja(solmu.arvo) : '';
+          nimi        = solmu.arvo ? muuttuja(solmu.arvo) : 'fn';
         
         const runko = muodostaRunko(solmu, uusiScope);
         
@@ -29,27 +37,47 @@ module.exports = asetukset => {
           parametrit.push('');
         }
         
-        return `defn ${nimi} [${parametrit.join(' ')}] ${runko}`;
+        const curryParametrit = _.map(_.initial(parametrit), (p, i, parametrit) => {
+            const osittaiset = parametrit.slice(0, i + 1).join(' ');
+            
+            return `([${osittaiset}] (partial ${nimi} ${osittaiset}))\n  `;
+        })
+        .join('');
+        
+        return `(defn ${nimi}\n  ${curryParametrit} ([${parametrit.join(' ')}] ${runko}))`;
     };
-  
-    const kasitteleRungonRivi = r => '(' + r + ')';
+    
+    // Muutama apufunktio
+    const
+        $arvo = a => a.solmu.arvo,
+        $muuttuja = a => muuttuja($arvo(a)),
+        kasitteleRungonRivi = r => r;
   
     return {
         ohjelma({ solmu, kavele }) {
+            const
+                namespace = asetukset.namespace || 'ohjelma',
+                use = asetukset.salliStandardikirjasto ?
+                    ' (:use standardikirjastoNatiivi)'
+                    : '';
             
-            return solmu
+            return `(ns ${namespace}${use})` + '\n' +
+                solmu
                 .runko
                 .map(kavele)
-                .map(kasitteleRungonRivi);
+                .map(kasitteleRungonRivi)
+                .join('\n');
         },
         
         funktioluonti,
+        
+        infiksifunktioluonti: funktioluonti,
         
         funktiokutsu({ solmu, kavele }) {
             const arvo = kavele(solmu.arvo);
             let argumentit = solmu.argumentit.map(kavele);
             
-            return arvo + argumentit.join(' ');
+            return `(${arvo} ${argumentit.join(' ')})`;
         },
         
         muuttujaluonti({ solmu, kavele, uusiScope }) {
@@ -59,11 +87,35 @@ module.exports = asetukset => {
         
             const runko = muodostaRunko(solmu, uusiScope);
         
-            return `def ${luoMuuttuja(solmu.arvo)} ${runko}`;
+            return `(def ${luoMuuttuja(solmu.arvo)} ${runko})`;
         },
         
-        numero({ solmu }) {
-            return solmu.arvo;
+        numero: $arvo,
+        
+        muuttuja: $muuttuja,
+        
+        infiksifunktio: $muuttuja,
+        
+        totuusarvo: $arvo,
+        
+        teksti({ solmu }) {
+            return JSON.stringify(solmu.arvo);
+        },
+        
+        sovituslausejoukko({ solmu, kavele, scope }) {
+            const arvo = scope.sisainenMuuttuja('$ehtolause_arvo', [solmu.arvo]);
+            scope.viittaus({ arvo });
+            
+            const vertailut = solmu.runko.map(s => {
+                let
+                  ehto  = kavele(s.ehto),
+                  tulos = kavele(s.arvo);
+                
+                return `(if (standardikirjastoNatiivi/vrt ${ehto} ${arvo}) ${tulos} `;
+            }).join(' ');
+            
+            return vertailut + ` ${ kavele(solmu.oletusArvo) })`;
         }
+        
     };
 };

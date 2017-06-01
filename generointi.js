@@ -14,7 +14,8 @@ module.exports = function(koodi, kohdekieli = 'javascript', { standardikirjasto 
 
     const [generoituStandardikirjasto, standardikirjastoScope] = generoi(parsittuStandardikirjasto, kohdekieli, {
         salliStandardikirjasto: true,
-        vaadiOhjelma: false
+        vaadiOhjelma: false,
+        namespace: 'standardikirjasto'
       }),
       [generoituKoodi] = generoi(parsittuKoodi, kohdekieli, {
         salliStandardikirjasto: false,

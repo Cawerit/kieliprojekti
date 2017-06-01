@@ -1,1 +1,3 @@
 tila = 5
+
+ohjelma(tila) = tila

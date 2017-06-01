@@ -9,9 +9,7 @@ function gen(tiedosto, kieli) {
     const
         paate = kohdekielet.tiedostoPaate(kieli),
         standardikirjastoNatiivi = fs.readFileSync(path.join(__dirname, 'kirjastot', 'standardikirjasto' + '.' + paate), 'utf8'),
-        standardikirjasto = 
-            'a = 1';    // DEBUG
-            // fs.readFileSync(path.join(__dirname, 'kirjastot', 'standardikirjasto.ö'), 'utf8');
+        standardikirjasto = fs.readFileSync(path.join(__dirname, 'kirjastot', 'standardikirjasto.ö'), 'utf8');
 
     const tulos = generoi(tiedosto, kieli, { standardikirjasto });
     tulos.standardikirjastoNatiivi = standardikirjastoNatiivi;
