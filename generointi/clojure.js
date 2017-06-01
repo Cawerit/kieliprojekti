@@ -58,15 +58,17 @@ module.exports = asetukset => {
             const
                 namespace = asetukset.namespace || 'ohjelma',
                 use = asetukset.salliStandardikirjasto ?
-                    ' (:use standardikirjastoNatiivi)'
-                    : '';
+                    '(:use standardikirjastoNatiivi)'
+                    : '(:use standardikirjasto)';
             
-            return `(ns ${namespace}${use})` + '\n' +
+            return `(ns ${namespace} ${use})` + '\n' +
                 solmu
                 .runko
                 .map(kavele)
                 .map(kasitteleRungonRivi)
-                .join('\n');
+                .join('\n') +
+                '\n\n' +
+                (asetukset.vaadiOhjelma === false ? '' : `(${muuttuja('ohjelma')} ${muuttuja('tila')})`);
         },
         
         funktioluonti,

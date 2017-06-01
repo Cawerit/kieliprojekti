@@ -1,13 +1,18 @@
 (ns standardikirjastoNatiivi)
 
-(defn- testifunktio [a] ("haaa" ))
+(defn nayta [viesti] (println viesti))
 
-(defn standardikirjasto [funktioVaiArvo nimi & loput]
+(def api (hash-map
+    "nayta" nayta
+))
+
+(defn standardikirjasto [funktioVaiArvo nimi & args]
     (if (== funktioVaiArvo 0)
-        (apply testifunktio loput)
-        "hoo"))
+        (apply (get api nimi) (if (nil? args) (list) args))
+        (get api nimi)))
     
 (defn vrt [odotettuArvo, oikeaArvo]
     (if (clojure.test/function? odotettuArvo)
         (odotettuArvo oikeaArvo)
         (== odotettuArvo oikeaArvo)))
+    
