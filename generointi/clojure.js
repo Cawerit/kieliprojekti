@@ -68,7 +68,8 @@ module.exports = asetukset => {
                 .map(kasitteleRungonRivi)
                 .join('\n') +
                 '\n\n' +
-                (asetukset.vaadiOhjelma === false ? '' : `(${muuttuja('ohjelma')} ${muuttuja('tila')})`);
+                (asetukset.vaadiOhjelma === false ? ''
+                : `(standardikirjastoNatiivi/suorita ${muuttuja('ohjelma')} ${muuttuja('tila')})`);
         },
         
         funktioluonti,
