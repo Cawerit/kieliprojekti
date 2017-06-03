@@ -22,7 +22,7 @@ vähennäKaksi = (-)(2)
 -- Voit kokeilla muokata myös kerroKahdella funktion käyttämään tätä
 -- hieman kompaktimpaa syntaksia.
 
-ohjelma() =
+ohjelma(_) =
     kun a
         on c    niin näytä("Samat arvot!")
         -- kun..on rakenne tukee totuusarvon palauttavia

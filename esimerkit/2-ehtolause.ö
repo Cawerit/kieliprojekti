@@ -18,7 +18,7 @@ c =
     apumuuttuja = b - 2
     apumuuttuja * 2
 
-ohjelma() =
+ohjelma(_) =
     -- Ö-kielessä ehtolauseella on seuraava rakenne:
     -- kun arvo on a niin b on c niin d tai e muutoin
     -- "on x niin y" pareja voi yhdistää niin monta kuin haluaa, kunhan

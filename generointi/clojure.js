@@ -128,7 +128,7 @@ module.exports = asetukset => {
                   tulos = kavele(s.arvo);
                 
                 return `(if (standardikirjastoNatiivi/vrt ${ehto} ${arvo}) ${tulos} `;
-            }).join(' ');
+            }).join(') ');
             
             return vertailut + ` ${ kavele(solmu.oletusArvo) })`;
         }

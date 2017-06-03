@@ -10,7 +10,13 @@
         
 (defn- pari [a b] (Pari. a b))
 
-(defn- summaa [a b] (+ a b))
+(deftype Kokoelma [parit]
+         Object
+          (toString [k]
+            (str "kokoelma(" (clojure.string/join ", " (.parit k)) ")" )))
+
+(defn- kokoelma [& parit] (Kokoelma. (apply list parit)))
+
 
 
 ; Komento-luokka kuvaa ohjelmasta palautettua pyyntöä
@@ -73,7 +79,9 @@
 
 (defn standardikirjasto [funktioVaiArvo nimi & args]
     (if (== funktioVaiArvo 0)
-        (apply (get api nimi) (if (nil? args) (list) args))
+        (do
+            (assert (clojure.test/function? (get api nimi)) (str "Funktiota " nimi " ei löydy standardikirjastosta"))
+            (apply (get api nimi) (if (nil? args) (list) args)))
         (get api nimi)))
     
 (defn vrt [odotettuArvo, oikeaArvo]
