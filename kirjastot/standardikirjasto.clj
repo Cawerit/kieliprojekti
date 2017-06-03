@@ -1,19 +1,45 @@
 (ns standardikirjastoNatiivi)
 
+;; Util
+
 (def not-nil? (complement nil?))
+
+(deftype Pari [a b]
+         Object
+            (toString [p] (str (.a p) " : " (.b p))))
+        
+(defn- pari [a b] (Pari. a b))
+
+(defn- summaa [a b] (+ a b))
+
 
 ; Komento-luokka kuvaa ohjelmasta palautettua pyyntöä
 ; suorittaa annettu tehtävä ja/tai muokata tilaa
 (deftype Komento [tehtava tilan-muokkaus])
 
 ; Suorittaa annetun komennon tehtävän
-(defn tehtava [komento tila]
+(defn- tehtava [komento tila]
   ((.tehtava komento) tila))
 
 ; Muokkaa ohjelman tilaa komentoon liittyvällä muokkaajalla
-(defn tilan-muokkaus [komento komennon-tulos vanha-tila]
-  (def tm (.tilan-muokkaus komento))
-  (if (not-nil? tm) (tm komennon-tulos) vanha-tila))
+(defn- tilan-muokkaus [komento komennon-tulos vanha-tila]
+  (let [tm (.tilan-muokkaus komento)]
+    (if (not-nil? tm) (tm komennon-tulos) vanha-tila)))
+
+;;; Komentoja:
+
+; Tulostaa annetun viestin
+(defn- nayta [viesti] (Komento. (fn [_] (println (str viesti))) nil))
+
+; Kysyy kysymyksen ja muokkaa tilaa
+(defn- kysy [viesti tilan-muokkaus]
+    (Komento.
+        (fn [_]
+            (print viesti)
+            (flush)
+            (read-line))
+        tilan-muokkaus
+    ))
 
 (defn suorita
     "Ö-ohjelman kasaava funktio, joka kutsuu ohjelmaa tilalla
@@ -25,18 +51,22 @@
         tulos (ohjelma tila)
         uusi-kierros (fn []
             (let [
-                  uusi-tila (tilan-muokkaus tulos (tehtava tulos tila) tila)])
-            (if (= tila uusi-tila) uusi-tila (suorita ohjelma uusi-tila)))]
+                  uusi-tila (tilan-muokkaus tulos (tehtava tulos tila) tila)]
+            (if (= tila uusi-tila) uusi-tila (suorita ohjelma uusi-tila))))]
         
         (if (instance? Komento tulos) (uusi-kierros) nil)))
-
-(defn nayta [viesti] (Komento. (fn [_] (println viesti)) nil))
 
 ;; Julkiset funktiot listataan tässä jotta niihin päästään käsiksi
 ;; standardikirjastoista käsin.
 (def api (hash-map
     "nayta" nayta
     "suorita" suorita
+    "pari" pari
+    "kysy" kysy
+    "summaa" +
+    "vahenna" -
+    "kerro" *
+    "jaa" /
 ))
 
 (defn standardikirjasto [funktioVaiArvo nimi & args]

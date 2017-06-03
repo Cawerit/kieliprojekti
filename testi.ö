@@ -1,4 +1,4 @@
-tila = 5
+tila = 1
 
 ohjelma(tila) =
-    kun tila on 5 niin näytä("woo") tai näytä("huu") muutoin
+    näytä(1 + 2 * 3 / 3)
