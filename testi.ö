@@ -1,3 +1,4 @@
 tila = 5
 
-ohjelma(tila) = näytä(tila)
+ohjelma(tila) =
+    kun tila on 5 niin näytä("woo") tai näytä("huu") muutoin

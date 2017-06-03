@@ -22,16 +22,12 @@ module.exports = asetukset => {
             .join('\n');
     };
   
-    const funktioluonti = ({ solmu, uusiScope }) => {
+    const funktioluonti = ({ solmu, scope, uusiScope }) => {
         const
           parametrit  = solmu.parametrit.map(muuttuja),
           nimi        = solmu.arvo ? muuttuja(solmu.arvo) : 'fn';
         
         const runko = muodostaRunko(solmu, uusiScope);
-        
-        // Jos argumentit ovat [a, b, c],
-        // Niin luodaan funktio
-        // function (a) { return function(b) { return function(c) { runko } } }
         
         if (parametrit.length === 0) {
           parametrit.push('');
@@ -90,7 +86,7 @@ module.exports = asetukset => {
         
             const runko = muodostaRunko(solmu, uusiScope);
         
-            return `(def ${luoMuuttuja(solmu.arvo)} ${runko})`;
+            return `(let [${luoMuuttuja(solmu.arvo)} ${runko}])`;
         },
         
         numero: $arvo,

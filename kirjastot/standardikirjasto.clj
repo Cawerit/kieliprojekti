@@ -21,7 +21,7 @@
     Mikäli tehtävä muokkaa tilaa, suorittaa ohjelman uudestaan
     muokatulla tilalla."
     [ohjelma tila]
-  (def tulos (ohjelma tila))
+  (let [tulos (ohjelma tila)])
   (defn uusi-kierros []
     (def uusi-tila
       (tilan-muokkaus tulos (tehtava tulos tila) tila))
@@ -30,6 +30,8 @@
 
 (defn nayta [viesti] (Komento. (fn [_] (println viesti)) nil))
 
+;; Julkiset funktiot listataan tässä jotta niihin päästään käsiksi
+;; standardikirjastoista käsin.
 (def api (hash-map
     "nayta" nayta
     "suorita" suorita
@@ -43,5 +45,5 @@
 (defn vrt [odotettuArvo, oikeaArvo]
     (if (clojure.test/function? odotettuArvo)
         (odotettuArvo oikeaArvo)
-        (== odotettuArvo oikeaArvo)))
+        (= odotettuArvo oikeaArvo)))
     
