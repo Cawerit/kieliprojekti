@@ -4,6 +4,7 @@ const
     _               = require('lodash');
 
 const clojureKommentti = _.constant('');
+const indent = '  ';
 
 module.exports = asetukset => {
     const
@@ -16,16 +17,26 @@ module.exports = asetukset => {
   
     const muodostaRunko = (solmu, uusiScope) => {
         const runko = generoiRunko(solmu, uusiScope());
+        let tulos;
         
-        return runko
-            .map((r, i) => '  '.repeat(i) + r)
-            .join('\n');
+        if (runko.length > 1) {
+            tulos = 
+                '(let [\n  ' +
+                    _.initial(runko)
+                    .join('\n' + indent) +
+                ']' +
+                _.last(runko) + ')';
+        } else {
+            tulos = runko[0];
+        }
+                    
+        return tulos;
     };
   
     const funktioluonti = ({ solmu, scope, uusiScope }) => {
         const
           parametrit  = solmu.parametrit.map(muuttuja),
-          nimi        = solmu.arvo ? muuttuja(solmu.arvo) : 'fn';
+          nimi        = solmu.arvo ? muuttuja(solmu.arvo) : '';
         
         const runko = muodostaRunko(solmu, uusiScope);
         
@@ -40,7 +51,11 @@ module.exports = asetukset => {
         })
         .join('');
         
-        return `(defn ${nimi}\n  ${curryParametrit} ([${parametrit.join(' ')}] ${runko}))`;
+        if (scope.parent || !nimi) {
+            return `${nimi} (fn ${nimi} ${curryParametrit} ([${parametrit.join(' ')}] ${runko}))`;
+        } else {
+            return `(defn ${nimi}\n  ${curryParametrit} ([${parametrit.join(' ')}] ${runko}))`;   
+        }
     };
     
     // Muutama apufunktio
@@ -79,14 +94,14 @@ module.exports = asetukset => {
             return `(${arvo} ${argumentit.join(' ')})`;
         },
         
-        muuttujaluonti({ solmu, kavele, uusiScope }) {
-            // Apufunktio joka turvaa muuttujanimen jos solmua ei ole
-            // määritetty generoinnin "sisäiseksi" muuttujaksi
-            const luoMuuttuja = solmu._sisainenMuuttuja ? _.identity : muuttuja;
+        muuttujaluonti({ solmu, kavele, scope, uusiScope }) {
+            const
+                runko = muodostaRunko(solmu, uusiScope),
+                nimi = solmu._sisainenMuuttuja ? solmu.arvo : muuttuja(solmu.arvo);
         
-            const runko = muodostaRunko(solmu, uusiScope);
-        
-            return `(let [${luoMuuttuja(solmu.arvo)} ${runko}])`;
+            return scope.parent
+                ? nimi + ' ' + runko
+                : `(def ${nimi} ${runko})`;
         },
         
         numero: $arvo,

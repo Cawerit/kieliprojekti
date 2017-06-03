@@ -151,5 +151,6 @@ function generoi(ast, kohdekieli, asetukset) {
   };
 
   const scope = new Scope(asetukset.perittyScope || null);
+  scope.parent = null;
   return [kavele(scope)(ast), scope];
 }

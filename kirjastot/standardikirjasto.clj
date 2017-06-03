@@ -21,12 +21,14 @@
     Mikäli tehtävä muokkaa tilaa, suorittaa ohjelman uudestaan
     muokatulla tilalla."
     [ohjelma tila]
-  (let [tulos (ohjelma tila)])
-  (defn uusi-kierros []
-    (def uusi-tila
-      (tilan-muokkaus tulos (tehtava tulos tila) tila))
-    (if (= tila uusi-tila) uusi-tila (suorita ohjelma uusi-tila)))
-  (if (instance? Komento tulos) (uusi-kierros) nil))
+    (let [
+        tulos (ohjelma tila)
+        uusi-kierros (fn []
+            (let [
+                  uusi-tila (tilan-muokkaus tulos (tehtava tulos tila) tila)])
+            (if (= tila uusi-tila) uusi-tila (suorita ohjelma uusi-tila)))]
+        
+        (if (instance? Komento tulos) (uusi-kierros) nil)))
 
 (defn nayta [viesti] (Komento. (fn [_] (println viesti)) nil))
 
