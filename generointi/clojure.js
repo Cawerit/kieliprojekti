@@ -23,8 +23,8 @@ module.exports = asetukset => {
             tulos = 
                 '(let [\n  ' +
                     _.initial(runko)
-                    .join('\n' + indent) +
-                ']' +
+                    .join('\n' + indent.repeat(2)) +
+                '] ' +
                 _.last(runko) + ')';
         } else {
             tulos = runko[0];
@@ -61,7 +61,6 @@ module.exports = asetukset => {
     // Muutama apufunktio
     const
         $arvo = a => a.solmu.arvo,
-        $muuttuja = a => muuttuja($arvo(a)),
         kasitteleRungonRivi = r => r;
   
     return {
@@ -73,9 +72,7 @@ module.exports = asetukset => {
                     : '(:use standardikirjasto)';
             
             return `(ns ${namespace} ${use})` + '\n' +
-                solmu
-                .runko
-                .map(kavele)
+                generoiRunko(solmu, kavele)
                 .map(kasitteleRungonRivi)
                 .join('\n') +
                 '\n\n' +
@@ -106,9 +103,14 @@ module.exports = asetukset => {
         
         numero: $arvo,
         
-        muuttuja: $muuttuja,
+        muuttuja({ solmu, scope }){
+            scope.viittaus(solmu);
+            return muuttuja(solmu.arvo);
+        },
         
-        infiksifunktio: $muuttuja,
+        infiksifunktio({ solmu }) {
+            return muuttuja(solmu.arvo);
+        },
         
         totuusarvo: $arvo,
         

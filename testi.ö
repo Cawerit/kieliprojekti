@@ -1,4 +1,13 @@
-tila = 1
+tila = eiMitään
 
-ohjelma(tila) =
-    näytä(1 + 2 * 3 / 3)
+a = b + 1
+b = 5
+
+c =
+    apumuuttuja = b - 2
+    apumuuttuja * 2
+
+ohjelma(_) =
+    kun a
+        on c niin näytä("Samat arvot!")
+        tai näytä("Eri arvot!") muutoin

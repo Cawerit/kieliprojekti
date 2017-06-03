@@ -67,6 +67,8 @@
     "vahenna" -
     "kerro" *
     "jaa" /
+    "pienempi" <
+    "suurempi" >
 ))
 
 (defn standardikirjasto [funktioVaiArvo nimi & args]
