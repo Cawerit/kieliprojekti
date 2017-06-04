@@ -15,9 +15,23 @@
           (toString [k]
             (str "kokoelma(" (clojure.string/join ", " (.parit k)) ")" )))
 
-(defn- kokoelma [& parit] (Kokoelma. (apply list parit)))
+(defn- kokoelma [& parit] (Kokoelma. (into [] parit)))
 
+(defn- muokkaa-kokoelmaa [kokoelma uusi-pari]
+    (let [
+          key (.a uusi-pari)
+          vanha (first (keep-indexed #(when (= (.a %2) %1)) (.parit kokoelma)))
+          uusi-lista (if vanha (assoc vanha uusi-pari) (conj vanha uusi-pari))
+         ]
+     (Kokoelma. uusi-lista)))
 
+(deftype Lista [data]
+         Object
+          (toString [k]
+            (str "lista(" (clojure.string/join ", " (.data k)) ")" )))
+      
+(defn- lista [& arvot]
+    (Lista. (into [] arvot)))
 
 ; Komento-luokka kuvaa ohjelmasta palautettua pyyntöä
 ; suorittaa annettu tehtävä ja/tai muokata tilaa
@@ -75,6 +89,8 @@
     "jaa" /
     "pienempi" <
     "suurempi" >
+    "muokkaa" muokkaa-kokoelma
+    "lista" lista
 ))
 
 (defn standardikirjasto [funktioVaiArvo nimi & args]
