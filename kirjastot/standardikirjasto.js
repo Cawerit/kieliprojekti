@@ -499,7 +499,7 @@ var standardikirjasto; // Ö-kielen standardikirjasto
     var lueIndeksi = fn('@', [onListaTaiKokoelma, T], function (listaTaiKokoelma, indeksi) {
       var r = _lueIndeksi(listaTaiKokoelma, indeksi);
       if (r == null) {
-        throw new Error('Indeksiä ' + indeksi + ' ei löydy listasta ' + listaTaiKokoelma);
+        throw new Error('Indeksiä ' + indeksi + ' ei löydy kokoelmasta ' + listaTaiKokoelma);
       }
       return r;
     });

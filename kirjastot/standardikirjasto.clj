@@ -4,16 +4,53 @@
 
 (def not-nil? (complement nil?))
 
+(defprotocol Indeksoitava
+    (lue-indeksi [x i]))
+
+;; Maybe
+
+(defprotocol Ehka
+  (_arvo_ [x]))
+
+(deftype EiMitaan []
+  Ehka
+    (_arvo_ [x] (throw (Exception. "Huono argumentti funktioon arvo. Argumentin 1 pitäisi olla tyyppiä tämä, mutta se oli eiMitään"))))
+  
+(deftype Tama [a]
+  Ehka
+    (_arvo_ [x] a))
+
+(defn- arvo [a] _arvo_ a)
+
+(defn- tama [a] (Tama. a))
+
+(defn- numeroksi [n]
+    (try
+        (tama (Float/parseFloat n))
+        (catch Exception e (EiMitaan.))))
+
+;; Kokoelmatyypit Pari, Kokoelma ja Lista
+
 (deftype Pari [a b]
-         Object
-            (toString [p] (str (.a p) " : " (.b p))))
+        Object
+            (toString [p] (str (.a p) " : " (.b p)))
+        Indeksoitava
+            (lue-indeksi [x i]
+                (case i
+                    0 a
+                    1 b
+                    nil)))
         
 (defn- pari [a b] (Pari. a b))
 
 (deftype Kokoelma [parit]
-         Object
+        Object
           (toString [k]
-            (str "kokoelma(" (clojure.string/join ", " (.parit k)) ")" )))
+            (str "kokoelma(" (clojure.string/join ", " (.parit k)) ")" ))
+        Indeksoitava
+          (lue-indeksi [x i]
+            (let [osuma (first (filter #(= (.a %1) i) parit))]
+              (if (nil? osuma) nil (.b osuma)))))
 
 (defn- kokoelma [& parit] (Kokoelma. (into [] parit)))
 
@@ -26,12 +63,27 @@
      (Kokoelma. uusi-lista)))
 
 (deftype Lista [data]
-         Object
+        Object
           (toString [k]
-            (str "lista(" (clojure.string/join ", " (.data k)) ")" )))
+            (str "lista(" (clojure.string/join ", " (.data k)) ")" ))
+        Indeksoitava
+          (lue-indeksi [x i]
+            (nth data i nil)))
       
 (defn- lista [& arvot]
     (Lista. (into [] arvot)))
+
+
+(defn- lue-indeksi_ [a i]
+    (let [tulos (lue-indeksi a i)]
+         (assert (not-nil? tulos) (str "Indeksiä " i " ei löydy kokoelmasta " a))
+         tulos))
+     
+(defn- lue-indeksi_varovasti [a i]
+    (let [tulos (lue-indeksi a i)]
+        (if (nil? tulos) (EiMitaan.) (tama a))))
+
+
 
 ; Komento-luokka kuvaa ohjelmasta palautettua pyyntöä
 ; suorittaa annettu tehtävä ja/tai muokata tilaa
@@ -82,6 +134,8 @@
     "nayta" nayta
     "suorita" suorita
     "pari" pari
+    "lista" lista
+    "kokoelma" kokoelma
     "kysy" kysy
     "summaa" +
     "vahenna" -
@@ -89,8 +143,14 @@
     "jaa" /
     "pienempi" <
     "suurempi" >
-    "muokkaa" muokkaa-kokoelma
+    "muokkaa" muokkaa-kokoelmaa
     "lista" lista
+    "arvo" arvo
+    "tama" tama
+    "eiMitaan" (EiMitaan.)
+    "lueIndeksi" lue-indeksi_
+    "lueIndeksiVarovasti" lue-indeksi_varovasti
+    "numeroksi" numeroksi
 ))
 
 (defn standardikirjasto [funktioVaiArvo nimi & args]
