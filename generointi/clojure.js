@@ -4,7 +4,7 @@ const
     _               = require('lodash');
 
 const clojureKommentti = _.constant('');
-const indent = '  ';
+const indent = '    ';
 
 module.exports = asetukset => {
     const
@@ -16,15 +16,16 @@ module.exports = asetukset => {
             .muuttujanimiGeneraattori(generaattoriAsetukset);
   
     const muodostaRunko = (solmu, uusiScope) => {
+        const vali = '\n' + indent.repeat(2);
         const runko = generoiRunko(solmu, uusiScope());
         let tulos;
         
         if (runko.length > 1) {
-            tulos = 
-                '(let [\n  ' +
-                    _.initial(runko)
-                    .join('\n' + indent.repeat(2)) +
-                '] ' +
+            tulos = vali +
+                '(let [' +
+                    _.initial(runko).map(r => vali + indent + r).join('') +
+                vali +
+                ']' + vali +
                 _.last(runko) + ')';
         } else {
             tulos = runko[0];
@@ -128,9 +129,9 @@ module.exports = asetukset => {
                   tulos = kavele(s.arvo);
                 
                 return `(if (standardikirjastoNatiivi/vrt ${ehto} ${arvo}) ${tulos} `;
-            }).join(') ');
+            }).join('\n' + indent.repeat(2));
             
-            return vertailut + ` ${ kavele(solmu.oletusArvo) })`;
+            return vertailut + ` ${ kavele(solmu.oletusArvo) }` + ')'.repeat(solmu.runko.length);
         }
         
     };

@@ -4,23 +4,24 @@
 
 (def not-nil? (complement nil?))
 
-(defprotocol Indeksoitava
-    (lue-indeksi [x i]))
-
 ;; Maybe
 
 (defprotocol Ehka
   (_arvo_ [x]))
 
 (deftype EiMitaan []
+  Object
+    (toString [x] "eiMitään")
   Ehka
     (_arvo_ [x] (throw (Exception. "Huono argumentti funktioon arvo. Argumentin 1 pitäisi olla tyyppiä tämä, mutta se oli eiMitään"))))
   
 (deftype Tama [a]
+  Object
+    (toString [x] (str "tämä(" a ")"))
   Ehka
     (_arvo_ [x] a))
 
-(defn- arvo [a] _arvo_ a)
+(defn- arvo [a] (_arvo_ a))
 
 (defn- tama [a] (Tama. a))
 
@@ -30,6 +31,10 @@
         (catch Exception e (EiMitaan.))))
 
 ;; Kokoelmatyypit Pari, Kokoelma ja Lista
+
+(defprotocol Indeksoitava
+    (lue-indeksi [x i]))
+
 
 (deftype Pari [a b]
         Object
@@ -57,11 +62,12 @@
 (defn- muokkaa-kokoelmaa [kokoelma uusi-pari]
     (let [
           key (.a uusi-pari)
-          vanha (first (keep-indexed #(when (= (.a %2) %1)) (.parit kokoelma)))
-          uusi-lista (if vanha (assoc vanha uusi-pari) (conj vanha uusi-pari))
+          data (.parit kokoelma)
+          vanha (first (keep-indexed #(when (= (.a %2) key) %1) data))
+          uusi-lista (if vanha (assoc data vanha uusi-pari) (conj data uusi-pari))
          ]
      (Kokoelma. uusi-lista)))
-
+ 
 (deftype Lista [data]
         Object
           (toString [k]
@@ -89,6 +95,8 @@
 ; suorittaa annettu tehtävä ja/tai muokata tilaa
 (deftype Komento [tehtava tilan-muokkaus])
 
+
+
 ; Suorittaa annetun komennon tehtävän
 (defn- tehtava [komento tila]
   ((.tehtava komento) tila))
@@ -113,6 +121,30 @@
         tilan-muokkaus
     ))
 
+(defn- sitten [a b_]
+    (Komento.
+        (fn [vanha-tila]
+            (let [
+                  tulos-a (tehtava a vanha-tila)
+                  tila-a (tilan-muokkaus a tulos-a vanha-tila)
+                  b (if (clojure.test/function? b_) (b_ tila-a) b_) ; B voi olla komento tai komennon palauttava funktio
+                  tulos-b (tehtava b tila-a)
+                  tila-b (tilan-muokkaus b tulos-b tila-a)
+             ]
+            ; Mahdollinen bugi:
+            ; Toisin kuin JS-versiossa, tästä kohtaa on vaikea
+            ; palauttaa tulos-b muuttujaa, sillä tarvitsemme
+            ; tila-b muuttujaa Komento-konstruktorin toisessa argumentissa,
+            ; eli tilan muokkausfunktiossa ja meidän on siksi palautettava
+            ; tila-b eikä tulos-b. Katso JS-toteutus nähdäksesi eron paremmin.
+            ; Tämä onneksi tuskin aiheuttaa ongelmia, sillä komennon tulosta
+            ; ei pitäisi tarvita muuhun kuin tilan muokkausfunktioon joka
+            ; tässä juuri määritellään.
+            tila-b)
+        )
+        (fn [tila-b] tila-b)))
+                 
+
 (defn suorita
     "Ö-ohjelman kasaava funktio, joka kutsuu ohjelmaa tilalla
     ja suorittaa mahdollisesti plaautetun tehtävän.
@@ -123,8 +155,14 @@
         tulos (ohjelma tila)
         uusi-kierros (fn []
             (let [
-                  uusi-tila (tilan-muokkaus tulos (tehtava tulos tila) tila)]
-            (if (= tila uusi-tila) uusi-tila (suorita ohjelma uusi-tila))))]
+                      uusi-tila (tilan-muokkaus tulos (tehtava tulos tila) tila)]
+                (if (or
+                        (identical? tulos :jatka)
+                        (and 
+                             (not (identical? tulos :lopeta))
+                             (= tila uusi-tila)))
+                    uusi-tila
+                    (suorita ohjelma uusi-tila))))]
         
         (if (instance? Komento tulos) (uusi-kierros) nil)))
 
@@ -151,6 +189,9 @@
     "lueIndeksi" lue-indeksi_
     "lueIndeksiVarovasti" lue-indeksi_varovasti
     "numeroksi" numeroksi
+    "sitten" sitten
+    "lopeta" (Komento. (constantly :lopeta) nil)
+    "jatka" (Komento. (constantly :jatka) nil)
 ))
 
 (defn standardikirjasto [funktioVaiArvo nimi & args]
