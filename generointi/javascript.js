@@ -9,15 +9,25 @@ const beautifyOptions = {
   end_with_newline: true
 };
 
+const kasitteleRungonRivi = s => s.startsWith('function') ? s + '\n' : s + ';\n';
+
 const yksinkertainenIlmaisu = /^[a-zA-Z]+$/;
 
+const jsKommentti = k => `/* ${k.replace(/\*\//g, '* /')} */`;
+
 module.exports = asetukset => {
-  const muuttuja = apufunktiot
-    .muuttujanimiGeneraattori(asetukset.salliStandardikirjasto ? ['standardikirjasto'] : []);
+  const
+    generaattoriAsetukset = {
+      ohita: asetukset.salliStandardikirjasto ? ['standardikirjasto'] : [],
+      kommentoi: jsKommentti
+    },
+    muuttuja = apufunktiot
+      .muuttujanimiGeneraattori(generaattoriAsetukset);
 
   // Pieni apufunktio funktion rungon muodostamiseen
   const muodostaRunko = (solmu, uusiScope) => {
-    const runko = generoiRunko(solmu, uusiScope());
+    const runko = generoiRunko(solmu, uusiScope())
+      .map(kasitteleRungonRivi);
 
     if (runko.length > 0) {
       runko[runko.length - 1] = 'return ' + runko[runko.length - 1];
@@ -57,7 +67,9 @@ module.exports = asetukset => {
 
     ohjelma(kavely) {
       const solmu = kavely.solmu,
-        tulos = generoiRunko(solmu, kavely.kavele).join('\n'),
+        tulos = generoiRunko(solmu, kavely.kavele)
+          .map(kasitteleRungonRivi)
+          .join('\n'),
         ohjelmaNimi = muuttuja('ohjelma'),
         tilaNimi = muuttuja('tila');
 

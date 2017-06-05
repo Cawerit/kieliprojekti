@@ -39,7 +39,7 @@ käännäNimi() =
     -- identiteetti-funktio palauttaa saamansa argumentin sellaisenaan.
     kysy("Antaisitko nimesi: ", käännettynä) sitten: näytä
 
-ohjelma() =
+ohjelma(_) =
     näytä(kokoelmanKasaus())
     -- Tässä nähdään kahden laista kompositiota:
     -- sitten: ketjuttaa komennon ja funktion palauttavan komennon

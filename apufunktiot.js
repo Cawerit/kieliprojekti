@@ -20,6 +20,7 @@ const
  * Sanat jotka on varattu kohdekielille tai Ö:n standardikirjastolle.
  */
 const varattu = [
+    // JavaScript
   'abstract', 'arguments', 'await*', 'boolean', 'break', 'byte', 'case', 'catch',
   'char', 'class*', 'const', 'continue', 'debugger', 'default', 'delete', 'do',
   'double', 'else', 'enum*', 'eval', 'export', 'extends*', 'false', 'final',
@@ -34,7 +35,11 @@ const varattu = [
   'hasOwnProperty', 'Infinity', 'isFinite', 'isNaN', 'isPrototypeOf',
   'length', 'Math', 'NaN', 'name', 'Number', 'Object', 'prototype', 'String',
   'toString', 'undefined', 'valueOf', 'getClass', 'window',
-  'standardikirjasto', 'module', 'exports', 'require', '_'
+  'module', 'exports', 'require', '_',
+  // Clojure
+  'def', 'defn', 'fn',
+  // Ö
+  'standardikirjasto'
  ];
 
 // Ö-kieli tukee muuttujanimissä symboleita ja avainsanoja joita kohdekielet
@@ -42,7 +47,9 @@ const varattu = [
 // mahdollisimman pienellä muutoksella, tarvittaessa kuitenkin tukeutuen
 // base32-enkoodaukseen jolla koko sanasta tehdään epäselvä mutta
 // mutta turvallinen sana.
-const muuttujanimiGeneraattori = (ohita = []) => nimi => {
+const muuttujanimiGeneraattori = (asetukset = {}) => nimi => {
+    const {kommentoi, ohita} = asetukset;
+    
     if (hyvaksytytMerkit.test(nimi)) {
         const eiSallittu =
             huonoAloitus.test(nimi)
@@ -66,7 +73,7 @@ const muuttujanimiGeneraattori = (ohita = []) => nimi => {
         // base32-enkoodauksella jos : voidaan vaihtaa dollarimerkkiin
         const korvattuKaksoispiste = nimi.replace(viimeinenKaksoispiste, '');
         if (hyvaksytytMerkit.test(korvattuKaksoispiste)) {
-            return muuttujanimiGeneraattori(ohita)(korvattuKaksoispiste) + '$';
+            return muuttujanimiGeneraattori(asetukset)(korvattuKaksoispiste) + '$';
         }
 
         // Ö-kielessä käytetään usein ääkkösiä.
@@ -74,12 +81,12 @@ const muuttujanimiGeneraattori = (ohita = []) => nimi => {
         // tehtyä muuttujasta validi
         const deburred = _.deburr(nimi);
         if (hyvaksytytMerkit.test(deburred)) {
-            return '$' + muuttujanimiGeneraattori(ohita)(deburred);
+            return '$' + muuttujanimiGeneraattori(asetukset)(deburred);
         }
-
+        
         // Paremmat muunnokset eivät riittäneet, base32-endkoodataan
         // muuttuja jotta se on varmasti "turvallinen"
-        return 'm_' + base32.encode(nimi) + `/* ${nimi.replace(/\*\//g, '* /')} */`;
+        return 'm_' + base32.encode(nimi) + ' ' + kommentoi(nimi);
     }
 };
 
