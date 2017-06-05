@@ -77,7 +77,7 @@
           (lue-indeksi [x i]
             (let [
                   size (count data)
-                  i_ (if (and syklinen (> i size) (not= size 0))
+                  i_ (if (and syklinen (>= i size) (not= size 0))
                          (mod size i) ; Jos lista on syklinen, otetaan (pituus % i) indeksi
                          i)
                  ]
