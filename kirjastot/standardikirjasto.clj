@@ -4,6 +4,8 @@
 
 (def not-nil? (complement nil?))
 
+(defn- on [a b] (= a b))
+
 ;; Maybe
 
 (defprotocol Ehka
@@ -34,7 +36,6 @@
 
 (defprotocol Indeksoitava
     (lue-indeksi [x i]))
-
 
 (deftype Pari [a b]
         Object
@@ -68,17 +69,42 @@
          ]
      (Kokoelma. uusi-lista)))
  
-(deftype Lista [data]
+(deftype Lista [data syklinen]
         Object
           (toString [k]
             (str "lista(" (clojure.string/join ", " (.data k)) ")" ))
         Indeksoitava
           (lue-indeksi [x i]
-            (nth data i nil)))
+            (let [
+                  size (count data)
+                  i_ (if (and syklinen (> i size) (not= size 0))
+                         (mod size i) ; Jos lista on syklinen, otetaan (pituus % i) indeksi
+                         i)
+                 ]
+                (nth data i_ nil))))
       
 (defn- lista [& arvot]
-    (Lista. (into [] arvot)))
+    (Lista. (into [] arvot) false))
 
+(defn- yhdistaListat [a b]
+    (if (string? a)
+        (do
+            (assert (string? b) (str "Huono argumentti 1 funktioon ++, "
+                                     "argumenttien pitäisi olla lista ja lista "
+                                     "tai teksti ja teksti, mutta ne olivat"
+                                     a b))
+            (str a b))
+        (concat a b)))
+
+(defn- lisaaLoppuun [a l]
+    (Lista. (conj (.data l) a) false))
+
+(defn- etsiIndeksi [pred l]
+    (or (first (keep-indexed #(when (pred %2) %1) (.data l))) -1))
+
+
+(defn- silmukka [l]
+    (Lista. (.data l) true))
 
 (defn- lue-indeksi_ [a i]
     (let [tulos (lue-indeksi a i)]
@@ -90,11 +116,9 @@
         (if (nil? tulos) (EiMitaan.) (tama a))))
 
 
-
 ; Komento-luokka kuvaa ohjelmasta palautettua pyyntöä
 ; suorittaa annettu tehtävä ja/tai muokata tilaa
 (deftype Komento [tehtava tilan-muokkaus])
-
 
 
 ; Suorittaa annetun komennon tehtävän
@@ -143,6 +167,10 @@
             tila-b)
         )
         (fn [tila-b] tila-b)))
+    
+(defn- muokkaaTilaa [muokkaaja]
+    (Komento. identity (fn [x]
+        (muokkaaja x))))
                  
 
 (defn suorita
@@ -192,6 +220,12 @@
     "sitten" sitten
     "lopeta" (Komento. (constantly :lopeta) nil)
     "jatka" (Komento. (constantly :jatka) nil)
+    "muokkaaTilaa" muokkaaTilaa
+    "silmukka" silmukka
+    "yhdistaListat" yhdistaListat
+    "lisaaLoppuun" lisaaLoppuun
+    "etsiIndeksi" etsiIndeksi
+    "on" on
 ))
 
 (defn standardikirjasto [funktioVaiArvo nimi & args]

@@ -85,6 +85,8 @@ module.exports = asetukset => {
         
         infiksifunktioluonti: funktioluonti,
         
+        lambda: funktioluonti,
+        
         funktiokutsu({ solmu, kavele }) {
             const arvo = kavele(solmu.arvo);
             let argumentit = solmu.argumentit.map(kavele);
@@ -117,6 +119,10 @@ module.exports = asetukset => {
         
         teksti({ solmu }) {
             return JSON.stringify(solmu.arvo);
+        },
+        
+        ilmaisu({solmu, kavele}) {
+            return kavele(solmu.runko[0]);
         },
         
         sovituslausejoukko({ solmu, kavele, scope }) {
